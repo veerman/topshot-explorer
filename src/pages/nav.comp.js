@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react"
 import * as fcl from "@onflow/fcl"
 import styled from "styled-components"
+import {Link} from "react-router-dom"
 
 import {Navbar, Nav, NavDropdown, Form, FormControl, Button} from "react-bootstrap"
 const Red = styled.span`
@@ -72,20 +73,20 @@ export function TopShotNav() {
   }, [])
   return (
     <Navbar bg="dark" variant="dark" expand="md" sticky="top">
-      <Navbar.Brand href="/">
+      <Navbar.Brand as={Link} to="/">
         {error ? <Red>Topshot Explorer</Red> : "Topshot Explorer"}
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/plays">Plays</Nav.Link>
+          <Nav.Link as={Link} to="/plays">Plays</Nav.Link>
           {seriesSets && Object.entries(seriesSets).map(
             ([series, sets],i) => {
               return (
                 <NavDropdown key={series} title={`s${series} sets`} id="basic-nav-dropdown">
                 {sets.map((s) => {
                     return (
-                      <NavDropdown.Item key={s.id} href={"/sets/" + s.id}>
+                      <NavDropdown.Item key={s.id} as={Link} to={"/sets/" + s.id}>
                         {s.id} {s.setName} S{s.series} {s.locked ? <Red>locked</Red> : <Green>open</Green>}
                       </NavDropdown.Item>
                     )
@@ -115,7 +116,7 @@ export function TopShotNav() {
             }}
             className="mr-sm-2"
           />
-          <Button variant="outline-success" href={"/account/" + accountAddress}>
+          <Button variant="outline-success" as={Link} to={"/account/" + accountAddress}>
             Get Account
           </Button>
         </Form>

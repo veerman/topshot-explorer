@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback} from "react"
 import {useParams} from "react-router-dom"
 import styled from "styled-components"
 
-import ReactDatatable from '@ashvin27/react-datatable'
+import {MirroredDatatable} from "../util/MirroredDatatable"
 
 import * as fcl from "@onflow/fcl"
 const Red = styled.span`
@@ -15,14 +15,6 @@ const Muted = styled.span`
   color: #78899a;
 `
 
-const Button = styled.button`
-  margin-left: 20px;
-  height: 30px;
-  font-size: 18px;
-  border-radius: 15px;
-  border-color: grey;
-  border-width: 1px;
-`
 
 const getTopshotSet = async (setID) => {
   const resp = await fcl.send([
@@ -57,13 +49,12 @@ const getTopshotSet = async (setID) => {
           var editions: [Edition] = []
           var playOrder = UInt32(1)
 
+          // fetch these dictionaries once; copying them per play blows the computation limit
+          let retiredEditions = setData.getRetired()
+          let numberMintedPerPlay = setData.getNumberMintedPerPlay()
           for playID in self.playIDs {
-            var retired = false
-            var retiredEditions = setData.getRetired()
-            retired = retiredEditions[playID]!
-            var momentCount = UInt32(0)
-            var numberMintedPerPlay = setData.getNumberMintedPerPlay()
-            momentCount = numberMintedPerPlay[playID]!
+            var retired = retiredEditions[playID]!
+            var momentCount = numberMintedPerPlay[playID]!
             editions.append(Edition(playID: playID, retired: retired, momentCount: momentCount, playOrder: playOrder))
             playOrder = playOrder + UInt32(1)
           }
@@ -150,8 +141,8 @@ const columns = [
 ];
 
 const config = {
-  page_size: 10,
-  length_menu: [ 10, 20, 50 ],
+  page_size: 100,
+  length_menu: [ 100 ], // the table adds an "All" option itself
   no_data_text: 'No data available!',
   sort: { column: "playOrder", order: "desc" },
   key_column: "playID"
@@ -162,18 +153,10 @@ export function TopshotSet() {
   const {setID} = useParams()
   const [TopshotSet, setTopshotSet] = useState(null)
 
-  // used to chek the reload, so another reload is not triggered while the previous is still running
-  const [done, setDone] = useState(false)
-
-  const [manualReloadDone, setManualReloadDone] = useState(true)
-
   const load = useCallback(() => {
-    setDone(false)
     return getTopshotSet(setID).then(
       (topshotSet) => {
-        console.log(topshotSet)
         setTopshotSet(topshotSet)
-        setDone(true)
       })
   }, [setID])
 
@@ -182,33 +165,11 @@ export function TopshotSet() {
       .catch(setError)
   }, [setID, load]);
 
-  // for reloading
   useEffect(() => {
-    if(done){
-      // set some delay
-      const timer = setTimeout(()=>{
-        load()
-        .catch((e)=>{
-          setDone(true) // enable reloading again for failed reload attempts
-        })
-      }, 5000)
-      return () => clearTimeout(timer);
-    }
-  }, [done, load]);
-
-  const handleManualReload = () => {
-    setManualReloadDone(false)
-    load()
-    .then(()=>{
-      setManualReloadDone(true)
-    })
-    .catch((err)=>{
-      setManualReloadDone(true)
-      // Do we need to show them the error on manual reloadf?
-      console.log(`An error occured while reloading err: ${err}`);
-    })
-
-  }
+    document.title = TopshotSet
+      ? `${TopshotSet.set.setName} S${TopshotSet.set.series} | Topshot Explorer`
+      : `Set ${setID} | Topshot Explorer`
+  }, [TopshotSet, setID])
 
   const getPlay = (playID) => {
     return (
@@ -244,11 +205,10 @@ export function TopshotSet() {
   return (
     <Root>
       <h1>
-        <Muted>{TopshotSet.set.setName}</Muted> S{TopshotSet.set.series}:
+        <Muted>{TopshotSet.set.setName}</Muted> S{TopshotSet.set.series}:{" "}
         {TopshotSet.set.locked ? <Red>locked set</Red> : <Green>open set</Green>}
-        <Button onClick={handleManualReload}>{manualReloadDone ? "Reload" : "Reloading..."}</Button>
       </h1>
-      <ReactDatatable
+      <MirroredDatatable
         config={config}
         records={data}
         columns={columns}

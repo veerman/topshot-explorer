@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react"
 import styled from "styled-components"
-import ReactDatatable from '@ashvin27/react-datatable'
+import {MirroredDatatable} from "../util/MirroredDatatable"
 import {getTopShotPlays} from "../util/fetchPlays";
 
 const Root = styled.div`
@@ -14,18 +14,9 @@ const Muted = styled.span`
 
 const H1 = styled.h1``
 
-const Button = styled.button`
-  margin-left: 20px;
-  height: 30px;
-  font-size: 18px;
-  border-radius: 15px;
-  border-color: grey;
-  border-width: 1px;
-`
-
 const config = {
   page_size: 100,
-  length_menu: [ 100, 500, 1000 ],
+  length_menu: [ 100 ], // the table adds an "All" option itself
   no_data_text: 'No data available!',
   sort: { column: "playID", order: "desc" },
   key_column: "playID"
@@ -37,9 +28,11 @@ export function TopshotPlays() {
   // used to chek the reload, so another reload is not triggered while the previous is still running
   // const [done, setDone] = useState(false)
 
-  const [manualReloadDone, setManualReloadDone] = useState(true)
-
   const [topshotPlays, setTopshotPlays] = useState(null)
+  const [progress, setProgress] = useState(null)
+  useEffect(() => {
+    document.title = "Plays | Topshot Explorer"
+  }, [])
   useEffect(() => {
     load()
       .catch(() => setError(true))
@@ -60,28 +53,14 @@ export function TopshotPlays() {
   //   }
   // }, [done]);
 
-  const load = () => {
+  const load = (force) => {
     // setDone(false)
-    return getTopShotPlays()
+    return getTopShotPlays(force, (loaded, total) => setProgress({loaded, total}))
       .then((d) => {
         console.log(d)
         setTopshotPlays(d)
         // setDone(true)
       })
-  }
-
-  const handleManualReload = () => {
-    setManualReloadDone(false)
-    load()
-    .then(()=>{
-      setManualReloadDone(true)
-    })
-    .catch((err)=>{
-      setManualReloadDone(true)
-      // Do we need to show them the error on manual reloadf?
-      console.log(`An error occured while reloading err: ${err}`);
-    })
-
   }
 
   if (error != null)
@@ -98,14 +77,30 @@ export function TopshotPlays() {
         </Root>
       </Root>
     )
-  if (topshotPlays == null)
+  if (topshotPlays == null) {
+    const pct = progress ? Math.round((progress.loaded / progress.total) * 100) : 0
     return (
       <Root>
         <h3>
-          <span>Fetching Plays...</span>
+          <span>
+            {progress
+              ? `Fetching Plays: ${progress.loaded.toLocaleString()} of ${progress.total.toLocaleString()}`
+              : "Fetching Plays..."}
+          </span>
         </h3>
+        <div className="progress" style={{maxWidth: "480px", height: "14px"}}>
+          <div
+            className="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style={{width: `${Math.max(pct, 4)}%`}}
+            aria-valuenow={pct}
+            aria-valuemin="0"
+            aria-valuemax="100"
+          />
+        </div>
       </Root>
     )
+  }
 
   var columns_found = { 'playID': true }; // add playID to columns found since it's in metadata
   topshotPlays.plays.forEach(play => { // get all possible column keys (names) in metadata
@@ -210,12 +205,11 @@ export function TopshotPlays() {
     <Root>
       <H1>
         <span>Plays</span>
-        <Button onClick={handleManualReload}>{manualReloadDone ? "Reload" : "Reloading..."}</Button>
       </H1>
       <div>
         {topshotPlays && (
           <div>
-            <ReactDatatable
+            <MirroredDatatable
               config={config}
               records={data}
               columns={columns}

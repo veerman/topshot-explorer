@@ -1,57 +1,26 @@
 import React, {useState, useEffect} from "react"
 import * as fcl from "@onflow/fcl"
 import styled from "styled-components"
-import Prism from "prismjs"
-import {getTopShotPlays} from "../util/fetchPlays";
 
-const getTopShotSets = async () => {
+// the homepage only shows the headline numbers; fetching plays or sets
+// here would pull megabytes of data it never renders
+const getTopShotOverview = async () => {
     const resp = await fcl.send([
         fcl.script`
     import TopShot from 0x${window.topshotAddress}
-    access(all) struct Set {
-      access(all) let id: UInt32
-      access(all) let setName: String
-      access(all) let playIDs: [UInt32]
-      access(all) var locked: Bool
-      init(id: UInt32, setName: String) {
-        self.id = id
-        self.setName = setName
-        self.playIDs = TopShot.getPlaysInSet(setID: id)!
-        self.locked = TopShot.isSetLocked(setID: id)!
-      }
-    }
-    access(all) struct TopShotData {
-      access(all) var sets: [Set]
+    access(all) struct Overview {
+      access(all) let totalSupply: UInt64
+      access(all) let currentSeries: UInt32
       init() {
-        var sets: [Set] = []
-        self.sets = sets
-
-        var setID = UInt32(1)
-
-        while setID < TopShot.nextSetID {
-          var setName = TopShot.getSetName(setID: setID)
-          if setName == nil {
-            setID = setID + UInt32(1)
-            continue
-          }
-          sets.append(Set(id: setID, setName: setName!))
-          setID = setID + UInt32(1)
-        }
-        self.sets = sets
+        self.totalSupply = TopShot.totalSupply
+        self.currentSeries = TopShot.currentSeries
       }
     }
-    access(all) fun main(): TopShotData {
-      return TopShotData()
+    access(all) fun main(): Overview {
+      return Overview()
     } `,
     ])
     return fcl.decode(resp)
-
-}
-
-const getTopShot = async () => {
-    const plays = await getTopShotPlays();
-    const sets = await getTopShotSets();
-    return {...plays, ...sets}
 }
 
 const Root = styled.div`
@@ -69,15 +38,15 @@ export function TopShot() {
   const [error, setError] = useState(null)
   const [topshotData, setTopShotData] = useState(null)
   useEffect(() => {
-    getTopShot()
+    document.title = "Topshot Explorer"
+  }, [])
+  useEffect(() => {
+    getTopShotOverview()
       .then((d) => {
         setTopShotData(d)
       })
       .catch((e) => setError(JSON.stringify(e)))
   }, [])
-
-  const codeChange = (topshotData || {}).code || new Uint8Array()
-  useEffect(() => Prism.highlightAll(), [codeChange])
 
   if (error != null)
     return (

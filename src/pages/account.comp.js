@@ -192,22 +192,21 @@ export function Account() {
   const [momentIDs, setMomentIDs] = useState([])
   const [saleMomentIDs, setSaleMomentIDs] = useState([])
 
-  // used to chek the reload, so another reload is not triggered while the previous is still running
-  const [done, setDone] = useState(false)
-
   const [manualReloadDone, setManualReloadDone] = useState(true)
 
   const load = useCallback(() => {
-    setDone(false)
     return getTopshotAccount(address)
       .then((d) => {
         console.log(d)
         setTopShotAccount(d)
         setMomentIDs(d.momentIDs.slice(0, 20))
         setSaleMomentIDs(d.saleMomentIDs.slice(0, 20))
-        setDone(true)
         setHasV3(d.hasV3)
       })
+  }, [address])
+
+  useEffect(() => {
+    document.title = `Account 0x${address} | Topshot Explorer`
   }, [address])
 
   useEffect(() => {
@@ -238,20 +237,6 @@ export function Account() {
       })
       .catch(setListingError)
   }, [address, saleMomentIDs, topshotAccount])
-
-  // for reloading
-  useEffect(() => {
-    if(done){
-      // set some delay
-      const timer = setTimeout(()=>{
-        load()
-        .catch((e)=>{
-          setDone(true) // enable reloading again for failed reload attempts
-        })
-      }, 5000)
-      return () => clearTimeout(timer);
-    }
-  }, [done, load]);
 
   const handleManualReload = () => {
     setManualReloadDone(false)
@@ -292,10 +277,8 @@ export function Account() {
     setMomentError(null)
     if(searchMomentID === null || searchMomentID === ""){
       setMomentIDs(topshotAccount.momentIDs.slice(0, 20))
-      setDone(true)  // continue real-time update
       return
     }
-    setDone(false)  // stop real-time update
     let value = parseInt(searchMomentID)
     //search the list of momentIDs
     if(!topshotAccount.momentIDs.includes(value)){
@@ -309,10 +292,8 @@ export function Account() {
     setListingError(null)
     if(searchListingID === null || searchListingID === ""){
       setSaleMomentIDs(topshotAccount.saleMomentIDs.slice(0, 20))
-      setDone(true)  // continue real-time update
       return
     }
-    setDone(false)  // stop real-time update
     let value = parseInt(searchListingID)
     //search the list of saleMomentIDs
     if(!topshotAccount.saleMomentIDs.includes(value)){

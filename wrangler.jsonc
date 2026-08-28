@@ -1,0 +1,23 @@
+{
+  // One Worker serves the static build and a caching proxy for Flow reads
+  // (see CLOUDFLARE-PLAYBOOK.md). Static assets are served by the CDN before
+  // the Worker runs; only /flow/* invokes it.
+  "name": "topshot-explorer",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": {
+    "directory": "./build",
+    "binding": "ASSETS",
+    // client-side routes like /plays and /sets/218 must serve the app shell
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/flow/*"]
+  },
+  "observability": {"enabled": true},
+  // When v2 ships at the apex, change these to v1.topshotexplorer.com only.
+  "routes": [
+    { "pattern": "topshotexplorer.com", "custom_domain": true },
+    { "pattern": "www.topshotexplorer.com", "custom_domain": true }
+  ]
+}
