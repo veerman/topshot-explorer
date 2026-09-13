@@ -86,7 +86,7 @@ export function cyrb128(str) {
 
 // Bump when normalization logic changes (e.g. date formatting) so cached
 // databases recompile their plays/sets from the stored _raw backups once.
-const NORMALIZATION_VERSION = "3"; // 3: birthplace house format + canonical-name aliases
+const NORMALIZATION_VERSION = "4"; // 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
 
 // The inputs are static imports, so the hash cannot change within a session;
 // computing it once avoids re-serializing over a megabyte of JSON per call.

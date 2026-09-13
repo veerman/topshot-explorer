@@ -731,6 +731,9 @@
   "2720": {
     "Birthplace": "Havre de Grace, MD, USA"
   },
+  "2732": {
+    "FullName": "Cheyenne Parker-Tyus"
+  },
   "2754": {
     "DraftTeam": "San Antonio Stars"
   },
@@ -1191,6 +1194,9 @@
   "6153": {
     "Birthplace": "Brussels, BEL"
   },
+  "6154": {
+    "DateOfMoment": "2024-10-22 23:30:00 +0000 UTC"
+  },
   "6157": {
     "fullName": "Bub Carrington"
   },
@@ -1229,6 +1235,18 @@
   },
   "6361": {
     "fullName": "Steph Curry"
+  },
+  "6362": {
+    "TeamAtMoment": "Global Stars",
+    "TeamAtMomentNBAID": "1610616851",
+    "HomeTeamName": "Global Stars",
+    "AwayTeamName": "OGs"
+  },
+  "6363": {
+    "TeamAtMoment": "OGs",
+    "TeamAtMomentNBAID": "1610616852",
+    "HomeTeamName": "Global Stars",
+    "AwayTeamName": "OGs"
   },
   "6364": {
     "TeamAtMoment": "OGs",
@@ -1392,6 +1410,9 @@
   "7087": {
     "DraftTeam": "San Antonio Stars"
   },
+  "7123": {
+    "TeamAtMomentNBAID": "1610612766"
+  },
   "7126": {
     "Birthplace": "Chicago, IL, USA"
   },
@@ -1421,6 +1442,9 @@
   },
   "7157": {
     "NbaSeason": "2000-01"
+  },
+  "7182": {
+    "DateOfMoment": "2025-05-18 02:00:00 +0000 UTC"
   },
   "7200": {
     "Birthplace": "Edéa, CMR"
@@ -1762,14 +1786,5 @@
   },
   "9087": {
     "DraftTeam": "Seattle SuperSonics"
-  },
-  "2732": {
-    "FullName": "Cheyenne Parker-Tyus"
-  },
-  "6154": {
-    "DateOfMoment": "2024-10-22 23:30:00 +0000 UTC"
-  },
-  "7182": {
-    "DateOfMoment": "2025-05-18 02:00:00 +0000 UTC"
   }
 }

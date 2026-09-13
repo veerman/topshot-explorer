@@ -306,10 +306,12 @@ these instead of correcting them, which is why they looked "already fixed".
   ESPN/AP); Tatum #8052 -> 120-100 (Celtics-Mavs 2026-03-06, ESPN/StatMuse).
 - **NOT errors**: the 2025 All-Star mini-tournament plays (#6355/56/61) have
   target-score finals (first to 40), so tiny scores are real; the bounds
-  detector now skips score checks on ⭐ entities. Still open: #6362 (Trae
-  Young) and #6363 (Jaylen Brown), the same event but stamped with franchise
-  team names, no DateOfMoment, and a missing away-team name; incomplete
-  upstream data needing a judgment on how to represent mini-tournament games.
+  detector skips score checks on ⭐ entities. Rule for a mini-tournament
+  play stamped with a franchise team: override the player's side to the
+  All-Star entity it played for and name both sides of the game, as the
+  other plays of that game have them. #6362 (Trae Young, Chuck's Global
+  Stars) and #6363 (Jaylen Brown, Shaq's OGs) are the 2025 final, Global
+  Stars 25, OGs 41.
 
 ## Verification results (2026-08-30)
 

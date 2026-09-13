@@ -162,8 +162,8 @@ function FindingRow({ finding, queuedFix, ignored, onQueue, onUnqueue, onIgnore,
 }
 
 // A collapsible category. The description lives here, once, not on every row.
-function FindingsCategory({ title, intro, hint, findings, queuedMap, ignoredSet, showIgnored, onQueue, onUnqueue, onIgnore, onRestore, allowBulk }) {
-  const [open, setOpen] = useState(findings.length > 0 && findings.length <= 100);
+function FindingsCategory({ title, intro, hint, findings, queuedMap, ignoredSet, showIgnored, onQueue, onUnqueue, onIgnore, onRestore, allowBulk, startClosed }) {
+  const [open, setOpen] = useState(!startClosed && findings.length > 0 && findings.length <= 100);
 
   const visible = showIgnored ? findings : findings.filter((f) => !ignoredSet.has(f.key));
   const ignoredCount = findings.filter((f) => ignoredSet.has(f.key)).length;
@@ -182,7 +182,7 @@ function FindingsCategory({ title, intro, hint, findings, queuedMap, ignoredSet,
       <summary>
         <span className="category-title">{title}</span>
         <span className="category-counts font-mono">
-          {openCount} open{blockedCount > 0 && ` · ${blockedCount} blocked`}{queuedCount > 0 && ` · ${queuedCount} queued`}{ignoredCount > 0 && ` · ${ignoredCount} ignored`}
+          {openCount} {startClosed ? "listed" : "open"}{blockedCount > 0 && ` · ${blockedCount} blocked`}{queuedCount > 0 && ` · ${queuedCount} queued`}{ignoredCount > 0 && ` · ${ignoredCount} ignored`}
         </span>
       </summary>
       <p className="category-intro text-muted">{intro}{hint && <span className="category-hint"> {hint}</span>}</p>
@@ -396,8 +396,12 @@ export function Corrections() {
     return runDataAudits(playsCorrected);
   }, [playsCorrected]);
 
+  // Open Issues counts what a correction can close. The autograph
+  // disagreements are excluded: the chain flags a play, the catalogue
+  // signs a parallel, and no correction reconciles the two, so they show
+  // below as known disagreements instead.
   const findingsCount = audits
-    ? audits.nameConflicts.length + audits.profileConflicts.length + audits.boundsFindings.length + audits.teamFindings.length + audits.seasonFindings.length + audits.autographFindings.length + audits.tagCount
+    ? audits.nameConflicts.length + audits.profileConflicts.length + audits.boundsFindings.length + audits.teamFindings.length + audits.seasonFindings.length + audits.tagCount
     : 0;
 
   // Queue operations. One queued fix per finding; picking another candidate
@@ -709,18 +713,6 @@ export function Corrections() {
               onRestore={restoreFinding}
             />
             <FindingsCategory
-              title="Autograph Flag vs Signed Editions"
-              intro="The chain flags an autograph on the play, one value for every parallel; Dapper Labs' catalogue records which parallel is signed, and the badge follows the catalogue. These plays disagree: flagged with nothing signed, or signed with no flag. Nothing to fix here until the chain carries the fact per parallel."
-              findings={audits.autographFindings}
-              queuedMap={queuedMap}
-              ignoredSet={ignoredSet}
-              showIgnored={showIgnored}
-              onQueue={queueFix}
-              onUnqueue={unqueueFix}
-              onIgnore={ignoreFinding}
-              onRestore={restoreFinding}
-            />
-            <FindingsCategory
               title="Team ID / Name Mismatches"
               intro="The team name is not a current or historical name of its team ID in teams.json: wrong ID or name on the play, or an alias missing from teams.json."
               findings={audits.teamFindings}
@@ -757,6 +749,27 @@ export function Corrections() {
                 Not a decision: {audits.reconcilable.map((r) => `${r.count} stored "${r.longTag}"`).join(", ")} copies agree
                 with the derivation; `npm run reconcile` strips them before every build.
               </p>
+            )}
+            {audits.autographFindings.length > 0 && (
+              <>
+                <h3 className="known-heading mt-20">Known disagreements</h3>
+                <p className="text-muted known-intro">
+                  Two sources that cannot be reconciled by a correction. Listed so nobody rediscovers them; not counted above.
+                </p>
+                <FindingsCategory
+                  title="Autograph Flag vs Signed Editions"
+                  intro="The chain flags an autograph on the play, one value for every parallel; Dapper Labs' catalogue records which parallel is signed, and the badge follows the catalogue. These plays disagree: flagged with nothing signed, or signed with no flag. Nothing changes here until the chain carries the fact per parallel."
+                  findings={audits.autographFindings}
+                  queuedMap={queuedMap}
+                  ignoredSet={ignoredSet}
+                  showIgnored={showIgnored}
+                  onQueue={queueFix}
+                  onUnqueue={unqueueFix}
+                  onIgnore={ignoreFinding}
+                  onRestore={restoreFinding}
+                  startClosed
+                />
+              </>
             )}
           </>
         )
@@ -1010,6 +1023,14 @@ export function Corrections() {
         }
 
         /* ------- Findings categories & rows ------- */
+        .known-heading {
+          margin-top: 36px;
+          font-size: 1.05rem;
+        }
+        .known-intro {
+          margin-top: 6px;
+          font-size: 0.85rem;
+        }
         .findings-category > summary {
           cursor: pointer;
           display: flex;
