@@ -503,7 +503,14 @@ export function Navbar() {
                   never ellipsize one, shrink it). An EVM address is 42
                   characters and is the one kind shortened to its ends. */}
               {wallet === account.address && <span className="nav-account-signed" title={`Your ${walletName}`}>✓</span>}
-              {isEvmAddress(account.address) ? `${account.address.slice(0, 8)}…${account.address.slice(-8)}` : account.address}
+              <span className="nav-account-addr">{isEvmAddress(account.address) ? `${account.address.slice(0, 8)}…${account.address.slice(-8)}` : account.address}</span>
+              {/* On a phone the chip is a person glyph (the full address
+                  is the first line of the menu it opens), so the brand,
+                  the chip, the search icon and the menu share one row */}
+              <svg className="nav-account-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" />
+              </svg>
               {included.length > 0 && <span className="nav-account-plus" title={`${included.length} linked ${included.length === 1 ? "account" : "accounts"} included`}>+{included.length}</span>}
               {account.status === "loading" && <span className="nav-account-progress">{account.progress}%</span>}
               <span className="nav-account-caret">▾</span>
@@ -1107,6 +1114,9 @@ export function Navbar() {
           color: #fff;
           border-color: var(--primary);
         }
+        .nav-account-icon {
+          display: none;
+        }
         .nav-account-chip {
           display: inline-flex;
           align-items: center;
@@ -1630,6 +1640,20 @@ export function Navbar() {
             margin-left: auto;
             margin-right: 92px;
           }
+          .nav-account-addr {
+            display: none;
+          }
+          .nav-account-icon {
+            display: block;
+          }
+          .nav-account-chip {
+            height: 36px;
+            padding: 0 9px;
+            gap: 5px;
+          }
+          .nav-search-open-btn {
+            height: 36px;
+          }
           .nav-links {
             margin-right: 0;
           }
@@ -1673,13 +1697,6 @@ export function Navbar() {
         @media (max-width: 480px) {
           .nav-brand {
             font-size: 0.85rem;
-          }
-          .nav-container:has(.nav-account-wrapper) .brand-text,
-          .nav-container:has(.nav-account-wrapper) .brand-badge {
-            display: none;
-          }
-          .nav-container:has(.nav-account-wrapper) .nav-brand {
-            font-size: 1.3rem;
           }
           .nav-account-chip {
             font-size: 0.66rem;
