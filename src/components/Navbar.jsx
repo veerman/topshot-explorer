@@ -321,7 +321,7 @@ export function Navbar() {
         {/* Brand */}
         <div className="nav-brand-group">
           <Link to="/" className="nav-brand">
-            <span>🏀</span> Top Shot Explorer <span className="brand-badge">V2</span>
+            <span>🏀</span> <span className="brand-text">Top Shot Explorer</span> <span className="brand-badge">V2</span>
           </Link>
           
           {/* Glowing Sync Status: always mounted at a fixed width so the bar
@@ -353,6 +353,11 @@ export function Navbar() {
         </button>
 
         {/* Links */}
+        {/* Quick search: a magnifying glass at the head of the menu that
+            opens into a box across the bar (the links step aside, as for
+            the account box) */}
+        <NavSearch open={searchOpen} onOpen={openSearch} onClose={closeSearch} />
+
         <div className={`nav-links${menuOpen ? " open" : ""}${(lookupOpen && !account.address) || searchOpen ? " lookup" : ""}`}>
           <Link
             to="/plays"
@@ -470,10 +475,6 @@ export function Navbar() {
             )}
           </div>
         </div>
-
-        {/* Quick search: a magnifying glass that opens into a box across
-            the bar (the links step aside, as for Look up) */}
-        <NavSearch open={searchOpen} onOpen={openSearch} onClose={closeSearch} />
 
         {/* Account context: an input until an address is set, then one
             compact chip opening a menu (full address, quick stats, links,
@@ -666,8 +667,8 @@ export function Navbar() {
           </div>
         ) : !lookupOpen ? (
           <div className="nav-search-form nav-dropdown-wrapper nav-tools">
-            <button type="button" className="nav-lookup-btn" onClick={() => setLookupOpen(true)} title="Look up an address or a Top Shot username">
-              Look up
+            <button type="button" className="nav-lookup-btn" onClick={() => setLookupOpen(true)} title="Browse as an address or a Top Shot username">
+              Account
             </button>
             {signInButton}
             {sessionError}
@@ -1015,6 +1016,10 @@ export function Navbar() {
           gap: 8px;
           flex-shrink: 0;
           min-width: 0;
+          margin-left: auto;
+        }
+        .nav-links {
+          margin-right: auto;
         }
         .nav-search-wrap.open {
           flex: 1 1 auto;
@@ -1620,10 +1625,13 @@ export function Navbar() {
              top row is the brand, the search icon and the menu button);
              the menu stays anchored beside the chip */
           .nav-account-wrapper {
-            flex-basis: 100%;
+            width: auto;
             max-width: none;
-            justify-content: flex-end;
-            margin: 0;
+            margin-left: auto;
+            margin-right: 92px;
+          }
+          .nav-links {
+            margin-right: 0;
           }
           /* The search icon is pinned to the top row beside the menu
              button (40px plus a gap), whatever the second row holds;
@@ -1638,8 +1646,9 @@ export function Navbar() {
             width: 100%;
             max-width: none;
           }
-          /* While the box is open, the Look up row steps aside */
-          .nav-container:has(.nav-search-wrap.open) .nav-tools {
+          /* While the box is open, the Account row and the chip step aside */
+          .nav-container:has(.nav-search-wrap.open) .nav-tools,
+          .nav-container:has(.nav-search-wrap.open) .nav-account-wrapper {
             display: none;
           }
           .nav-search-menu {
@@ -1664,6 +1673,13 @@ export function Navbar() {
         @media (max-width: 480px) {
           .nav-brand {
             font-size: 0.85rem;
+          }
+          .nav-container:has(.nav-account-wrapper) .brand-text,
+          .nav-container:has(.nav-account-wrapper) .brand-badge {
+            display: none;
+          }
+          .nav-container:has(.nav-account-wrapper) .nav-brand {
+            font-size: 1.3rem;
           }
           .nav-account-chip {
             font-size: 0.66rem;
