@@ -235,8 +235,9 @@ export function EditionDetail() {
     const [cSet, cPlay] = String(editionKey || "").split("_");
     return commentaryFor(cSet, cPlay);
   }, [editionKey]);
-  const commentaryPlaying = Boolean(commentary && activeVideo === commentary.video);
-  const videoFailed = Boolean(activeVideo) && failedVideo === activeVideo;
+  // The commentary cut plays beside the video, never instead of it: one
+  // group so starting either starts both (VideoPlayer syncGroup)
+  const [pairGroup] = useState(() => new Set());
 
   // 3. Helper to build team links (historical name resolved for the game date)
   const renderTeamLink = (teamName, isHighlight = false, emojiStar = "") =>
@@ -471,12 +472,15 @@ export function EditionDetail() {
         )}
       </div>
 
-      {/* Side-by-Side Dashboard Layout */}
-      <div className="edition-dashboard-layout">
+      {/* Side-by-Side Dashboard Layout. With a commentary cut the media
+          card needs the whole width for two players, so the columns
+          dissolve (display: contents) and the panels take grid areas:
+          media across, overview beside context, the assets list last */}
+      <div className={`edition-dashboard-layout${commentary ? " with-companion" : ""}`}>
         {/* Left Column: Media Player & Assets */}
         <div className="dashboard-column">
           {/* Prominent Media Player Card */}
-          <div className="glass-panel prominent-media-card">
+          <div className="glass-panel prominent-media-card panel-media">
             <div className="media-head">
               <h3 className="media-section-title">Featured Highlights</h3>
               {cubeFace && (activeVideo || thumbUrl) && (
@@ -493,37 +497,47 @@ export function EditionDetail() {
                   <button type="button" className="cube-inline-expand" onClick={openCube} title="Open the cube full screen">Full screen ⤢</button>
                 </div>
               </div>
-            ) : activeVideo ? (
-              <div className="video-wrapper mt-15">
-                <VideoPlayer src={activeVideo} autoPlay={autoPlayPicked} hotkeys videoClassName="embedded-video-player" onError={() => setFailedVideo(activeVideo)} />
-                {commentaryPlaying && (
-                  <p className="text-muted mt-8" style={{ fontSize: "0.85rem" }}>
-                    {videoFailed
-                      ? "This commentary is no longer hosted by Dapper Labs."
-                      : `Commentary narrated by ${commentary.narrator}. Hosted by Dapper Labs, not on chain.`}
-                  </p>
-                )}
-              </div>
-            ) : thumbUrl ? (
-              <div className="video-wrapper mt-15">
-                <img
-                  src={thumbUrl}
-                  alt=""
-                  className="media-thumb-fallback"
-                  title="No video on IPFS for this edition; click to view the image"
-                  onClick={() => setOverlayMedia({ url: thumbUrl, type: "image", title: getMediaTypeLabel(thumbType) })}
-                />
-              </div>
             ) : (
-              <div className="video-fallback-box mt-15">
-                <span style={{ fontSize: "3rem" }}>🎥</span>
-                <p className="text-muted mt-8" style={{ fontSize: "0.9rem" }}>No IPFS media for this edition.</p>
+              /* The video, and beside it the narrated cut of this edition
+                 when one exists: two players, each with its own controls;
+                 starting either starts both */
+              <div className={`media-pair mt-15${commentary ? " has-companion" : ""}`}>
+                {activeVideo ? (
+                  <div className="video-wrapper">
+                    <VideoPlayer src={activeVideo} autoPlay={autoPlayPicked} hotkeys videoClassName="embedded-video-player" onError={() => setFailedVideo(activeVideo)} syncGroup={commentary ? pairGroup : undefined} />
+                  </div>
+                ) : thumbUrl ? (
+                  <div className="video-wrapper">
+                    <img
+                      src={thumbUrl}
+                      alt=""
+                      className="media-thumb-fallback"
+                      title="No video on IPFS for this edition; click to view the image"
+                      onClick={() => setOverlayMedia({ url: thumbUrl, type: "image", title: getMediaTypeLabel(thumbType) })}
+                    />
+                  </div>
+                ) : (
+                  <div className="video-fallback-box">
+                    <span style={{ fontSize: "3rem" }}>🎥</span>
+                    <p className="text-muted mt-8" style={{ fontSize: "0.9rem" }}>No IPFS media for this edition.</p>
+                  </div>
+                )}
+                {commentary && (
+                  <div className="video-wrapper companion-wrapper">
+                    <VideoPlayer src={commentary.video} videoClassName="embedded-video-player" onError={() => setFailedVideo(commentary.video)} syncGroup={pairGroup} />
+                    <p className="companion-caption text-muted">
+                      {failedVideo === commentary.video
+                        ? "This commentary is no longer hosted by Dapper Labs."
+                        : `Commentary by ${commentary.narrator}. Hosted by Dapper Labs, not on chain.`}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Media Assets: the same lines the set page rows show */}
-          <div className="glass-panel mt-20 toggler-panel">
+          <div className="glass-panel mt-20 toggler-panel panel-assets">
             <h3>Media Assets</h3>
             {ipfsRecord && ipfsRecord.cids ? (
               <div className="mt-15">
@@ -538,9 +552,9 @@ export function EditionDetail() {
                   extraLines={commentary ? [(
                     <a
                       key="commentary"
-                      className={`ipfs-line${commentaryPlaying ? " is-active" : ""}`}
+                      className={`ipfs-line${!showCube ? " is-active" : ""}`}
                       href={commentary.video}
-                      onClick={(e) => { e.preventDefault(); setAutoPlayPicked(true); setActiveVideo(commentary.video); setMediaMode("video"); }}
+                      onClick={(e) => { e.preventDefault(); setAutoPlayPicked(true); setMediaMode("video"); }}
                       title="A narrated cut of this moment from the original nbatopshot.com, served from Dapper Labs' own hosting, not on chain"
                     >
                       🎙 Commentary by {commentary.narrator} <span className="ipfs-line-label">(Dapper Labs hosted)</span>
@@ -557,7 +571,7 @@ export function EditionDetail() {
         {/* Right Column: Overview & Context */}
         <div className="dashboard-column">
           {/* Play Overview Panel: one grid, rows shared across both columns */}
-          <div className="glass-panel core-summary-panel">
+          <div className="glass-panel core-summary-panel panel-overview">
             <h3>Play Overview</h3>
             {/* The matchup first and across the panel, so neither team name wraps */}
             <div className="summary-item matchup-summary-item matchup-summary-wide mt-20">
@@ -610,7 +624,7 @@ export function EditionDetail() {
           </div>
 
           {/* Set & Parallel Context Block */}
-          <div className="glass-panel mt-20 toggler-panel">
+          <div className="glass-panel mt-20 toggler-panel panel-context">
             <h3 className="section-title-accent">Set & Parallel Context</h3>
             <div className="summary-grid summary-grid-aligned mt-20" style={{ "--rows": 3 }}>
               <div className="summary-item">
@@ -725,6 +739,37 @@ export function EditionDetail() {
           display: flex;
           flex-direction: column;
           gap: 20px;
+        }
+        .edition-dashboard-layout.with-companion {
+          grid-template-areas: "media media" "overview context" "assets assets";
+        }
+        .edition-dashboard-layout.with-companion > .dashboard-column {
+          display: contents;
+        }
+        .with-companion .panel-media { grid-area: media; }
+        .with-companion .panel-overview { grid-area: overview; }
+        .with-companion .panel-context { grid-area: context; margin-top: 0; }
+        .with-companion .panel-assets { grid-area: assets; margin-top: 0; }
+        @media (max-width: 900px) {
+          .edition-dashboard-layout.with-companion {
+            grid-template-areas: "media" "overview" "context" "assets";
+          }
+        }
+        .media-pair {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 20px;
+        }
+        .media-pair .video-wrapper {
+          flex: 0 1 360px;
+        }
+        .companion-caption {
+          font-size: 0.8rem;
+          padding: 8px 10px 10px;
+          margin: 0;
         }
         .hover-glow-nav {
           transition: var(--transition-smooth);

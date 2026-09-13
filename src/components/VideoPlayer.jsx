@@ -25,8 +25,12 @@ const isTypingTarget = (el) => {
  * autoPlay: start as soon as the file loads (a src change reloads, so a
  *           newly picked clip starts too)
  * hotkeys:  Space toggles playback anywhere on the page, except while typing
+ * syncGroup: a Set shared by companion players (the edition page's video
+ *           and its commentary cut). Playing any member starts the others
+ *           from wherever they are; pausing, seeking, speed and volume stay
+ *           per player.
  */
-export function VideoPlayer({ src, autoPlay = false, hotkeys = false, videoClassName = "", onError }) {
+export function VideoPlayer({ src, autoPlay = false, hotkeys = false, videoClassName = "", onError, syncGroup }) {
   const videoRef = useRef(null);
   // Play state follows the element's own events, so a blocked autoplay
   // still shows the play button
@@ -57,6 +61,24 @@ export function VideoPlayer({ src, autoPlay = false, hotkeys = false, videoClass
     vid.volume = volume;
     vid.muted = isMuted;
   }, [speed, isLooping, volume, isMuted, src]);
+
+  useEffect(() => {
+    if (!syncGroup) return undefined;
+    const vid = videoRef.current;
+    if (!vid) return undefined;
+    syncGroup.add(vid);
+    return () => { syncGroup.delete(vid); };
+  }, [syncGroup]);
+
+  // This player started: start the rest of its group too. A member that is
+  // already playing gets no event, so the chain stops there.
+  const handlePlay = () => {
+    setIsPlaying(true);
+    if (!syncGroup) return;
+    syncGroup.forEach((other) => {
+      if (other !== videoRef.current && other.paused) other.play().catch(() => { /* autoplay policy */ });
+    });
+  };
 
   const togglePlay = useCallback(() => {
     const vid = videoRef.current;
@@ -103,7 +125,7 @@ export function VideoPlayer({ src, autoPlay = false, hotkeys = false, videoClass
         onClick={togglePlay}
         onLoadStart={handleLoadStart}
         onError={onError}
-        onPlay={() => setIsPlaying(true)}
+        onPlay={handlePlay}
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={(e) => setCurrentTime(e.target.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.target.duration)}
