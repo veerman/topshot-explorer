@@ -20,6 +20,7 @@ import {
 } from "./auth.js";
 import { signWall, wallEntryFor, wallPending } from "./wall.js";
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from "./graph.js";
+import { proxyAllowed, PROXY_BODY_MAX } from "./proxy-policy.js";
 import {
   bookFromObjects, foldEvents, bakeObjects, mergeAccepted, shardRows, blockTimeMs,
   BOOK_KEY, OTHER_KEY, STATS_KEY, STATE_KEY, shardKey, ACCEPTED_STATE_CAP
@@ -51,9 +52,34 @@ const ttlForBody = (bytes) => {
   return CACHE_TTL_SECONDS;
 };
 
-const proxyFlow = async (request, url, ctx) => {
+// ---- per-client limits ----------------------------------------------------
+// Two rate-limit bindings (wrangler.jsonc): PROXY_LIMIT for uncached Flow
+// reads, generous enough for a cold first sync; ABUSE_LIMIT for the routes
+// that turn one cheap request into upstream work (sign-in verification,
+// a username fetch from nbatopshot.com, a wall signature). Edge cache hits
+// never count. Without a binding the check passes.
+const clientKey = (request) => request.headers.get("cf-connecting-ip") || "anonymous";
+const overLimit = async (limiter, key) => {
+  if (!limiter) return false;
+  try {
+    const { success } = await limiter.limit({ key });
+    return !success;
+  } catch {
+    return false;
+  }
+};
+const tooMany = (what) =>
+  new Response(JSON.stringify({ error: `too many ${what}; try again in a minute` }), {
+    status: 429, headers: { "content-type": "application/json", "cache-control": "no-store", "retry-after": "60" }
+  });
+
+const proxyFlow = async (request, url, env, ctx) => {
   const upstreamPath = url.pathname.slice("/flow".length);
   const upstreamUrl = FLOW_UPSTREAM + upstreamPath + url.search;
+  // Only the app's own reads pass (proxy-policy.js); nothing else is
+  // forwarded, and a declared body over the ceiling is refused unread
+  if (!proxyAllowed(request.method, upstreamPath)) return new Response("not proxied", { status: 403 });
+  if (Number(request.headers.get("content-length")) > PROXY_BODY_MAX) return new Response("body too large", { status: 413 });
   const forward = (body) =>
     fetch(upstreamUrl, {
       method: request.method,
@@ -62,12 +88,14 @@ const proxyFlow = async (request, url, ctx) => {
     });
 
   if (request.method !== "POST" || upstreamPath !== CACHEABLE_PATH || !CACHEABLE_SEARCH.has(url.search)) {
+    if (await overLimit(env.PROXY_LIMIT, clientKey(request))) return tooMany("requests");
     return forward(request.method === "GET" || request.method === "HEAD" ? undefined : request.body);
   }
 
   // Key the cache on the exact request body (script text plus arguments),
   // with the block-height variant kept distinct in the key
   const requestBytes = await request.arrayBuffer();
+  if (requestBytes.byteLength > PROXY_BODY_MAX) return new Response("body too large", { status: 413 });
   const digest = await crypto.subtle.digest("SHA-256", requestBytes);
   const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
   const cache = caches.default;
@@ -79,6 +107,7 @@ const proxyFlow = async (request, url, ctx) => {
     res.headers.set("x-flow-cache", "HIT");
     return res;
   }
+  if (await overLimit(env.PROXY_LIMIT, clientKey(request))) return tooMany("requests");
 
   const upstream = await forward(requestBytes);
   const bodyBytes = new Uint8Array(await upstream.arrayBuffer());
@@ -108,8 +137,8 @@ const LOOKUP_MISS_TTL = 3600;
 
 // ---- address lookup ------------------------------------------------------
 // GET /lookup/address/<0xaddr>: who an address is, from the lookup table in
-// D1 (binding LOOKUP_DB; loaded from the private census export, see
-// scratch/census in the working tree, never the repo): username, wallet
+// D1 (binding LOOKUP_DB; loaded from a census that is not part of the
+// repository): username, wallet
 // kind, and the account-linking parents and children with their names.
 // One address per request, answers cached a day at the edge, and a rate
 // limit per client (binding LOOKUP_LIMIT), so pages get what they show and
@@ -182,6 +211,9 @@ const authRoutes = async (url, request, env) => {
   if (path === "/auth/verify" && request.method === "POST") {
     let body;
     try { body = await request.json(); } catch { return json(400, { error: "expected JSON" }); }
+    // Each attempt runs a script on the access node, so attempts are
+    // limited per client; a real wallet needs one or two
+    if (await overLimit(env.ABUSE_LIMIT, `verify:${clientKey(request)}`)) return tooMany("sign-in attempts");
     const result = await verifySignIn(env.SESSION_SECRET, FLOW_REST, url.host, body);
     if (!result.ok) return json(401, { error: result.error });
     const flags = (await isDenied(env, result.address)) ? DENIED_FLAG : "";
@@ -216,15 +248,22 @@ const wallRoutes = async (url, request, env, ctx) => {
   const path = url.pathname;
   if (path === "/wall/pending" && request.method === "GET") {
     const after = Math.max(0, Number(url.searchParams.get("after")) || 0);
-    // Ten seconds at the edge: launch-day readers all ask the same question
+    // Ten seconds at the edge: launch-day readers all ask the same
+    // question. One list is cached whatever `after` says, and filtered
+    // here, so the parameter cannot be varied to reach the database.
     const cache = caches.default;
-    const cacheKey = new Request(`${url.origin}/__wall-cache/pending/${after}`);
+    const cacheKey = new Request(`${url.origin}/__wall-cache/pending`);
     const cached = await cache.match(cacheKey);
-    if (cached) return new Response(cached.body, cached);
-    const body = await wallPending(env.LOOKUP_DB, after);
-    const stored = new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=10" } });
-    ctx.waitUntil(cache.put(cacheKey, stored.clone()));
-    return new Response(stored.body, stored);
+    let full;
+    if (cached) {
+      full = await cached.json();
+    } else {
+      full = await wallPending(env.LOOKUP_DB, 0, 2000);
+      const stored = new Response(JSON.stringify(full), { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=10" } });
+      ctx.waitUntil(cache.put(cacheKey, stored));
+    }
+    const body = { total: full.total, entries: (full.entries || []).filter((e) => e.seq > after) };
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=10" } });
   }
   const session = await sessionOf(request, env);
   if (!session) return json(401, { error: "sign in with your wallet first" });
@@ -233,6 +272,9 @@ const wallRoutes = async (url, request, env, ctx) => {
     return entry ? json(200, entry) : json(404, { error: "not signed yet" });
   }
   if (path === "/wall/sign" && request.method === "POST") {
+    // A signature reads the account graph from the chain and writes a
+    // row; a few per minute per wallet is plenty
+    if (await overLimit(env.ABUSE_LIMIT, `wall:${session.address}`)) return tooMany("signatures");
     let body;
     try { body = (await request.json()) || {}; } catch { body = {}; }
     // Who is signing, from the chain: a Dapper wallet, or a wallet
@@ -274,11 +316,7 @@ const lookupAddress = async (url, request, env, ctx) => {
     res.headers.set("x-lookup-cache", "HIT");
     return res;
   }
-  if (env.LOOKUP_LIMIT) {
-    const ip = request.headers.get("cf-connecting-ip") || "anonymous";
-    const { success } = await env.LOOKUP_LIMIT.limit({ key: ip });
-    if (!success) return json(429, { error: "too many lookups; try again in a minute" }, { "retry-after": "60" });
-  }
+  if (await overLimit(env.LOOKUP_LIMIT, clientKey(request))) return tooMany("lookups");
 
   const row = await env.LOOKUP_DB.prepare("SELECT username, dapper, parents, children, checked_at FROM lookup WHERE address = ?1").bind(address).first();
   let status = 404;
@@ -313,7 +351,7 @@ const lookupAddress = async (url, request, env, ctx) => {
   return res;
 };
 
-const lookupUsername = async (url, env, ctx) => {
+const lookupUsername = async (url, request, env, ctx) => {
   const name = decodeURIComponent(url.pathname.slice("/lookup/user/".length)).trim().replace(/^@/, "");
   const json = (status, body, extra = {}) =>
     new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
@@ -330,6 +368,10 @@ const lookupUsername = async (url, env, ctx) => {
     return res;
   }
 
+  // A miss at the edge is a fetch of the profile page on nbatopshot.com,
+  // so misses are limited per client: an enumeration run stops here
+  // instead of getting this host's addresses blocked over there
+  if (await overLimit(env.ABUSE_LIMIT, `user:${clientKey(request)}`)) return tooMany("lookups");
   const { status, body } = await lookupUser(name);
   if (status === 200) ctx.waitUntil(learnUsername(env, body));
   if (status === 200 || status === 404) {
@@ -403,7 +445,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/flow/")) {
       try {
-        return await proxyFlow(request, url, ctx);
+        return await proxyFlow(request, url, env, ctx);
       } catch (err) {
         console.error("flow proxy error:", err);
         return new Response("flow proxy error", { status: 502 });
@@ -428,7 +470,7 @@ export default {
     }
     if (url.pathname.startsWith("/lookup/user/") && request.method === "GET") {
       try {
-        return await lookupUsername(url, env, ctx);
+        return await lookupUsername(url, request, env, ctx);
       } catch (err) {
         console.error("username lookup error:", err);
         return new Response(JSON.stringify({ error: "lookup failed" }), { status: 502, headers: { "content-type": "application/json" } });

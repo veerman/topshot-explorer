@@ -24,8 +24,8 @@
     { "binding": "CACHE_BUCKET", "bucket_name": "topshot-explorer-cache" }
   ],
   // Address lookup (GET /lookup/address/<addr>): who an address is, from a
-  // D1 table loaded out of the private collector census (never in the
-  // repo). One address per request, rate limited per client. Optional
+  // D1 table loaded out of a collector census that is not part of the
+  // repository. One address per request, rate limited per client. Optional
   // like everything else here: without the binding the route answers 404
   // and the app shows addresses.
   "d1_databases": [
@@ -34,8 +34,14 @@
   // Wallet sign-in (/auth/*, see auth.js) signs its session cookie with the
   // SESSION_SECRET secret (`wrangler secret put SESSION_SECRET`); without it
   // the routes answer 503 and the username lookup stays closed.
+  // Per-client limits, all per minute (worker.js overLimit): address
+  // lookups; the routes that turn one request into upstream work (sign-in
+  // verification, a username fetch, a wall signature); uncached Flow reads
+  // through the proxy, sized so a cold first sync fits with room
   "ratelimits": [
-    { "name": "LOOKUP_LIMIT", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } }
+    { "name": "LOOKUP_LIMIT", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } },
+    { "name": "ABUSE_LIMIT", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } },
+    { "name": "PROXY_LIMIT", "namespace_id": "1003", "simple": { "limit": 600, "period": 60 } }
   ],
   "limits": { "cpu_ms": 60000 },
   // Test deploy. At cutover this becomes the apex + www (release them from
