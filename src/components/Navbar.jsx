@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSyncStatus } from "../hooks/useSyncStatus";
 import { getSeriesOverrides, ROOKIE_TAGS } from "../services/overrides.service";
 import { subscribeAccountContext, getAccountContext, setAccountAddress, clearAccountAddress, reloadAccount, subscribeRecentAddresses, forgetAddress, toggleLinkedAccount, rememberUsername, usernameOf, evmAddressesOf, isEvmAddress } from "../services/account.context";
 import { isAddressLike, lookupUsername } from "../services/username.lookup";
+import { NavSearch } from "./NavSearch";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { getOffersMadeBy } from "../services/fcl.service";
 import { getAllPlaysDB } from "../services/db.service";
@@ -31,6 +32,9 @@ export function Navbar() {
   // the links back; so does navigating or landing on an account.
   const [lookupState, setLookupState] = useState({ open: false, path: null });
   const lookupInputRef = useRef(null);
+  // Quick search (NavSearch): open for the page it was opened on, like
+  // Look up, so the box closes when a result takes the reader somewhere
+  const [searchState, setSearchState] = useState({ open: false, path: null });
   // A username being resolved through /lookup/user, or why it was not:
   // { name, status: "loading" | "missing" | "invalid" | "unavailable" | "error", message }
   const [lookup, setLookup] = useState(null);
@@ -186,6 +190,10 @@ export function Navbar() {
   // Open only for the page it was opened on: navigating closes it
   const lookupOpen = lookupState.open && lookupState.path === location.pathname;
   const setLookupOpen = (open) => setLookupState({ open, path: location.pathname });
+  const searchOpen = searchState.open && searchState.path === location.pathname;
+  const pathname = location.pathname;
+  const openSearch = useCallback(() => setSearchState({ open: true, path: pathname }), [pathname]);
+  const closeSearch = useCallback(() => setSearchState({ open: false, path: null }), []);
   useEffect(() => { if (lookupOpen && lookupInputRef.current) lookupInputRef.current.focus(); }, [lookupOpen]);
 
   // Grace period before a dropdown closes, so brief mouse excursions
@@ -345,7 +353,7 @@ export function Navbar() {
         </button>
 
         {/* Links */}
-        <div className={`nav-links${menuOpen ? " open" : ""}${lookupOpen && !account.address ? " lookup" : ""}`}>
+        <div className={`nav-links${menuOpen ? " open" : ""}${(lookupOpen && !account.address) || searchOpen ? " lookup" : ""}`}>
           <Link
             to="/plays"
             className={`nav-item ${isActive("/plays") ? "active" : ""}`}
@@ -462,6 +470,10 @@ export function Navbar() {
             )}
           </div>
         </div>
+
+        {/* Quick search: a magnifying glass that opens into a box across
+            the bar (the links step aside, as for Look up) */}
+        <NavSearch open={searchOpen} onOpen={openSearch} onClose={closeSearch} />
 
         {/* Account context: an input until an address is set, then one
             compact chip opening a menu (full address, quick stats, links,
@@ -752,7 +764,7 @@ export function Navbar() {
           /* Single row on desktop no matter what appears or disappears;
              the search input compresses instead of the bar reflowing */
           flex-wrap: nowrap;
-          gap: 16px;
+          gap: 12px;
         }
         .nav-brand-group {
           display: flex;
@@ -808,7 +820,9 @@ export function Navbar() {
         .nav-links {
           display: flex;
           align-items: center;
-          gap: 24px;
+          /* 14, not 24: ten links, the search icon and the account chip
+             have to share a 1250px bar */
+          gap: 14px;
           flex-shrink: 0;
         }
         .nav-menu-btn {
@@ -992,6 +1006,85 @@ export function Navbar() {
         }
         .nav-lookup-open .nav-recent-menu {
           width: min(100%, 460px);
+        }
+        /* Quick search: the icon matches the Look up button; open, the
+           box takes the bar and the matches list under it */
+        .nav-search-wrap {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+          min-width: 0;
+        }
+        .nav-search-wrap.open {
+          flex: 1 1 auto;
+        }
+        .nav-search-wrap.open .nav-search-input {
+          width: auto;
+          flex: 1 1 auto;
+        }
+        .nav-search-open-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 32px;
+          padding: 0;
+          color: var(--text-main);
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        .nav-search-open-btn:hover {
+          border-color: var(--primary);
+        }
+        .nav-search-menu {
+          width: min(100%, 520px);
+          padding: 6px;
+        }
+        .nav-search-result {
+          width: 100%;
+          padding: 8px 10px;
+          font: inherit;
+          font-size: 0.85rem;
+          text-align: left;
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
+        /* The highlighted match carries a box and a mark, never colour alone */
+        .nav-search-result.is-active {
+          background: rgba(139, 92, 246, 0.12);
+          color: #fff;
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+        }
+        .nav-search-kind {
+          flex: 0 0 auto;
+          min-width: 52px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+        }
+        .nav-search-name {
+          flex: 0 1 auto;
+          min-width: 0;
+          font-weight: 600;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .nav-search-detail {
+          flex: 1 1 auto;
+          min-width: 0;
+          text-align: right;
+          font-size: 0.78rem;
+          color: var(--text-muted);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .nav-lookup-close {
           width: 32px;
@@ -1523,14 +1616,47 @@ export function Navbar() {
             width: auto;
             min-width: 0;
           }
-          /* The account chip shrinks to its content so the menu stays
-             anchored beside it instead of at the far edge of a full-width
-             wrapper; it sits at the right of the top row, clear of the
-             absolute menu button (40px + gap) */
+          /* The account chip takes the second row, right-aligned (the
+             top row is the brand, the search icon and the menu button);
+             the menu stays anchored beside the chip */
           .nav-account-wrapper {
-            width: auto;
-            margin-left: auto;
-            margin-right: 42px;
+            flex-basis: 100%;
+            max-width: none;
+            justify-content: flex-end;
+            margin: 0;
+          }
+          /* The search icon is pinned to the top row beside the menu
+             button (40px plus a gap), whatever the second row holds;
+             open, the box is its own full-width row under the top row */
+          .nav-search-wrap {
+            position: absolute;
+            top: 0;
+            right: 50px;
+          }
+          .nav-search-wrap.open {
+            position: static;
+            width: 100%;
+            max-width: none;
+          }
+          /* While the box is open, the Look up row steps aside */
+          .nav-container:has(.nav-search-wrap.open) .nav-tools {
+            display: none;
+          }
+          .nav-search-menu {
+            width: 100%;
+          }
+          /* A long name wraps and its detail drops under it */
+          .nav-search-result {
+            flex-wrap: wrap;
+            row-gap: 2px;
+          }
+          .nav-search-name {
+            white-space: normal;
+          }
+          .nav-search-detail {
+            flex-basis: 100%;
+            text-align: left;
+            padding-left: 64px;
           }
         }
         /* Small phones: the full address never truncates, so the
