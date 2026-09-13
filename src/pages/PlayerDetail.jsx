@@ -223,7 +223,7 @@ export function PlayerDetail() {
       // OWNED numerator, not the total; Mint Size sorts by percentage in % view
       { key: "MintSize", text: "Mint Size", align: "right", sortValue: (_val, rec) => (accountMode ? (pctMode ? (rec.MintSizeSort > 0 ? rec.MintSizeOwned / rec.MintSizeSort : 0) : rec.MintSizeOwned) : rec.MintSizeSort), filterValue: (_val, rec) => (accountMode ? rec.MintSizeOwned : rec.MintSizeSort), headerControl: accountMode ? <OwnedPctToggle /> : undefined },
       { key: "Status", text: "Status" },
-      { key: "SetIDs", text: "Set Links" }
+      { key: "SetIDs", text: "Set IDs" }
     ];
   }, [accountMode, pctMode]);
 
@@ -253,15 +253,17 @@ export function PlayerDetail() {
         </Link>
       );
 
-      // 2. Set Links element
+      // 2. Set ids, each opening THIS play's edition in that set: the play
+      // is already in front of the reader, so the click goes forward to the
+      // edition, not back to the set (same rule as Plays and Calendar)
       const matchingSets = playerContext.playToSetsMap[playID] || [];
       const setLinks = matchingSets.length > 0 ? (
         <div className="set-links-cell">
           {matchingSets.map((s, idx) => (
             <React.Fragment key={s.id}>
               {idx > 0 && ", "}
-              <Link to={`/sets/${s.id}`} className="set-link" title={`${s.name} (Series ${s.series})`}>
-                {s.id}
+              <Link to={`/editions/${Number(s.id)}_${Number(playID)}`} className="set-link" title={`${s.name} (Series ${s.series}); opens edition ${Number(s.id)}_${Number(playID)}`}>
+                {Number(s.id)}
               </Link>
             </React.Fragment>
           ))}
