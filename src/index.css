@@ -1,0 +1,1660 @@
+/* Outfit (OFL 1.1), self-hosted as a variable font so it loads locally and
+   instantly: main.jsx blocks the first render on it, which only works when
+   the font cannot be slow. Same latin/latin-ext split Google Fonts serves. */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/outfit-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/outfit-var-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* App emoji font: self-hosted subsets covering exactly the emoji the app
+   uses. Adding one: append it to src/dev/subset-text.txt and run
+   `npm run emoji:subset` (fontTools; both sources live in src/dev/fonts).
+   Two lanes in one family, chosen per-browser by the tech() guard:
+   - Noto Color Emoji subset (~130KB, COLRv1, OFL 1.1; license in
+     public/fonts/OFL.txt): Chrome, Edge, Firefox.
+   - Twemoji Mozilla subset (~40KB, COLRv0, CC-BY/MIT): Safari and anything
+     else without COLRv1, which would otherwise draw the Noto glyphs as
+     black silhouettes rather than skipping them.
+   Registered under our own family name (subsets are Modified Versions). */
+@font-face {
+  font-family: 'TopShot Emoji';
+  src:
+    url('/fonts/emoji-subset.woff2') format('woff2') tech(color-COLRv1),
+    url('/fonts/emoji-subset-colr0.woff2') format('woff2');
+  font-display: swap;
+}
+
+:root {
+  /* Premium Harmonies HSL Palette */
+  --bg-base: #0a0b10;
+  --bg-surface: rgba(18, 20, 30, 0.7);
+  --bg-card: rgba(26, 29, 45, 0.55);
+  --border-glow: rgba(139, 92, 246, 0.15);
+  --border-light: rgba(255, 255, 255, 0.08);
+  
+  --primary: #8b5cf6;
+  --primary-glow: rgba(139, 92, 246, 0.3);
+  --primary-hover: #a78bfa;
+  
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-glow: #ffffff;
+  
+  --accent-nba: #3b82f6; /* Blue for NBA */
+  --accent-wnba: #ec4899; /* Orange/pink for WNBA */
+  
+  --status-success: #10b981; /* Green */
+  --status-success-bg: rgba(16, 185, 129, 0.12);
+  --status-danger: #ef4444; /* Red */
+  --status-danger-bg: rgba(239, 68, 68, 0.12);
+  --status-mismint: #f59e0b; /* Amber */
+  --status-mismint-bg: rgba(245, 158, 11, 0.15);
+  
+  /* Emoji glyphs resolve here (no latin font in our stacks carries emoji).
+     The bundled subset leads; system fonts catch anything outside it. */
+  --font-emoji: 'TopShot Emoji', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji';
+  --font-sans: 'Outfit', var(--font-emoji), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Deliberately NOT a monospace face. Mono fonts mark their zero on purpose
+     (Roboto Mono dots it, Consolas and Cascadia slash it), and a dotted zero
+     reads as an 8 at a glance. Outfit has a plain zero; tabular-nums on body
+     keeps the digit alignment that the mono face was here for. */
+  --font-mono: 'Outfit', var(--font-emoji), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  --glass-blur: blur(16px);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 
+                    0 1px 3px rgba(255, 255, 255, 0.05) inset;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.2px;
+  /* Equal-width digits, so IDs and serials still line up in columns */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+#root {
+  width: 1300px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-bottom: 60px;
+}
+
+/* Common Typography & Titles */
+h1, h2, h3, h4, h5 {
+  font-weight: 600;
+  color: var(--text-glow);
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* The gradient text-fill above strips the color out of emoji that fall
+   back to the system emoji font (a white Celtics clover); emoji rendered
+   through the .emoji-name structure keep their own colors */
+h1 .emoji-name-emoji,
+h1 .plain-emoji {
+  -webkit-text-fill-color: initial;
+  background: none;
+}
+
+a {
+  color: var(--primary-hover);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+a:hover {
+  color: #fff;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+/* A button that reads as a link, for actions that must be a click (a
+   wallet window only opens inside one) but sit in running text */
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--primary-hover);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.link-btn:hover:not(:disabled) {
+  color: #fff;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+.link-btn:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+/* Glassmorphism Containers */
+.glass-panel {
+  background: var(--bg-surface);
+  /* No backdrop-filter here: Chromium flashes the rounded clip of large
+     blurred panels as a giant ellipse for the first composited frames.
+     The page background is flat, so the blur added nothing visible. */
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-premium);
+  margin-bottom: 24px;
+  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-glow);
+}
+
+/* Glowing Badges & Status */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: var(--status-success-bg);
+  color: var(--status-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-danger {
+  background-color: var(--status-danger-bg);
+  color: var(--status-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-warning {
+  background-color: var(--status-mismint-bg);
+  color: var(--status-mismint);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-nba {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--accent-nba);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-wnba {
+  background-color: rgba(236, 72, 153, 0.12);
+  color: var(--accent-wnba);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+/* Premium Buttons & Form Controls */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  filter: brightness(1.1);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+.btn-primary:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-control {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: var(--transition-smooth);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Table Design. Native HTML tables, laid out entirely by CSS. The browser's
+   auto table algorithm sizes every column to its content, spreads spare
+   width across the columns, and under pressure shrinks the columns whose
+   text can wrap first, so data fits the panel with no JavaScript
+   measurement and no horizontal scrollbar in any realistic case. The
+   font-size below is fixed and chosen so real data fits with room to
+   spare. Cells are flat and borderless, so spare width reads as plain
+   whitespace. Text wraps under pressure rather than forcing a scrollbar;
+   .table-wrapper scrolls only as a genuine last resort, and it is the
+   wrapper that scrolls, never the page. */
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 16px;
+  scrollbar-width: thin;  /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+table.premium-table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+/* Sized in em so padding, badges and chips ride the table's font scale */
+table.premium-table .team-id-badge,
+table.premium-table .set-link {
+  font-size: 0.9em;
+}
+
+table.premium-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 0.9em 0.75em;
+  user-select: none;
+  cursor: pointer;
+  /* color only: transition "all" on tens of thousands of cells makes every
+     style recalculation more expensive */
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+table.premium-table th:hover {
+  color: #fff;
+}
+
+/* Offers page: the other offers on an expanded target, one table row
+   each so every value sits in its column. Quieter than a data row (no
+   tint: a tinted band reads as a heading), a hairline rule between them */
+table.premium-table tr.offer-child-row td {
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.035);
+}
+
+table.premium-table td {
+  padding: 0.9em 0.75em;
+  color: var(--text-main);
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  vertical-align: middle;
+  /* white-space stays normal: multi-word text wraps under pressure, which
+     is how the auto layout absorbs tight widths without a scrollbar */
+}
+
+table.premium-table tr:hover td {
+  color: #fff;
+}
+
+/* Findable mode: the huge page sizes (1000/"All") render EVERY row so
+   browser find-in-page (Ctrl+F) searches the full dataset. Containment is
+   ignored on real table rows, so this mode switches rows to fixed-track
+   grids (tracks measured once from the auto-laid first window, set as
+   --pg-cols in fr units so they keep filling the panel on resize) and
+   gives each body row content-visibility: auto: offscreen rows exist in
+   the DOM and are findable, but cost no layout or paint until scrolled to
+   or revealed by a find match. */
+table.premium-table.findable,
+table.premium-table.findable thead,
+table.premium-table.findable tbody {
+  display: block;
+}
+table.premium-table.findable tr {
+  display: grid;
+  grid-template-columns: var(--pg-cols);
+  align-items: center;
+}
+table.premium-table.findable tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--pg-row-h);
+}
+table.premium-table.findable th,
+table.premium-table.findable td {
+  display: block;
+}
+
+/* Season chip: undated moments show their season instead of a fabricated
+   date. Dimmed, italic, dash-bordered pill so it cannot be mistaken for a
+   real date; tooltip carries the explanation. */
+.season-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.85em;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* Stacked box-score matchup cell (away on top, home below). Fixed emoji and
+   score column widths keep names and scores aligned across every row, even
+   when a team has no emoji. Tracks are in em so they ride the table's font
+   scale. */
+.matchup-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 14em;
+  max-width: 19em;
+  margin-inline: auto;
+  /* Team names share a left edge no matter how the td aligns its text */
+  text-align: left;
+}
+.matchup-row {
+  display: grid;
+  grid-template-columns: 1.75em 1fr 2.7em 1em;
+  align-items: center;
+  column-gap: 6px;
+}
+.matchup-emoji {
+  font-size: 1.2em;
+  line-height: 1;
+  text-align: center;
+}
+.matchup-team {
+  white-space: normal;
+}
+.matchup-score {
+  font-family: var(--font-mono);
+  text-align: right;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.matchup-score-winner {
+  color: #fff;
+  font-weight: 700;
+}
+.matchup-arrow {
+  color: var(--status-success);
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+/* Emoji + name pairs (team links and cells): the name is its own flex
+   item, so a wrapped name starts its second line under the text, never
+   under the emoji; the emoji is a bit larger and vertically centered so it
+   fills the extra height when the name runs to two lines. */
+.emoji-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+.emoji-name-emoji {
+  font-size: 1.25em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.emoji-name-text {
+  min-width: 0;
+}
+
+
+/* Per-column filter row + toolbar toggle */
+table.premium-table tr.filter-row th {
+  padding: 4px 6px;
+  cursor: default;
+  background: rgba(14, 16, 24, 0.95);
+}
+.column-filter-input {
+  width: 100%;
+  min-width: 56px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+.column-filter-input:focus {
+  border-color: var(--primary);
+  outline: none;
+  background: rgba(139, 92, 246, 0.06);
+}
+.filter-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+.filter-toggle-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.filter-toggle-btn.active {
+  color: var(--primary-hover);
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+/* Highlight Mismint Rows */
+table.premium-table tr.mismint-row td {
+  background: rgba(245, 158, 11, 0.06);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+}
+table.premium-table tr.mismint-row:hover td {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Paging & Search Controls */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.table-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  /* One line on desktop; under width pressure the buttons wrap instead of
+     widening the page (the page must never scroll horizontally) */
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .pagination-controls {
+    gap: 5px;
+  }
+  .page-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+}
+.page-btn:hover:not(:disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.page-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Utilities */
+.text-muted {
+  color: var(--text-muted);
+}
+.text-center {
+  text-align: center;
+}
+.d-flex {
+  display: flex;
+}
+.align-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-10 {
+  gap: 10px;
+}
+.gap-15 {
+  gap: 15px;
+}
+.gap-20 {
+  gap: 20px;
+}
+/* Used all over the app but never defined until 2026-09-02: rows meant to
+   wrap on narrow screens were silently overflowing instead */
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+/* The rest of the spacing scale: used across ~13 pages since the start but
+   never defined until 2026-09-06, so every use was silently a no-op */
+.mt-4 {
+  margin-top: 4px;
+}
+.mt-8 {
+  margin-top: 8px;
+}
+.mt-12 {
+  margin-top: 12px;
+}
+.mt-15 {
+  margin-top: 15px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+.gap-8 {
+  gap: 8px;
+}
+
+/* Loader style */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Syncing Progress Bar */
+.sync-bar-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  height: 8px;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.sync-bar-fill {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent-nba) 100%);
+  height: 100%;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Winner highlight adjacent cells merge */
+.td-winner-highlight-team {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-top: 2px solid #10b981 !important;
+  border-bottom: 2px solid #10b981 !important;
+  border-left: 2px solid #10b981 !important;
+}
+.td-winner-highlight-score {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-top: 2px solid #10b981 !important;
+  border-bottom: 2px solid #10b981 !important;
+  border-right: 2px solid #10b981 !important;
+}
+
+/* ============================================================
+   Shared page components. One definition each; these were
+   previously copy-pasted (with drift) across page style blocks.
+   A page may still override one locally for a deliberate variant
+   (page <style> tags load after this sheet, so they win).
+   ============================================================ */
+
+/* Panel that wraps a DataTable */
+.table-panel {
+  padding: 24px;
+}
+
+/* Hover glow for links and buttons; previously defined only inside
+   Calendar's style block, so 14 other pages using it got no glow */
+.font-hover-glow:hover {
+  color: #fff;
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Bold link with room for an inline chip (mismint warning, lock icon);
+   previously defined only inside Plays' style block */
+.player-detail-link {
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Soft gradient wash for explanatory banners; previously defined only in
+   Sets and Settings though 11 pages use it */
+.info-banner {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+/* Rows a DataTable marks clickable via onRowClick */
+.clickable-row {
+  cursor: pointer;
+}
+.clickable-row:hover td {
+  background: rgba(139, 92, 246, 0.06);
+}
+
+/* Small mono id pill (play/team ids in tables and headers) */
+.team-id-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--primary-hover);
+  background: rgba(139, 92, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Set id/name chip linking to a set */
+.set-link {
+  font-family: var(--font-mono);
+  background: rgba(255,255,255,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255,255,255,0.05);
+  color: var(--primary-hover);
+}
+
+/* The reward glyph beside a set id: the badge belongs to that edition */
+.set-link-mark {
+  font-family: var(--font-emoji, inherit);
+  font-size: 0.75em;
+  margin-left: 3px;
+  vertical-align: 1px;
+}
+
+/* Inline mismint warning chip */
+.mini-badge-mismint {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--status-mismint);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Play badges (tags on the data side): one emoji per circle, gradient per
+   badge from --badge-gradient (see TAG_BADGES in overrides.service.js). The
+   circle is the brand element, shared by every badge; the emoji is the glyph.
+   Sits on its own line directly under a player's name. (Not ".badge": that is
+   the generic status pill above.) */
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.play-badge-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  line-height: 1;
+}
+/* Dark disc with a 2px gradient ring: the glyph (emoji colours or white
+   letters) always sits on near-black, so contrast is the same for every
+   badge and the gradient only identifies. Ring = gradient painted on the
+   border box under a solid padding box. */
+.play-badge {
+  --badge-gradient: linear-gradient(135deg, #64748b, #334155);
+  --badge-disc: #0f1118;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--badge-disc), var(--badge-disc)) padding-box,
+    var(--badge-gradient) border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+  cursor: default;
+  user-select: none;
+}
+.play-badge-emoji {
+  font-family: var(--font-emoji);
+  font-size: 13px;
+  /* The emoji ink sits about a quarter pixel left and half a pixel low of
+     the circle's centre at every zoom (measured 2026-09-09); shrinking the
+     content box from the left and bottom recentres it without moving the
+     ring (box-sizing is border-box) */
+  padding: 0 0 1px 0.5px;
+}
+.play-badge-text {
+  font-family: var(--font-sans);
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  padding-top: 1px; /* optical centre for caps */
+}
+/* Rookie Trifecta: Mint + Year + Premiere collapsed into one badge of
+   three stars put together (two up, one down) */
+.play-badge-tristar {
+  position: relative;
+}
+.play-badge-tristar .tri-star {
+  position: absolute;
+  font-family: var(--font-emoji);
+  font-size: 8px;
+  line-height: 1;
+}
+.play-badge-tristar .tri-star-1 { top: 3px; left: 2px; }
+.play-badge-tristar .tri-star-2 { top: 3px; right: 2px; }
+.play-badge-tristar .tri-star-3 { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.play-badge-row-lg .play-badge {
+  width: 32px;
+  height: 32px;
+}
+.play-badge-row-lg .play-badge-emoji {
+  font-size: 18px;
+}
+.play-badge-row-lg .play-badge-text {
+  font-size: 10px;
+}
+.play-badge-row-lg .play-badge-tristar .tri-star { font-size: 11px; }
+.play-badge-row-lg .play-badge-tristar .tri-star-1 { top: 4px; left: 3px; }
+.play-badge-row-lg .play-badge-tristar .tri-star-2 { top: 4px; right: 3px; }
+.play-badge-row-lg .play-badge-tristar .tri-star-3 { bottom: 3px; }
+
+/* Label/value rows inside info panels (Profile, Biography, ...) */
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.95rem;
+}
+.info-label {
+  color: var(--text-muted);
+}
+.info-value {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Two-column summary panel on play/edition detail pages */
+.core-summary-panel {
+  padding: 24px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+.summary-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.95rem;
+  align-items: center;
+}
+.summary-label {
+  color: var(--text-muted);
+}
+.summary-value {
+  color: #fff;
+  font-weight: 500;
+}
+/* The matchup is a stacked two-row block, so it aligns to the top of
+   its label rather than centring like the single-line rows */
+.matchup-summary-item {
+  align-items: flex-start;
+}
+/* The matchup on a detail page runs across the whole panel: team names
+   never wrap and the scores sit at the panel's right edge */
+.matchup-summary-wide {
+  gap: 14px;
+}
+.matchup-summary-wide .summary-value {
+  flex: 1;
+  min-width: 0;
+}
+.matchup-summary-wide .matchup-cell {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+.matchup-summary-wide .matchup-team {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Detail page header kit (play/edition detail) */
+.detail-header {
+  padding: 30px;
+  position: relative;
+}
+.border-mismint {
+  border-left: 4px solid var(--status-mismint);
+}
+.play-id-tag {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--primary-hover);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.player-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+.player-subtitle {
+  font-size: 1.05rem;
+}
+.mismint-warning-box {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+.mismint-warning-box h4 {
+  color: var(--status-mismint);
+  margin-bottom: 6px;
+}
+.mismint-warning-box p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.detail-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+.arena-twitter-link {
+  color: var(--primary-hover);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+.arena-twitter-link:hover {
+  color: var(--primary);
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .player-title {
+    font-size: 1.7rem;
+  }
+  .detail-sections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Date Calendar Link */
+.date-calendar-link {
+  color: var(--primary-hover);
+  text-decoration: underline dotted rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+.date-calendar-link:hover {
+  color: #fff;
+  text-decoration: underline solid var(--primary-hover);
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Layout contract: pages never expand beyond the viewport. Wide content
+   (tables, code, diffs) scrolls inside its own .table-wrapper container;
+   the page body itself never scrolls horizontally. */
+
+.datatable-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 900px) {
+  .app-main {
+    padding: 0 14px 40px;
+  }
+  .glass-panel {
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-main {
+    padding: 0 10px 32px;
+  }
+  .glass-panel {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  table.premium-table {
+    font-size: 0.8rem;
+  }
+  table.premium-table th,
+  table.premium-table td {
+    padding: 8px 6px;
+  }
+  .table-search {
+    max-width: 100%;
+  }
+}
+
+/* Shared video control bar (components/VideoPlayer.jsx, used by the media
+   overlay and the edition page player) */
+.video-player {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.video-player-video {
+  max-width: 100%;
+  display: block;
+}
+.media-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px 2px;
+  flex-wrap: wrap;
+}
+.media-progress-row {
+  flex-wrap: nowrap;
+  padding-top: 12px;
+}
+.media-time {
+  color: var(--text-muted, rgba(255,255,255,0.6));
+  font-size: 0.75rem;
+  min-width: 34px;
+  text-align: center;
+}
+.media-seek-bar {
+  flex: 1;
+  accent-color: var(--primary);
+  cursor: pointer;
+  min-width: 120px;
+}
+.media-buttons-row {
+  justify-content: center;
+}
+.media-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.media-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.media-btn-active {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+.media-speed-group {
+  display: inline-flex;
+  gap: 4px;
+  padding: 0 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+.media-speed-btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 6px 8px;
+}
+.media-volume-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.media-volume-bar {
+  width: 80px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.media-open-link {
+  font-size: 0.75rem;
+  color: var(--text-muted, rgba(255,255,255,0.6));
+}
+@media (max-width: 600px) {
+  .media-volume-bar {
+    width: 56px;
+  }
+}
+
+/* Green "Your collection" ownership banner on detail pages (set, player,
+   team) shown while browsing as an account */
+.owned-set-banner {
+  background: rgba(34, 197, 94, 0.04);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+}
+.owned-set-banner h4 {
+  color: var(--status-success);
+}
+/* Figures in the banner: number white, label muted, one wrapping row */
+.owned-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.owned-stat-row strong,
+.owned-stat-variant {
+  color: #fff;
+  white-space: nowrap;
+}
+.owned-stat {
+  white-space: nowrap;
+}
+.owned-stat-locked {
+  margin-top: 4px;
+}
+.owned-stat-check {
+  color: var(--status-success);
+  margin-left: 4px;
+  font-weight: 700;
+}
+/* A COMPLETE owned/total (every edition, every play): a green-tinted box
+   around the figure, since a colour shift alone does not register for
+   colour-blind readers. Negative margins equal to the padding
+   keep the digits exactly where an incomplete cell puts them, so
+   columns stay aligned. */
+.owned-complete {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  border-radius: 7px;
+  background: rgba(34, 197, 94, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.55);
+}
+.owned-complete .owned-stat-check {
+  margin-left: 3px;
+}
+/* The banner's own strip: same shape as the header, smaller figures */
+.stat-strip-sm {
+  gap: 8px 26px;
+  margin-top: 12px;
+}
+.stat-strip-sm .stat-value {
+  font-size: 1.2rem;
+}
+.stat-strip-sm .stat-label {
+  font-size: 0.74rem;
+}
+/* Special serials owned, one chip each, wrapping */
+.special-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.special-chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+  color: #fff;
+  white-space: nowrap;
+}
+.special-chip-count {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-left: 2px;
+}
+/* Lists of id chips (owned serials, a roster row's play ids) line up
+   in columns: every chip takes the same width, so the wrapping flex
+   row reads as a grid. Flex rather than grid because an auto-layout
+   table cell has no definite width for auto-fill to work against. */
+.id-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.id-grid > * {
+  flex: 0 0 auto;
+  width: var(--id-w, 5.6em);
+  box-sizing: border-box;
+  white-space: nowrap;
+  text-align: center;
+}
+.id-grid.id-grid-left > * {
+  text-align: left;
+}
+
+/* Stat strip: label-over-number figures in a wrapping row (set header;
+   the player and team pages draw the same shape with their own classes) */
+.stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 36px;
+  margin-top: 16px;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fff;
+  white-space: nowrap;
+}
+.stat-value small {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-hover);
+  margin-left: 6px;
+}
+
+/* Stand-in set art (components/SetArt.jsx): a dark square carrying the
+   set name, sized in cqw against its box (the box declares
+   container-type: inline-size), so it reads like real art at 170px in a
+   set header and as a monogram in a 40px chip */
+.set-art-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 9%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.12), transparent 52%),
+    linear-gradient(160deg, #262a3d 0%, #101119 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 0 0.6em rgba(139, 92, 246, 0.18);
+  color: #e8e9ee;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-shadow: 0 0.08em 0.25em rgba(0, 0, 0, 0.7);
+}
+.set-art-placeholder span {
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.set-art-placeholder-mono {
+  padding: 6%;
+  letter-spacing: 0.02em;
+}
+
+/* The 3D moment cube trigger (components/MomentCube): a glyph, or the
+   hero thumbnail when derived media is on. Used by every editions table. */
+.cube-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  font-size: 0.95rem;
+  font-family: var(--font-emoji);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: var(--transition-smooth);
+}
+.cube-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+/* Thumbnail form of the trigger: full opacity, gentler zoom (a 96px image
+   scaled 1.2 would swallow neighbouring rows) */
+.cube-btn-thumb {
+  opacity: 1;
+}
+.cube-btn-thumb:hover {
+  transform: scale(1.04);
+}
+.cube-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 1.3rem;
+}
+.cube-btn-thumb img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  /* Thumbs are border-trimmed, largest side 512, so rarely square: contain
+     shows the whole cube; cover would crop its edges */
+  object-fit: contain;
+}
+/* The cube column in the collection tables: fixed to the thumb, centred */
+.premium-table td.cube-cell,
+.premium-table th.cube-th {
+  width: 96px;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+/* Supply: a count that swaps between remaining and minted on hover (or a
+   tap on touch), and SupplyWord, the label that swaps with it. Both
+   values sit in one grid cell so the wider sets the width and nothing
+   moves. Nothing is added beside a number: the label carries the meaning,
+   so a centred figure stays centred. A cell or card around the pair
+   hovers as one unit. */
+.supply,
+.supply-word {
+  display: inline-grid;
+  text-align: inherit;
+}
+.supply-a,
+.supply-b,
+.supply-word-a,
+.supply-word-b {
+  grid-area: 1 / 1;
+  text-align: inherit;
+  white-space: nowrap;
+}
+.supply-b,
+.supply-word-b {
+  visibility: hidden;
+}
+.supply:hover .supply-a,
+.supply.is-flipped .supply-a,
+.supply-word:hover .supply-word-a,
+td:hover .supply-a,
+.tier-cell:hover .supply-a,
+.home-view-tab:hover .supply-a,
+.home-view-tab:hover .supply-word-a,
+.stat-item:hover .supply-a,
+.stat-item:hover .supply-word-a,
+.summary-item:hover .supply-a,
+.summary-item:hover .supply-word-a,
+.metric-card:hover .supply-a,
+.metric-card:hover .supply-word-a,
+.player-stat-item:hover .supply-a,
+.player-stat-item:hover .supply-word-a,
+.team-stat-item:hover .supply-a,
+.team-stat-item:hover .supply-word-a {
+  visibility: hidden;
+}
+.supply:hover .supply-b,
+.supply.is-flipped .supply-b,
+.supply-word:hover .supply-word-b,
+td:hover .supply-b,
+.tier-cell:hover .supply-b,
+.home-view-tab:hover .supply-b,
+.home-view-tab:hover .supply-word-b,
+.stat-item:hover .supply-b,
+.stat-item:hover .supply-word-b,
+.summary-item:hover .supply-b,
+.summary-item:hover .supply-word-b,
+.metric-card:hover .supply-b,
+.metric-card:hover .supply-word-b,
+.player-stat-item:hover .supply-b,
+.player-stat-item:hover .supply-word-b,
+.team-stat-item:hover .supply-b,
+.team-stat-item:hover .supply-word-b {
+  visibility: visible;
+}
+
+/* Detail pages: the shared information groups (components/PlayInfoSections) */
+.detail-sections-grid > .detail-span-all {
+  grid-column: 1 / -1;
+}
+.info-row-stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.editorial-headline {
+  color: var(--primary-hover);
+  font-weight: 600;
+  text-align: right;
+}
+.editorial-description {
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.6;
+  width: 100%;
+  text-wrap: pretty;
+}
+.venue-search {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.venue-assumed {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  cursor: help;
+}
+/* A summary panel whose two columns share their rows: items are direct
+   children laid column-first over --rows rows, so the third row on the
+   left sits level with the third on the right */
+.summary-grid-aligned {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--rows, 3), auto);
+  column-gap: 30px;
+  row-gap: 12px;
+  align-items: start;
+}
+.summary-grid-aligned .summary-item {
+  min-height: 34px;
+  gap: 14px;
+}
+.summary-grid-aligned .summary-label {
+  white-space: nowrap;
+}
+.summary-grid-aligned .summary-value {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.summary-grid-aligned .summary-item-tall {
+  grid-row: span 2;
+}
+@media (max-width: 768px) {
+  .summary-grid-aligned {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+  }
+  .summary-grid-aligned .summary-item-tall {
+    grid-row: auto;
+  }
+}
+
+/* An edition's media files, one line each (components/MediaStack) */
+.ipfs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-align: left;
+}
+.ipfs-line {
+  display: block;
+  white-space: nowrap;
+  cursor: pointer;
+}
+span.ipfs-line {
+  cursor: default;
+}
+.ipfs-line-label {
+  color: var(--text-muted);
+}
+.ipfs-line.is-active {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+/* Extras flow straight under the core block; their colour sits between
+   the core purple and plain muted text: related, but secondary */
+.ipfs-stack-extras .ipfs-line {
+  color: rgba(167, 139, 250, 0.7);
+}
+.ipfs-line-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+/* The edition page shows the stack at reading size */
+.toggler-panel .ipfs-stack {
+  font-size: 0.85rem;
+  gap: 6px;
+}
+.toggler-panel .ipfs-stack-extras {
+  margin-top: 6px;
+}
+
+/* Owned moments of a set with parallels: one row per parallel */
+.owned-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-top: 12px;
+}
+.owned-table {
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.owned-table th,
+.owned-table td {
+  padding: 6px 18px 6px 0;
+  text-align: right;
+}
+.owned-table th:first-child,
+.owned-table td:first-child {
+  text-align: left;
+}
+.owned-table thead th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+}
+.owned-table tbody th {
+  font-weight: 600;
+  color: #fff;
+}
+.owned-table tbody td {
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.owned-table tbody tr + tr td,
+.owned-table tbody tr + tr th {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.play-id-link {
+  text-decoration: none;
+}
+.play-id-link:hover {
+  filter: brightness(1.25);
+}
+/* Approximations on the account header: quieter than the counts */
+.acct-chip-dim {
+  color: var(--text-muted);
+  cursor: help;
+}
+
+/* An address shown by its Top Shot username (components/AddressName) */
+.addr-name {
+  font-weight: 600;
+}
+.account-username {
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary-hover);
+}
+
+/* A header chip or league badge that leads somewhere */
+.badge-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+.badge-link:hover {
+  filter: brightness(1.25);
+}
+.play-badge-link {
+  text-decoration: none;
+}
+.play-badge-link:hover {
+  filter: brightness(1.2);
+}
+
+/* The cube inline in a media card (components/MomentCube MomentCubeView):
+   a square the width of its column, emoji on the app's own font as in the
+   overlay */
+.cube-inline {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.cube-inline-box {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
+  touch-action: none;
+}
+.cube-inline-note {
+  text-align: center;
+}
+.cube-inline-box .mediacube-scene {
+  font-family: var(--font-sans);
+}
+.cube-inline-box .mediacube-face svg text {
+  font-family: 'TopShot Emoji', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+.cube-inline-note {
+  font-size: 0.75rem;
+}

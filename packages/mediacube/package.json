@@ -1,0 +1,42 @@
+{
+  "name": "mediacube",
+  "version": "0.3.0",
+  "description": "Interactive 3D moment cube for the web. Each face can hold video, images, SVG cards, or extruded 3D text and emoji. No dependencies.",
+  "type": "module",
+  "main": "dist/mediacube.umd.cjs",
+  "module": "dist/mediacube.esm.js",
+  "browser": "dist/mediacube.esm.js",
+  "unpkg": "dist/mediacube.umd.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mediacube.esm.js",
+      "require": "./dist/mediacube.umd.cjs",
+      "default": "./dist/mediacube.esm.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": true,
+  "scripts": {
+    "build": "node build.js",
+    "check": "node build.js && node --check dist/mediacube.esm.js && node --check dist/mediacube.umd.js",
+    "demo": "python -m http.server 8080"
+  },
+  "keywords": [
+    "3d",
+    "cube",
+    "css3d",
+    "video",
+    "moment",
+    "collectible",
+    "web-component"
+  ],
+  "author": "Steve",
+  "license": "MIT"
+}

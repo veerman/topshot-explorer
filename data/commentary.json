@@ -1,0 +1,451 @@
+{
+  "_meta": {
+    "source": "v1 nbatopshot.com narrated moments (Contentful narratedMoment entries), archived 2026-06-03; URLs are Dapper-hosted public asset links, checked live 2026-09-07",
+    "format": "setID_playID: { narrator (first name as published), player (slug from the source), avatar (png url), video (mp4 url) }",
+    "count": 74
+  },
+  "34_835": {
+    "narrator": "Mike",
+    "player": "conley",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/34AFYcMMsN5sAsjHnEJcSR/fa884633ce5dc6bd42951bbe3de5de6d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7DqaHYzG7dsgF9Nz2DDYXE/ca12f8ef62ce9209eeb5e64dbae42f46/conley-commentary.mp4"
+  },
+  "39_1392": {
+    "narrator": "Torrey",
+    "player": "craig",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4Ap5qRxYRlWkQQAlKxAx1n/0dde140caf7646d58d1637af8ced65d7/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/6jQL2NVJuV9Yddm6CRZOnW/3b3fd7988f8ec999e22705425e54495f/craig-commentary.mp4"
+  },
+  "51_1995": {
+    "narrator": "Kevin",
+    "player": "durant",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2cdNp1rKtt5L9AMJmcWJgM/32630e82b221021073aca3a406c5c6b8/kd-commentary.mp4"
+  },
+  "53_2016": {
+    "narrator": "Doris",
+    "player": "Doris - DeRozan",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/4fAR4tCYqXUg7fQww4oFFi/f1ad6b5fdbb0be5d2ed57f45bfafb70c/D_DeRozan_DB_Narration_050922.mp4"
+  },
+  "53_2018": {
+    "narrator": "Doris",
+    "player": "Doris - Luka",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1ZUgKhSQIP5QAzjTj3dFpx/f69f08d9e2712324278aa7d60f8fbfa3/L_Doncic_DB_Narration_050922.mp4"
+  },
+  "53_2068": {
+    "narrator": "Doris",
+    "player": "Doris - Jokic",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5LEF3f1O5inhPGzF88qohZ/ba26dfa52132581be316a86cc7a1a32c/N_Jokic_DB_PHOTO_Narration_050922.mp4"
+  },
+  "53_2431": {
+    "narrator": "Doris",
+    "player": "doris-durant-holo-s3",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/NGNkfSRRgsTXvs9HVuofK/8f8ff7b27512cd99ce34a7693ac7f979/K_Durant_DB_Narration_050922.mp4"
+  },
+  "53_2442": {
+    "narrator": "Doris",
+    "player": "Doris - Poole ",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2vhisGmbBynPRpNVEYUXDJ/fea2a9f730631edde96e2691b8544b0d/J_Poole_DB_Narration_050922.mp4"
+  },
+  "53_2447": {
+    "narrator": "Doris",
+    "player": "Doris - LeBron",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1DPyccnhT0M0ZUI36zgPJ3/85dbc26a2b01b55138b5ee33215de9ec/L_James_DB_Narration_050922.mp4"
+  },
+  "54_2137": {
+    "narrator": "Doris",
+    "player": "Doris - Giannis",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5I15xUDzZ9fiubfD2MMMW0/ab62057e874e44aa6056306921ee3d7a/G_Antetokounmpo_DB_Narration_050922.mp4"
+  },
+  "56_1992": {
+    "narrator": "Klay",
+    "player": "klay",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/13gIIl3nUfKnD44soGuqHb/6e7548b1ab4ac3f92211a7237dfd0142/klay-commentary.mp4"
+  },
+  "59_2082": {
+    "narrator": "Kevin",
+    "player": "reward",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/LrGcfN76qwVyLLVCJS2ts/3302fe5ef96aacb4e68087c7d5646ded/kd-reward.mp4"
+  },
+  "59_2083": {
+    "narrator": "Kevin",
+    "player": "jokic",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2np9Wyii5QIGNMLkoRtiKV/fbc3f99a90fc4bbbb77d08b81805bc55/kd-jokic.mp4"
+  },
+  "59_2084": {
+    "narrator": "Kevin",
+    "player": "curry",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/4ja8WmEegxMssNC8MB7qf0/a2c3f5fc6862fb417fded8e33f55479a/kd-curry.mp4"
+  },
+  "59_2085": {
+    "narrator": "Kevin",
+    "player": "morant",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/70ZRG5LsJSZt9mEMd0jwVj/30a183531a04c9cb476b2a2a5138143f/kd-morant.mp4"
+  },
+  "59_2086": {
+    "narrator": "Kevin",
+    "player": "edwards",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/55kmtJDPx1BP0NwMazZfcE/cefdd546abb91ee3014da80388cd4da5/kd-edwards.mp4"
+  },
+  "59_2087": {
+    "narrator": "Kevin",
+    "player": "booker",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5ZqBWGiaNgulF8hSzuIN9k/ed37879be00a30cc92434dc8a15f2505/kd-booker.mp4"
+  },
+  "59_2088": {
+    "narrator": "Kevin",
+    "player": "mitchell",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/23y0rjZYGNnTugPdtZUwfz/d81886148a7d52223eae32caed69d923/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1t17XBQc8EMH9rAEj10IC1/4b1f97f7294029d812e069a724a7df15/kd-mitchell.mp4"
+  },
+  "59_2413": {
+    "narrator": "Klay",
+    "player": "hayward",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/w2ldAU5o6pVRui7Vw1Rwy/a671a6d9fac9ddf05bcf0dd84c9e1a95/klay-commentary-hayward.mp4"
+  },
+  "59_2414": {
+    "narrator": "Klay",
+    "player": "lavine",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/qHjHrntmYwZlPe0Pn9kx0/aec0847ba3f7479222f04de9730a9df2/klay-commentary-lavine.mp4"
+  },
+  "59_2415": {
+    "narrator": "Klay",
+    "player": "cousins",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2fKy4693f5sYjFh7Tb9bIp/62859a0fdf0b9dad2ff974635152b783/klay-commentary-cousins.mp4"
+  },
+  "59_2416": {
+    "narrator": "Klay",
+    "player": "green",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7HHF08AXTz4ux5zSnBH8dH/8b1374fc927a333b3495de47f00728d0/klay-commentary-green.mp4"
+  },
+  "59_2417": {
+    "narrator": "Klay",
+    "player": "klay2",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2zWrhiNpRqrEP6pOzLNwnS/1780140333092ef6e51f1a5a8899b8de/klay-commentary-klay.mp4"
+  },
+  "59_2418": {
+    "narrator": "Klay",
+    "player": "george",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1jR6fxL9b0XapKd2MVIAdR/f3ca1185eeef942c62c954107cc62ef0/klay-commentary-george.mp4"
+  },
+  "59_2419": {
+    "narrator": "Klay",
+    "player": "rose",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/6MmPo8oBzx1JoVJuU2PrsH/ceaf41c02efe567e6385de0b6fdb446d/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5ITn9NUeG1hu6qHx0Rx9YW/d955f4193c69f6931b1b684068b66886/klay-commentary-rose.mp4"
+  },
+  "64_2378": {
+    "narrator": "Jalen",
+    "player": "suggs",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/73QaU9HxFEhpxjRNPR5L2U/2407cc5035ed0562b661e0353d59b9d8/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5NzkkaxPNjyiFDWZuFJ5V4/cb200bff72cfb059b607255956bc049c/suggs-commentary-throwdowns.mp4"
+  },
+  "64_2380": {
+    "narrator": "Doris",
+    "player": "Doris - Embiid Holo ",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3mczwWq1ORtPJgT9eqXnnW/7c6b690752b1b1e78a771c8d27d66f48/J_Embiid_DB_Narration_050922.mp4"
+  },
+  "65_2406": {
+    "narrator": "Jalen",
+    "player": "suggs1",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/73QaU9HxFEhpxjRNPR5L2U/2407cc5035ed0562b661e0353d59b9d8/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/4oQpCXGfoLoQxMO71skmb2/72b50e521c2bd8a3ac551c9557aac956/suggs-commentary-extra-spice.mp4"
+  },
+  "66_2514": {
+    "narrator": "A'ja",
+    "player": "aja",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4OWzONSdgbgN0flPCvRFnf/a44135158d0ec85fab1d26d2034f2493/avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1dH6XUiYUD6WGlqwMdlHA5/086bf1d657bf6fa2c7aff9f058dc1f85/aja-commentary.mp4"
+  },
+  "67_2528": {
+    "narrator": "Doris",
+    "player": "Doris - Jayson Tatum First Round",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/4tP8JodyaXnbXAj8JXSL4f/357dc7e16612d884d4b8013dafa7e5f4/PlayoffRd1_Narrations_J_Tatum_Final_051622.mp4"
+  },
+  "67_2530": {
+    "narrator": "Doris",
+    "player": "Doris - DeRozan First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/20NISN3NVTZb1LcDqWMK3E/87899b6530582c264f4c98f5b3d31c5a/PlayoffRd1_Narrations_D_DeRozan_Final_051622.mp4"
+  },
+  "67_2537": {
+    "narrator": "Doris",
+    "player": "Doris - Draymond First Round 22",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/uoGBwG1jxmLd2hTJKe8Bs/24e05251b0fe75511fa3915e3386b7c7/PlayoffRd1_Narrations_D_Green_Final_051622.mp4"
+  },
+  "67_2541": {
+    "narrator": "Doris",
+    "player": "Doris - Ja Morant First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2cg5J3TkO7e8nQ3Zd49riR/ac4f6eba32b28ea3dc63c3b8d0f89615/PlayoffRd1_Narrations_J_Morant_Final_051622.mp4"
+  },
+  "67_2552": {
+    "narrator": "Doris",
+    "player": "Doris - Alvarado First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7sN6N9kbSbQl3bb1zR35CO/dd97a33ee4053a6e8cc8fecb417e7df4/PlayoffRd1_Narrations_J_Alvarado_Final_051622.mp4"
+  },
+  "67_2553": {
+    "narrator": "Doris",
+    "player": "Doris - Joel Embiid First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/6Rl5Ex3TK7CjMR5ijxyb6j/d4a364ee2894749846b1cbbe7a396177/PlayoffRd1_Narrations_J_Embiid_Final_051622.mp4"
+  },
+  "67_2555": {
+    "narrator": "Doris",
+    "player": "Doris - Tyrese Maxey First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7hyyspTuTMrwphxsouapfK/6b407b09ff3cdc476b5d3661d56a6751/PlayoffRd1_Narrations_T_Maxey_Final_051622.mp4"
+  },
+  "67_2557": {
+    "narrator": "Doris",
+    "player": "Doris - Chris Paul First Round 2022",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7Ili6ZLaUU9ngE5B5D8din/9529241eec5f0ddfebf1541b48f7dc66/PlayoffRd1_Narrations_C_Paul_Final_051622.mp4"
+  },
+  "67_2568": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Horford",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/4H3MGn2VKoP8WImKmjCZ6t/6e91cf1f23857a1e7b4029ae23db0fbc/DB_RD_2_HORFORD_NARRATION_052622.mp4"
+  },
+  "67_2570": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Tatum",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/ueEEJGS4ark0kypPutGQV/84880a0bcb8d83ea3cf0fad3152c07d7/DB_RD_2_TATUM_NARRATION_052622.mp4"
+  },
+  "67_2571": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - DFS",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2TCb4ZCqdhjMln92aQBeAr/92941b485cc9d414f43533ff7db83191/DB_RD_2_FINNEY-SMITH_NARRATION_052622.mp4"
+  },
+  "67_2572": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Luka",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7o7yKSNoymQmvih8OCKrX4/4ca991ef94a171fffde926128a983525/DB_RD_2_DONCIC_NARRATION_052622.mp4"
+  },
+  "67_2576": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Steph",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2L6QBDKpdo5IsDtk9qH9Q4/139f71e3201ebdc29ead550b8c84a95a/DB_RD_2_CURRY_NARRATION_052622.mp4"
+  },
+  "67_2581": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Herro",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5ux6UyunX01j7TsWtxrHFY/13002b5ce93cf9ccf35f50f870b76c2d/DB_RD_2_HERRO_NARRATION_052622.mp4"
+  },
+  "67_2582": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Giannis",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5BTCXEShycEXiIKFcZrykf/9b59327b0c8fd3b6d3c32c794bc0ede1/DB_RD_2_ANTETOKOUNMPO_NARRATION_052622.mp4"
+  },
+  "67_2583": {
+    "narrator": "Doris",
+    "player": "Doris Round 2 - Holiday",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/7tiNErKNL4QT1jyorraMne/d731a0b1950098da037abc2c030893aa/DB_RD_2_HOLIDAY_NARRATION_052622.mp4"
+  },
+  "67_2637": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Daniel Theis",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2Nhz5xp2yaw6Rss80AMrgl/f719e0253ba4f8a5d467240575d91c5d/DORIS_NARRATION__Theis_070722.mp4"
+  },
+  "67_2638": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Derrick White",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1YRtvILXzV3Zft4JbQPdFJ/fdfee899c5d88db034e2e2f3f49be203/DORIS_NARRATION__White_070722.mp4"
+  },
+  "67_2639": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Marcus Smart",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2py0SG4Fi3gfL7iPf30QON/22bf66e8518d8b2fb287c7684741cc4c/DORIS_NARRATION__Smart_070722.mp4"
+  },
+  "67_2640": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Luka Doncic",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/0ipvHD985Rv9tMVSHmt5E/8eeb0bd36faf16f89dedcc6cd5edd45c/DORIS_NARRATION__Luka_070722.mp4"
+  },
+  "67_2641": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Spencer Dinwiddie",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2Kwz3kP6CR3VfZut0s4GuZ/f8ef3093a34de33c88aca393ceec5e3d/DORIS_NARRATION__Dinwiddie_070722.mp4"
+  },
+  "67_2642": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Jordan Poole",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/283PVphtLaneKkk3PSrJJL/e8c271ed3947bdbe20ef7528cbf671fc/DORIS_NARRATION__Poole_070722.mp4"
+  },
+  "67_2643": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Kevon Looney",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2Jf8gInCm6XtMQQMldHhCU/fdf74e3f703d315f88aa4bd5b954e331/DORIS_NARRATION__Looney_070722.mp4"
+  },
+  "67_2644": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Steph Curry",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3HHCmNGWfIZwJ7bGsMxqkb/3516908d02fcd4278b049041fcc20248/DORIS_NARRATION__Steph_round_3_070722.mp4"
+  },
+  "67_2645": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - Kyle Lowry",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3YhZjW3y6xxNpEPdbNfud3/d011550b59f9a2534b2810ad1d449a0c/DORIS_NARRATION__Lowery_070722.mp4"
+  },
+  "67_2646": {
+    "narrator": "Doris",
+    "player": "Doris Conf Finals - PJ Tucker",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2cHUJxGuP7xFpMG9ZrjrVU/04bd3a9f21b979044447e82596cb7b32/DORIS_NARRATION__Tucker_070722.mp4"
+  },
+  "67_2664": {
+    "narrator": "Doris",
+    "player": "Doris Finals - Al Horford",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/68KYly1Ak4T2sQ4AXgZNNw/d58cac643d0fc2d4d3d9dd8e0607b487/DORIS_NARRATION__Horford_070722.mp4"
+  },
+  "67_2665": {
+    "narrator": "Doris",
+    "player": "Doris Finals Narration: Robert Williams",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5sIuIEG9Kfvn2svD1kA4Pj/92b303b593cb9235a014fe38171e9e5a/DORIS_NARRATION__Williams_070722.mp4"
+  },
+  "67_2666": {
+    "narrator": "Doris",
+    "player": "Doris Finals - Andrew Wiggins",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/572wddXO6kNEmViJazjoQ5/2995ef1eb863c67eb26f2a49d71338be/DORIS_NARRATION__Wiggins_070722.mp4"
+  },
+  "67_2667": {
+    "narrator": "Doris",
+    "player": "Doris Finals - Otto Porter Jr",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/xITOtSJJfYu8W1HbU0ANs/675399487f7ed0f34da9dfd7fc5c30e6/DORIS_NARRATION__Porter_070722.mp4"
+  },
+  "67_2668": {
+    "narrator": "Doris",
+    "player": "Doris Finals - Steph Curry",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1arQjmzQktOHlrTunoHLvT/c6f13a8e23c3cf5549ebe22e6a6b3f07/doris-burke-headshot.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2oL284xzWWW3iDY1jJzMAB/869daa229153a599ba06121268920de8/DORIS_NARRATION__Steph_FInals_070722.mp4"
+  },
+  "81_2827": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Rhyne Howard",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/56xnTySTlwpNDGnPdOGBt4/08219fb57d4ad3b6c0474f3edcc8ff55/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3FUAOJLiPtQE4QDhd4DtqB/b2530ca7b89449129b2a6d5bef6e1972/Rhyne_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2828": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Arike Ogunbowale",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/5czY5bi9M0WW92ay4KsZFo/7a3c5c70f536143cbe827ffbec2572b0/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2ckfXJxZgazBPD5DQoR6GR/42fceda5a1dcb398bc3c8b31c1c1e73f/Arike_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2829": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Sylvia Fowles",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/54vD1LiT38L1zCCLml9Mpm/64a0716fe6c5bb9d0b805784998de6b5/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/69GbD3gVAYKSr2PAYb0qsq/eb40cbe326dd3dd4db3b273f4e0975ec/Sylvia_Fowles_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2830": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Diana Taurasi",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/5ZFDtus5akuVTGiwYy91Vi/902d9b2f3ca3b00f8ec6c1e3877a534d/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/5l4RtTm217FhrjzUVd1Rye/f318c4b4b70522a9329046f3b0e46f60/Diana_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2831": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Jennifer Azzi",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/1k97zbxCy0AFttRQ6WVATE/714d503a949434ce53eccd28c4989285/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3IJ3sy4qT1QQhFzL9WxzAG/9da8d59bc2c7496761a313324fc2777c/Azzi_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2832": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Breanna Stewart",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4hSXfKr3hjBQVqFVrUZ0HL/6aeda5ef0bf8096118680807571592b2/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/3phhTj6xhJNXwEVhz4HTV2/ded5d59c0ff9bc60aee5e227bb34e7b3/Breanna_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2833": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Jewell Loyd",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/2a3fS5j2tAWnJc4EpVUREP/ad677ee28118fcc3f2e34c928b4ba890/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/OldreGWA3n92CMfwfY7xz/3cbbfc8092cb31d4f2f499da90c62999/Jewell_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2834": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Lauren Jackson",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/GHlEwODW6W3rv6G282h8Z/e87dd689af60d8ce635edc6fdb429629/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2VZbBuNcVV9q799DS01Sog/fbbd772258c115bb605c5fc1b70338fe/Lauren_Jackson_GRG_Final_Narration_091222.mp4"
+  },
+  "81_2835": {
+    "narrator": "Sue",
+    "player": "Sue's GRG Narration: Sue Bird",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/5uENMzjpEgOWBnweyV8Gt1/e7a99eab5f708e73dca7a9f570065954/SueHeadshot2.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/45SqlxMbzajG9T91aAdaDs/1d88e843ce06912d26788d8caf096ede/Sue_Bird_GRG_Final_Narration_091222.mp4"
+  },
+  "117_4124": {
+    "narrator": "Larry",
+    "player": "Larry Bird Anthology Narration: 60 pt game",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4KilBDVxl2D7jWeZLU9tRO/62c4453c80b474cf15a80c4e85688401/larry_bird_avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/RIJgRHQN7rJnTyVfHDpkZ/0eb1ab538c28fbe15382537fc63f9c80/60_Point_Game.mp4"
+  },
+  "117_4125": {
+    "narrator": "Larry",
+    "player": "Larry Bird Anthology Narration: Left handed game",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4KilBDVxl2D7jWeZLU9tRO/62c4453c80b474cf15a80c4e85688401/larry_bird_avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/1sebi8HEB26u5KcSIB5PEk/df53fc00880a6660468dfa4090a9b700/Lefty_Game.mp4"
+  },
+  "117_4126": {
+    "narrator": "Larry",
+    "player": "Larry Bird Anthology Narration: 86 finals",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4KilBDVxl2D7jWeZLU9tRO/62c4453c80b474cf15a80c4e85688401/larry_bird_avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/29swMQ3nRRVIAPXwRDFy78/4b8e718585d7e70e6678f05fb777ce1b/1986_NBA_Finals_2.mp4"
+  },
+  "117_4127": {
+    "narrator": "Larry",
+    "player": "Larry Bird Anthology Narration: 3 Pt Contest",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4KilBDVxl2D7jWeZLU9tRO/62c4453c80b474cf15a80c4e85688401/larry_bird_avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/6vr9UXNbUPtsGwz9QksNDo/fd97bc723b568609ab9303bd842cd9b2/3_Pt_Contest.mp4"
+  },
+  "117_4128": {
+    "narrator": "Larry",
+    "player": "Larry Bird Anthology Narration: 81 Finals",
+    "avatar": "https://images.ctfassets.net/8pi8z3xqpwj9/4KilBDVxl2D7jWeZLU9tRO/62c4453c80b474cf15a80c4e85688401/larry_bird_avatar.png",
+    "video": "https://videos.ctfassets.net/8pi8z3xqpwj9/2pLrugnGrowaIB7m9uI331/f2833158102162583c83d901607114dc/1981_NBA_Finals.mp4"
+  }
+}

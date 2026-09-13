@@ -1,0 +1,455 @@
+{
+  "source": {
+    "NBA": "https://www.basketball-reference.com/awards/roy.html",
+    "WNBA": "https://www.basketball-reference.com/wnba/awards/roy.html"
+  },
+  "note": "Rookie of the Year per season (ABA excluded; ties are two rows). Historical lookup; not yet used in tag derivation.",
+  "NBA": [
+    {
+      "season": "1947-48",
+      "player": "Paul Hoffman"
+    },
+    {
+      "season": "1948-49",
+      "player": "Howie Shannon"
+    },
+    {
+      "season": "1949-50",
+      "player": "Alex Groza"
+    },
+    {
+      "season": "1950-51",
+      "player": "Paul Arizin"
+    },
+    {
+      "season": "1951-52",
+      "player": "Bill Tosheff"
+    },
+    {
+      "season": "1951-52",
+      "player": "Mel Hutchins"
+    },
+    {
+      "season": "1952-53",
+      "player": "Monk Meineke"
+    },
+    {
+      "season": "1953-54",
+      "player": "Ray Felix"
+    },
+    {
+      "season": "1954-55",
+      "player": "Bob Pettit"
+    },
+    {
+      "season": "1955-56",
+      "player": "Maurice Stokes"
+    },
+    {
+      "season": "1956-57",
+      "player": "Tom Heinsohn"
+    },
+    {
+      "season": "1957-58",
+      "player": "Woody Sauldsberry"
+    },
+    {
+      "season": "1958-59",
+      "player": "Elgin Baylor"
+    },
+    {
+      "season": "1959-60",
+      "player": "Wilt Chamberlain"
+    },
+    {
+      "season": "1960-61",
+      "player": "Oscar Robertson"
+    },
+    {
+      "season": "1961-62",
+      "player": "Walt Bellamy"
+    },
+    {
+      "season": "1962-63",
+      "player": "Terry Dischinger"
+    },
+    {
+      "season": "1963-64",
+      "player": "Jerry Lucas"
+    },
+    {
+      "season": "1964-65",
+      "player": "Willis Reed"
+    },
+    {
+      "season": "1965-66",
+      "player": "Rick Barry"
+    },
+    {
+      "season": "1966-67",
+      "player": "Dave Bing"
+    },
+    {
+      "season": "1967-68",
+      "player": "Earl Monroe"
+    },
+    {
+      "season": "1968-69",
+      "player": "Wes Unseld"
+    },
+    {
+      "season": "1969-70",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1970-71",
+      "player": "Dave Cowens"
+    },
+    {
+      "season": "1970-71",
+      "player": "Geoff Petrie"
+    },
+    {
+      "season": "1971-72",
+      "player": "Sidney Wicks"
+    },
+    {
+      "season": "1972-73",
+      "player": "Bob McAdoo"
+    },
+    {
+      "season": "1973-74",
+      "player": "Ernie DiGregorio"
+    },
+    {
+      "season": "1974-75",
+      "player": "Jamaal Wilkes"
+    },
+    {
+      "season": "1975-76",
+      "player": "Alvan Adams"
+    },
+    {
+      "season": "1976-77",
+      "player": "Adrian Dantley"
+    },
+    {
+      "season": "1977-78",
+      "player": "Walter Davis"
+    },
+    {
+      "season": "1978-79",
+      "player": "Phil Ford"
+    },
+    {
+      "season": "1979-80",
+      "player": "Larry Bird"
+    },
+    {
+      "season": "1980-81",
+      "player": "Darrell Griffith"
+    },
+    {
+      "season": "1981-82",
+      "player": "Buck Williams"
+    },
+    {
+      "season": "1982-83",
+      "player": "Terry Cummings"
+    },
+    {
+      "season": "1983-84",
+      "player": "Ralph Sampson"
+    },
+    {
+      "season": "1984-85",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1985-86",
+      "player": "Patrick Ewing"
+    },
+    {
+      "season": "1986-87",
+      "player": "Chuck Person"
+    },
+    {
+      "season": "1987-88",
+      "player": "Mark Jackson"
+    },
+    {
+      "season": "1988-89",
+      "player": "Mitch Richmond"
+    },
+    {
+      "season": "1989-90",
+      "player": "David Robinson"
+    },
+    {
+      "season": "1990-91",
+      "player": "Derrick Coleman"
+    },
+    {
+      "season": "1991-92",
+      "player": "Larry Johnson"
+    },
+    {
+      "season": "1992-93",
+      "player": "Shaquille O'Neal"
+    },
+    {
+      "season": "1993-94",
+      "player": "Chris Webber"
+    },
+    {
+      "season": "1994-95",
+      "player": "Grant Hill"
+    },
+    {
+      "season": "1994-95",
+      "player": "Jason Kidd"
+    },
+    {
+      "season": "1995-96",
+      "player": "Damon Stoudamire"
+    },
+    {
+      "season": "1996-97",
+      "player": "Allen Iverson"
+    },
+    {
+      "season": "1997-98",
+      "player": "Tim Duncan"
+    },
+    {
+      "season": "1998-99",
+      "player": "Vince Carter"
+    },
+    {
+      "season": "1999-00",
+      "player": "Elton Brand"
+    },
+    {
+      "season": "1999-00",
+      "player": "Steve Francis"
+    },
+    {
+      "season": "2000-01",
+      "player": "Mike Miller"
+    },
+    {
+      "season": "2001-02",
+      "player": "Pau Gasol"
+    },
+    {
+      "season": "2002-03",
+      "player": "Amar'e Stoudemire"
+    },
+    {
+      "season": "2003-04",
+      "player": "LeBron James"
+    },
+    {
+      "season": "2004-05",
+      "player": "Emeka Okafor"
+    },
+    {
+      "season": "2005-06",
+      "player": "Chris Paul"
+    },
+    {
+      "season": "2006-07",
+      "player": "Brandon Roy"
+    },
+    {
+      "season": "2007-08",
+      "player": "Kevin Durant"
+    },
+    {
+      "season": "2008-09",
+      "player": "Derrick Rose"
+    },
+    {
+      "season": "2009-10",
+      "player": "Tyreke Evans"
+    },
+    {
+      "season": "2010-11",
+      "player": "Blake Griffin"
+    },
+    {
+      "season": "2011-12",
+      "player": "Kyrie Irving"
+    },
+    {
+      "season": "2012-13",
+      "player": "Damian Lillard"
+    },
+    {
+      "season": "2013-14",
+      "player": "Michael Carter-Williams"
+    },
+    {
+      "season": "2014-15",
+      "player": "Andrew Wiggins"
+    },
+    {
+      "season": "2015-16",
+      "player": "Karl-Anthony Towns"
+    },
+    {
+      "season": "2016-17",
+      "player": "Malcolm Brogdon"
+    },
+    {
+      "season": "2017-18",
+      "player": "Ben Simmons"
+    },
+    {
+      "season": "2018-19",
+      "player": "Luka Dončić"
+    },
+    {
+      "season": "2019-20",
+      "player": "Ja Morant"
+    },
+    {
+      "season": "2020-21",
+      "player": "LaMelo Ball"
+    },
+    {
+      "season": "2021-22",
+      "player": "Scottie Barnes"
+    },
+    {
+      "season": "2022-23",
+      "player": "Paolo Banchero"
+    },
+    {
+      "season": "2023-24",
+      "player": "Victor Wembanyama"
+    },
+    {
+      "season": "2024-25",
+      "player": "Stephon Castle"
+    },
+    {
+      "season": "2025-26",
+      "player": "Cooper Flagg"
+    }
+  ],
+  "WNBA": [
+    {
+      "season": "1998",
+      "player": "Tracy Reid"
+    },
+    {
+      "season": "1999",
+      "player": "Chamique Holdsclaw"
+    },
+    {
+      "season": "2000",
+      "player": "Betty Lennox"
+    },
+    {
+      "season": "2001",
+      "player": "Jackie Stiles"
+    },
+    {
+      "season": "2002",
+      "player": "Tamika Catchings"
+    },
+    {
+      "season": "2003",
+      "player": "Cheryl Ford"
+    },
+    {
+      "season": "2004",
+      "player": "Diana Taurasi"
+    },
+    {
+      "season": "2005",
+      "player": "Temeka Johnson"
+    },
+    {
+      "season": "2006",
+      "player": "Seimone Augustus"
+    },
+    {
+      "season": "2007",
+      "player": "Armintie Herrington"
+    },
+    {
+      "season": "2008",
+      "player": "Candace Parker"
+    },
+    {
+      "season": "2009",
+      "player": "Angel McCoughtry"
+    },
+    {
+      "season": "2010",
+      "player": "Tina Charles"
+    },
+    {
+      "season": "2011",
+      "player": "Maya Moore"
+    },
+    {
+      "season": "2012",
+      "player": "Nneka Ogwumike"
+    },
+    {
+      "season": "2013",
+      "player": "Elena Delle Donne"
+    },
+    {
+      "season": "2014",
+      "player": "Chiney Ogwumike"
+    },
+    {
+      "season": "2015",
+      "player": "Jewell Loyd"
+    },
+    {
+      "season": "2016",
+      "player": "Breanna Stewart"
+    },
+    {
+      "season": "2017",
+      "player": "Allisha Gray"
+    },
+    {
+      "season": "2018",
+      "player": "A'ja Wilson"
+    },
+    {
+      "season": "2019",
+      "player": "Napheesa Collier"
+    },
+    {
+      "season": "2020",
+      "player": "Crystal Dangerfield"
+    },
+    {
+      "season": "2021",
+      "player": "Michaela Onyenwere"
+    },
+    {
+      "season": "2022",
+      "player": "Rhyne Howard"
+    },
+    {
+      "season": "2023",
+      "player": "Aliyah Boston"
+    },
+    {
+      "season": "2024",
+      "player": "Caitlin Clark"
+    },
+    {
+      "season": "2025",
+      "player": "Paige Bueckers"
+    }
+  ]
+}

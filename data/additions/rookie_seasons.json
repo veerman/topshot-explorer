@@ -1,0 +1,470 @@
+{
+  "_note": "First league season for players whose rookie season is not their draft year (late debuts: injury redshirts, draft-and-stash, undrafted). Season = start year (NBA 2017 = 2017-18; WNBA 2015 = 2015). Seeded 2026-09-09 from the Atlas comparison (scratch/atlas-badges-2026-08-31.json): every entry is the earliest season the player has a moment in, which Atlas badges as their rookie year. Overrides DraftYear in the Rookie Year and Rookie Mint rules (overrides.service.js). Add a player here when the Atlas comparison reports an atlas-only Rookie Year whose season is the player's real first season.",
+  "players": {
+    "Aicha Coulibaly": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2025"
+    },
+    "Alex Caruso": {
+      "season": "2017",
+      "league": "NBA",
+      "draft": "2016"
+    },
+    "Alex Fowler": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Alex Reese": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": null
+    },
+    "Alex Wilson": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Alexa Held": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2022"
+    },
+    "Alicia Flórez": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Antonia Delaere": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Armoni Brooks": {
+      "season": "2020",
+      "league": "NBA",
+      "draft": "2019"
+    },
+    "Arvydas Sabonis": {
+      "season": "1995",
+      "league": "NBA",
+      "draft": "1986"
+    },
+    "Aubrey Griffin": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2025"
+    },
+    "Ben Simmons": {
+      "season": "2017",
+      "league": "NBA",
+      "draft": "2016"
+    },
+    "Blake Griffin": {
+      "season": "2010",
+      "league": "NBA",
+      "draft": "2009"
+    },
+    "Bojan Bogdanović": {
+      "season": "2014",
+      "league": "NBA",
+      "draft": "2011"
+    },
+    "Carla Leite": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2024"
+    },
+    "Chelsea Gray": {
+      "season": "2015",
+      "league": "WNBA",
+      "draft": "2014"
+    },
+    "Chet Holmgren": {
+      "season": "2023",
+      "league": "NBA",
+      "draft": "2022"
+    },
+    "Chloe Bibby": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2022"
+    },
+    "Chris Youngblood": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": null
+    },
+    "Chuma Okeke": {
+      "season": "2020",
+      "league": "NBA",
+      "draft": "2019"
+    },
+    "Damion Baugh": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2023"
+    },
+    "DaRon Holmes II": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": "2024"
+    },
+    "David Jones Garcia": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": "2024"
+    },
+    "David Robinson": {
+      "season": "1989",
+      "league": "NBA",
+      "draft": "1987"
+    },
+    "Drew Timme": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2023"
+    },
+    "Dylan Windler": {
+      "season": "2020",
+      "league": "NBA",
+      "draft": "2019"
+    },
+    "E.J. Liddell": {
+      "season": "2023",
+      "league": "NBA",
+      "draft": "2022"
+    },
+    "Elizabeth Kitley": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2024"
+    },
+    "Emese Hof": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2019"
+    },
+    "Emma Čechová": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Ethan Thompson": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": "2021"
+    },
+    "Georgia Amoore": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2025"
+    },
+    "Greg Oden": {
+      "season": "2008",
+      "league": "NBA",
+      "draft": "2007"
+    },
+    "Gui Santos": {
+      "season": "2023",
+      "league": "NBA",
+      "draft": "2022"
+    },
+    "Holly Winterburn": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Hot Rod Williams": {
+      "season": "1986",
+      "league": "NBA",
+      "draft": "1985"
+    },
+    "Isobel Borlase": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2024"
+    },
+    "Jae'Sean Tate": {
+      "season": "2020",
+      "league": "NBA",
+      "draft": "2018"
+    },
+    "Jaelyn Brown": {
+      "season": "2024",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Janelle Salaün": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2019"
+    },
+    "Jaylen Clark": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2023"
+    },
+    "Jock Landale": {
+      "season": "2021",
+      "league": "NBA",
+      "draft": "2018"
+    },
+    "Joel Embiid": {
+      "season": "2016",
+      "league": "NBA",
+      "draft": "2014"
+    },
+    "Jordan Harrison": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Jordan McLaughlin": {
+      "season": "2019",
+      "league": "NBA",
+      "draft": "2018"
+    },
+    "Jovana Nogic": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Justė Jocytė": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2025"
+    },
+    "Kariata Diaby": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2014"
+    },
+    "Karlo Matković": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2022"
+    },
+    "Kathryn Westbeld": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2018"
+    },
+    "Keaton Wallace": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2021"
+    },
+    "Keion Brooks Jr.": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": null
+    },
+    "Kendrick Nunn": {
+      "season": "2019",
+      "league": "NBA",
+      "draft": "2018"
+    },
+    "Kitija Laksa": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2020"
+    },
+    "Kristy Wallace": {
+      "season": "2022",
+      "league": "WNBA",
+      "draft": "2018"
+    },
+    "Laura Juškaitė": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Leila Lacan": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2024"
+    },
+    "Leonie Fiebich": {
+      "season": "2024",
+      "league": "WNBA",
+      "draft": "2020"
+    },
+    "Li Meng": {
+      "season": "2023",
+      "league": "WNBA",
+      "draft": "2017"
+    },
+    "Lou Lopez Sénéchal": {
+      "season": "2024",
+      "league": "WNBA",
+      "draft": "2023"
+    },
+    "Luisa Geiselsöder": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2020"
+    },
+    "Luke Travers": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": "2022"
+    },
+    "Manu Ginóbili": {
+      "season": "2002",
+      "league": "NBA",
+      "draft": "1999"
+    },
+    "Maria Conde": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2019"
+    },
+    "Megan McConnell": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Michael Porter Jr.": {
+      "season": "2019",
+      "league": "NBA",
+      "draft": "2018"
+    },
+    "Monique Akoa Makani": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Morgan Bertsch": {
+      "season": "2023",
+      "league": "WNBA",
+      "draft": "2019"
+    },
+    "Moussa Cisse": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": null
+    },
+    "Murjanatu Musa": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2018"
+    },
+    "Myron Gardner": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": "2023"
+    },
+    "Nikola Jokić": {
+      "season": "2015",
+      "league": "NBA",
+      "draft": "2014"
+    },
+    "Nikola Topić": {
+      "season": "2025",
+      "league": "NBA",
+      "draft": "2024"
+    },
+    "Noémie Brochant": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Nyadiew Puoch": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2024"
+    },
+    "Nyara Sabally": {
+      "season": "2023",
+      "league": "WNBA",
+      "draft": "2022"
+    },
+    "Olivia Époupa": {
+      "season": "2024",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Pauline Astier": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Quionche Carter": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Raegan Beers": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Rebekah Gardner": {
+      "season": "2022",
+      "league": "WNBA",
+      "draft": "2012"
+    },
+    "Rui Machida": {
+      "season": "2022",
+      "league": "WNBA",
+      "draft": "2015"
+    },
+    "Sasha Vezenkov": {
+      "season": "2023",
+      "league": "NBA",
+      "draft": "2017"
+    },
+    "Simone Fontecchio": {
+      "season": "2022",
+      "league": "NBA",
+      "draft": "2017"
+    },
+    "Stephanie Soares": {
+      "season": "2024",
+      "league": "WNBA",
+      "draft": "2023"
+    },
+    "Sydney Taylor": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Tamika Catchings": {
+      "season": "2002",
+      "league": "WNBA",
+      "draft": "2001"
+    },
+    "Teja Oblak": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
+    "Toni Kukoč": {
+      "season": "1993",
+      "league": "NBA",
+      "draft": "1990"
+    },
+    "Trentyn Flowers": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": null
+    },
+    "Vasilije Micić": {
+      "season": "2023",
+      "league": "NBA",
+      "draft": "2014"
+    },
+    "Yuki Kawamura": {
+      "season": "2024",
+      "league": "NBA",
+      "draft": null
+    },
+    "Zydrunas Ilgauskas": {
+      "season": "1997",
+      "league": "NBA",
+      "draft": "1996"
+    }
+  }
+}

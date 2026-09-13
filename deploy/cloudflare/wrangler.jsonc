@@ -1,0 +1,46 @@
+{
+  // One Worker serves the static build and the caching /flow/* proxy.
+  // Static assets are served by the CDN before the Worker runs; only
+  // /flow/* costs an invocation. This whole directory is optional: the app
+  // builds and runs on any static host without it (see README).
+  "name": "topshot-explorer-v2",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "../../dist",
+    "binding": "ASSETS",
+    // client-side routes like /plays and /sets/218 must serve the app shell
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/flow/*", "/lookup/*", "/auth/*", "/wall/*"]
+  },
+  "observability": { "enabled": true },
+  // Offers fold: every half hour the Worker applies the offer events since
+  // the published book's height and republishes it to the cache bucket
+  // (see foldOffers in worker.js). Paid plan only: the fold makes a few
+  // hundred requests per run and needs more than the free CPU budget.
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "r2_buckets": [
+    { "binding": "CACHE_BUCKET", "bucket_name": "topshot-explorer-cache" }
+  ],
+  // Address lookup (GET /lookup/address/<addr>): who an address is, from a
+  // D1 table loaded out of the private collector census (never in the
+  // repo). One address per request, rate limited per client. Optional
+  // like everything else here: without the binding the route answers 404
+  // and the app shows addresses.
+  "d1_databases": [
+    { "binding": "LOOKUP_DB", "database_name": "topshot-explorer-lookup", "database_id": "4c2b4514-2f4c-415d-9c0d-931c70c4c753" }
+  ],
+  // Wallet sign-in (/auth/*, see auth.js) signs its session cookie with the
+  // SESSION_SECRET secret (`wrangler secret put SESSION_SECRET`); without it
+  // the routes answer 503 and the username lookup stays closed.
+  "ratelimits": [
+    { "name": "LOOKUP_LIMIT", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } }
+  ],
+  "limits": { "cpu_ms": 60000 },
+  // Test deploy. At cutover this becomes the apex + www (release them from
+  // the v1 worker FIRST; two Workers cannot hold the same custom domain).
+  "routes": [
+    { "pattern": "v2.topshotexplorer.com", "custom_domain": true }
+  ]
+}

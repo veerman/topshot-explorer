@@ -1,0 +1,411 @@
+{
+  "source": {
+    "NBA": "https://www.basketball-reference.com/awards/mvp.html",
+    "WNBA": "https://www.basketball-reference.com/wnba/awards/mvp.html"
+  },
+  "note": "League MVP per season (ABA excluded). Historical lookup; not yet used in tag derivation.",
+  "NBA": [
+    {
+      "season": "1955-56",
+      "player": "Bob Pettit"
+    },
+    {
+      "season": "1956-57",
+      "player": "Bob Cousy"
+    },
+    {
+      "season": "1957-58",
+      "player": "Bill Russell"
+    },
+    {
+      "season": "1958-59",
+      "player": "Bob Pettit"
+    },
+    {
+      "season": "1959-60",
+      "player": "Wilt Chamberlain"
+    },
+    {
+      "season": "1960-61",
+      "player": "Bill Russell"
+    },
+    {
+      "season": "1961-62",
+      "player": "Bill Russell"
+    },
+    {
+      "season": "1962-63",
+      "player": "Bill Russell"
+    },
+    {
+      "season": "1963-64",
+      "player": "Oscar Robertson"
+    },
+    {
+      "season": "1964-65",
+      "player": "Bill Russell"
+    },
+    {
+      "season": "1965-66",
+      "player": "Wilt Chamberlain"
+    },
+    {
+      "season": "1966-67",
+      "player": "Wilt Chamberlain"
+    },
+    {
+      "season": "1967-68",
+      "player": "Wilt Chamberlain"
+    },
+    {
+      "season": "1968-69",
+      "player": "Wes Unseld"
+    },
+    {
+      "season": "1969-70",
+      "player": "Willis Reed"
+    },
+    {
+      "season": "1970-71",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1971-72",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1972-73",
+      "player": "Dave Cowens"
+    },
+    {
+      "season": "1973-74",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1974-75",
+      "player": "Bob McAdoo"
+    },
+    {
+      "season": "1975-76",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1976-77",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1977-78",
+      "player": "Bill Walton"
+    },
+    {
+      "season": "1978-79",
+      "player": "Moses Malone"
+    },
+    {
+      "season": "1979-80",
+      "player": "Kareem Abdul-Jabbar"
+    },
+    {
+      "season": "1980-81",
+      "player": "Julius Erving"
+    },
+    {
+      "season": "1981-82",
+      "player": "Moses Malone"
+    },
+    {
+      "season": "1982-83",
+      "player": "Moses Malone"
+    },
+    {
+      "season": "1983-84",
+      "player": "Larry Bird"
+    },
+    {
+      "season": "1984-85",
+      "player": "Larry Bird"
+    },
+    {
+      "season": "1985-86",
+      "player": "Larry Bird"
+    },
+    {
+      "season": "1986-87",
+      "player": "Magic Johnson"
+    },
+    {
+      "season": "1987-88",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1988-89",
+      "player": "Magic Johnson"
+    },
+    {
+      "season": "1989-90",
+      "player": "Magic Johnson"
+    },
+    {
+      "season": "1990-91",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1991-92",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1992-93",
+      "player": "Charles Barkley"
+    },
+    {
+      "season": "1993-94",
+      "player": "Hakeem Olajuwon"
+    },
+    {
+      "season": "1994-95",
+      "player": "David Robinson"
+    },
+    {
+      "season": "1995-96",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1996-97",
+      "player": "Karl Malone"
+    },
+    {
+      "season": "1997-98",
+      "player": "Michael Jordan"
+    },
+    {
+      "season": "1998-99",
+      "player": "Karl Malone"
+    },
+    {
+      "season": "1999-00",
+      "player": "Shaquille O'Neal"
+    },
+    {
+      "season": "2000-01",
+      "player": "Allen Iverson"
+    },
+    {
+      "season": "2001-02",
+      "player": "Tim Duncan"
+    },
+    {
+      "season": "2002-03",
+      "player": "Tim Duncan"
+    },
+    {
+      "season": "2003-04",
+      "player": "Kevin Garnett"
+    },
+    {
+      "season": "2004-05",
+      "player": "Steve Nash"
+    },
+    {
+      "season": "2005-06",
+      "player": "Steve Nash"
+    },
+    {
+      "season": "2006-07",
+      "player": "Dirk Nowitzki"
+    },
+    {
+      "season": "2007-08",
+      "player": "Kobe Bryant"
+    },
+    {
+      "season": "2008-09",
+      "player": "LeBron James"
+    },
+    {
+      "season": "2009-10",
+      "player": "LeBron James"
+    },
+    {
+      "season": "2010-11",
+      "player": "Derrick Rose"
+    },
+    {
+      "season": "2011-12",
+      "player": "LeBron James"
+    },
+    {
+      "season": "2012-13",
+      "player": "LeBron James"
+    },
+    {
+      "season": "2013-14",
+      "player": "Kevin Durant"
+    },
+    {
+      "season": "2014-15",
+      "player": "Stephen Curry"
+    },
+    {
+      "season": "2015-16",
+      "player": "Stephen Curry"
+    },
+    {
+      "season": "2016-17",
+      "player": "Russell Westbrook"
+    },
+    {
+      "season": "2017-18",
+      "player": "James Harden"
+    },
+    {
+      "season": "2018-19",
+      "player": "Giannis Antetokounmpo"
+    },
+    {
+      "season": "2019-20",
+      "player": "Giannis Antetokounmpo"
+    },
+    {
+      "season": "2020-21",
+      "player": "Nikola Jokić"
+    },
+    {
+      "season": "2021-22",
+      "player": "Nikola Jokić"
+    },
+    {
+      "season": "2022-23",
+      "player": "Joel Embiid"
+    },
+    {
+      "season": "2023-24",
+      "player": "Nikola Jokić"
+    },
+    {
+      "season": "2024-25",
+      "player": "Shai Gilgeous-Alexander"
+    },
+    {
+      "season": "2025-26",
+      "player": "Shai Gilgeous-Alexander"
+    }
+  ],
+  "WNBA": [
+    {
+      "season": "1997",
+      "player": "Cynthia Cooper"
+    },
+    {
+      "season": "1998",
+      "player": "Cynthia Cooper"
+    },
+    {
+      "season": "1999",
+      "player": "Yolanda Griffith"
+    },
+    {
+      "season": "2000",
+      "player": "Sheryl Swoopes"
+    },
+    {
+      "season": "2001",
+      "player": "Lisa Leslie"
+    },
+    {
+      "season": "2002",
+      "player": "Sheryl Swoopes"
+    },
+    {
+      "season": "2003",
+      "player": "Lauren Jackson"
+    },
+    {
+      "season": "2004",
+      "player": "Lisa Leslie"
+    },
+    {
+      "season": "2005",
+      "player": "Sheryl Swoopes"
+    },
+    {
+      "season": "2006",
+      "player": "Lisa Leslie"
+    },
+    {
+      "season": "2007",
+      "player": "Lauren Jackson"
+    },
+    {
+      "season": "2008",
+      "player": "Candace Parker"
+    },
+    {
+      "season": "2009",
+      "player": "Diana Taurasi"
+    },
+    {
+      "season": "2010",
+      "player": "Lauren Jackson"
+    },
+    {
+      "season": "2011",
+      "player": "Tamika Catchings"
+    },
+    {
+      "season": "2012",
+      "player": "Tina Charles"
+    },
+    {
+      "season": "2013",
+      "player": "Candace Parker"
+    },
+    {
+      "season": "2014",
+      "player": "Maya Moore"
+    },
+    {
+      "season": "2015",
+      "player": "Elena Delle Donne"
+    },
+    {
+      "season": "2016",
+      "player": "Nneka Ogwumike"
+    },
+    {
+      "season": "2017",
+      "player": "Sylvia Fowles"
+    },
+    {
+      "season": "2018",
+      "player": "Breanna Stewart"
+    },
+    {
+      "season": "2019",
+      "player": "Elena Delle Donne"
+    },
+    {
+      "season": "2020",
+      "player": "A'ja Wilson"
+    },
+    {
+      "season": "2021",
+      "player": "Jonquel Jones"
+    },
+    {
+      "season": "2022",
+      "player": "A'ja Wilson"
+    },
+    {
+      "season": "2023",
+      "player": "Breanna Stewart"
+    },
+    {
+      "season": "2024",
+      "player": "A'ja Wilson"
+    },
+    {
+      "season": "2025",
+      "player": "A'ja Wilson"
+    }
+  ]
+}

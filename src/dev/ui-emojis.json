@@ -1,0 +1,219 @@
+[
+ {
+  "e": "✅",
+  "files": [
+   "DataTable.jsx",
+   "SetDetail.jsx"
+  ]
+ },
+ {
+  "e": "❌",
+  "files": [
+   "DataTable.jsx",
+   "SetDetail.jsx"
+  ]
+ },
+ {
+  "e": "🔒",
+  "files": [
+   "DataTable.jsx",
+   "EditionDetail.jsx",
+   "SetDetail.jsx",
+   "Sets.jsx"
+  ]
+ },
+ {
+  "e": "✕",
+  "files": [
+   "DataTable.jsx"
+  ]
+ },
+ {
+  "e": "↕",
+  "files": [
+   "DataTable.jsx"
+  ]
+ },
+ {
+  "e": "🔁",
+  "files": [
+   "MediaOverlay.jsx"
+  ]
+ },
+ {
+  "e": "🔇",
+  "files": [
+   "MediaOverlay.jsx"
+  ]
+ },
+ {
+  "e": "🔊",
+  "files": [
+   "MediaOverlay.jsx"
+  ]
+ },
+ {
+  "e": "↗",
+  "files": [
+   "Account.jsx",
+   "AccountListings.jsx",
+   "EditionDetail.jsx",
+   "Home.jsx",
+   "MediaOverlay.jsx",
+   "PlayDetail.jsx"
+  ]
+ },
+ {
+  "e": "🏀",
+  "files": [
+   "ArenaDetail.jsx",
+   "Arenas.jsx",
+   "Home.jsx",
+   "Navbar.jsx"
+  ]
+ },
+ {
+  "e": "💻",
+  "files": [
+   "About.jsx"
+  ]
+ },
+ {
+  "e": "→",
+  "files": [
+   "About.jsx",
+   "EditionDetail.jsx"
+  ]
+ },
+ {
+  "e": "🐦",
+  "files": [
+   "About.jsx"
+  ]
+ },
+ {
+  "e": "⚠️",
+  "files": [
+   "Account.jsx",
+   "AccountListings.jsx",
+   "Calendar.jsx",
+   "EditionDetail.jsx",
+   "Corrections.jsx",
+   "PlayDetail.jsx",
+   "PlayerDetail.jsx",
+   "Plays.jsx",
+   "SetDetail.jsx",
+   "Settings.jsx",
+   "TeamDetail.jsx",
+   "relationship.service.js"
+  ]
+ },
+ {
+  "e": "←",
+  "files": [
+   "AccountListings.jsx",
+   "ArenaDetail.jsx",
+   "Calendar.jsx",
+   "EditionDetail.jsx",
+   "PlayDetail.jsx",
+   "PlayerDetail.jsx",
+   "SetDetail.jsx",
+   "TeamDetail.jsx"
+  ]
+ },
+ {
+  "e": "🏟️",
+  "files": [
+   "ArenaDetail.jsx"
+  ]
+ },
+ {
+  "e": "📅",
+  "files": [
+   "Calendar.jsx"
+  ]
+ },
+ {
+  "e": "🎂",
+  "files": [
+   "Calendar.jsx"
+  ]
+ },
+ {
+  "e": "🌟",
+  "files": [
+   "Calendar.jsx"
+  ]
+ },
+ {
+  "e": "🎥",
+  "files": [
+   "Calendar.jsx",
+   "EditionDetail.jsx",
+   "ipfs.analysis.js"
+  ]
+ },
+ {
+  "e": "📦",
+  "files": [
+   "EditionDetail.jsx"
+  ]
+ },
+ {
+  "e": "🔓",
+  "files": [
+   "EditionDetail.jsx",
+   "SetDetail.jsx",
+   "Sets.jsx"
+  ]
+ },
+ {
+  "e": "➔",
+  "files": [
+   "Corrections.jsx"
+  ]
+ },
+ {
+  "e": "✖",
+  "files": [
+   "PlayerDetail.jsx",
+   "Sets.jsx"
+  ]
+ },
+ {
+  "e": "✓",
+  "files": [
+   "Settings.jsx"
+  ]
+ },
+ {
+  "e": "🖼️",
+  "files": [
+   "ipfs.analysis.js"
+  ]
+ },
+ {
+  "e": "🔥",
+  "files": [
+   "overrides.service.js"
+  ]
+ },
+ {
+  "e": "⭐",
+  "files": [
+   "overrides.service.js"
+  ]
+ },
+ {
+  "e": "⛹️‍♀️",
+  "files": [
+   "display.utils.jsx"
+  ]
+ },
+ {
+  "e": "⛹️‍♂️",
+  "files": [
+   "display.utils.jsx"
+  ]
+ }
+]

@@ -1,0 +1,2352 @@
+{
+  "99999001": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "99999002": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "99999003": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "99999004": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "99999005": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610612737": {
+    "name": "Atlanta Hawks",
+    "historical_names": [
+      "St. Louis Hawks"
+    ],
+    "emoji": "🦅",
+    "color": "#E03A3E",
+    "championships": [
+      "1957-58"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2018-08-28",
+        "name": "Philips Arena",
+        "arena": "State Farm Arena",
+        "city": "Atlanta",
+        "state": "Georgia",
+        "lat": 33.757145,
+        "lng": -84.396512,
+        "area_codes": "404"
+      },
+      {
+        "start_date": "2018-08-29",
+        "arena": "State Farm Arena",
+        "city": "Atlanta",
+        "state": "Georgia",
+        "lat": 33.757145,
+        "lng": -84.396512,
+        "area_codes": "404"
+      },
+      {
+        "start_date": "2023-11-09",
+        "end_date": "2023-11-09",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      }
+    ]
+  },
+  "1610612738": {
+    "name": "Boston Celtics",
+    "emoji": "🍀",
+    "color": "#007A33",
+    "championships": [
+      "1956-57",
+      "1958-59",
+      "1959-60",
+      "1960-61",
+      "1961-62",
+      "1962-63",
+      "1963-64",
+      "1964-65",
+      "1965-66",
+      "1967-68",
+      "1968-69",
+      "1973-74",
+      "1975-76",
+      "1980-81",
+      "1983-84",
+      "1985-86",
+      "2007-08",
+      "2023-24"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-27",
+        "arena": "TD Garden",
+        "city": "Boston",
+        "state": "Massachusetts",
+        "lat": 42.36617,
+        "lng": -71.062262,
+        "area_codes": "617"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612739": {
+    "name": "Cleveland Cavaliers",
+    "emoji": "⚔️",
+    "color": "#860038",
+    "championships": [
+      "2015-16"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-27",
+        "end_date": "2019-04-09",
+        "name": "Quicken Loans Arena",
+        "arena": "Rocket Arena",
+        "city": "Cleveland",
+        "state": "Ohio",
+        "lat": 41.496389,
+        "lng": -81.688056,
+        "area_codes": "216"
+      },
+      {
+        "start_date": "2019-04-10",
+        "name": "Rocket Mortgage FieldHouse",
+        "arena": "Rocket Arena",
+        "city": "Cleveland",
+        "state": "Ohio",
+        "lat": 41.496389,
+        "lng": -81.688056,
+        "area_codes": "216"
+      },
+      {
+        "start_date": "2024-01-11",
+        "end_date": "2024-01-11",
+        "arena": "Accor Arena",
+        "city": "Paris",
+        "state": "France",
+        "lat": 48.838611,
+        "lng": 2.378611,
+        "area_codes": "+33"
+      }
+    ]
+  },
+  "1610612740": {
+    "name": "New Orleans Pelicans",
+    "historical_names": [
+      "New Orleans Hornets",
+      "New Orleans/Oklahoma City Hornets"
+    ],
+    "emoji": "⚜️",
+    "color": "#0C2340",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2014-02-05",
+        "name": "New Orleans Arena",
+        "arena": "Smoothie King Center",
+        "city": "New Orleans",
+        "state": "Louisiana",
+        "lat": 29.948956,
+        "lng": -90.082106,
+        "area_codes": "504"
+      },
+      {
+        "start_date": "2014-02-06",
+        "arena": "Smoothie King Center",
+        "city": "New Orleans",
+        "state": "Louisiana",
+        "lat": 29.948956,
+        "lng": -90.082106,
+        "area_codes": "504"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612741": {
+    "name": "Chicago Bulls",
+    "emoji": "🐂",
+    "color": "#CE1141",
+    "championships": [
+      "1990-91",
+      "1991-92",
+      "1992-93",
+      "1995-96",
+      "1996-97",
+      "1997-98"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "arena": "United Center",
+        "city": "Chicago",
+        "state": "Illinois",
+        "lat": 41.880625,
+        "lng": -87.674293,
+        "area_codes": "312"
+      }
+    ]
+  },
+  "1610612742": {
+    "name": "Dallas Mavericks",
+    "emoji": "🐴",
+    "color": "#00538C",
+    "championships": [
+      "2010-11"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-27",
+        "arena": "American Airlines Center",
+        "city": "Dallas",
+        "state": "Texas",
+        "lat": 32.790477,
+        "lng": -96.810469,
+        "area_codes": "214"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612743": {
+    "name": "Denver Nuggets",
+    "emoji": "⛏️",
+    "color": "#0E2240",
+    "championships": [
+      "2022-23"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2020-10-21",
+        "name": "Pepsi Center",
+        "arena": "Ball Arena",
+        "city": "Denver",
+        "state": "Colorado",
+        "lat": 39.748598,
+        "lng": -105.007733,
+        "area_codes": "303"
+      },
+      {
+        "start_date": "2020-10-22",
+        "arena": "Ball Arena",
+        "city": "Denver",
+        "state": "Colorado",
+        "lat": 39.748598,
+        "lng": -105.007733,
+        "area_codes": "303"
+      },
+      {
+        "start_date": "2017-01-12",
+        "end_date": "2017-01-12",
+        "arena": "The O2 Arena",
+        "city": "London",
+        "state": "United Kingdom",
+        "lat": 51.503038,
+        "lng": 0.003154,
+        "area_codes": "+44"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612744": {
+    "name": "Golden State Warriors",
+    "historical_names": [
+      "San Francisco Warriors"
+    ],
+    "emoji": "🌁",
+    "color": "#1D428A",
+    "championships": [
+      "1946-47",
+      "1955-56",
+      "1974-75",
+      "2014-15",
+      "2016-17",
+      "2017-18",
+      "2021-22"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2019-06-13",
+        "name": "Oracle Arena",
+        "arena": "Oakland Arena",
+        "city": "Oakland",
+        "state": "California",
+        "lat": 37.750311,
+        "lng": -122.203011,
+        "area_codes": "510"
+      },
+      {
+        "start_date": "2019-10-24",
+        "arena": "Chase Center",
+        "city": "San Francisco",
+        "state": "California",
+        "lat": 37.768056,
+        "lng": -122.3875,
+        "area_codes": "415"
+      }
+    ]
+  },
+  "1610612745": {
+    "name": "Houston Rockets",
+    "emoji": "🚀",
+    "color": "#CE1141",
+    "championships": [
+      "1993-94",
+      "1994-95"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "arena": "Toyota Center",
+        "city": "Houston",
+        "state": "Texas",
+        "lat": 29.750664,
+        "lng": -95.362202,
+        "area_codes": "713"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612746": {
+    "name": "LA Clippers",
+    "historical_names": [
+      "Buffalo Braves"
+    ],
+    "emoji": "⛵",
+    "color": "#C8102E",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2021-12-24",
+        "name": "Staples Center",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2021-12-25",
+        "end_date": "2024-05-01",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2024-10-23",
+        "arena": "Intuit Dome",
+        "city": "Inglewood",
+        "state": "California",
+        "lat": 33.9451,
+        "lng": -118.3431,
+        "area_codes": "310"
+      }
+    ]
+  },
+  "1610612747": {
+    "name": "Los Angeles Lakers",
+    "emoji": "🎬",
+    "color": "#552583",
+    "championships": [
+      "1948-49",
+      "1949-50",
+      "1951-52",
+      "1952-53",
+      "1953-54",
+      "1971-72",
+      "1979-80",
+      "1981-82",
+      "1984-85",
+      "1986-87",
+      "1987-88",
+      "1999-00",
+      "2000-01",
+      "2001-02",
+      "2008-09",
+      "2009-10",
+      "2019-20"
+    ],
+    "cups": [
+      "2023-24"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-27",
+        "end_date": "2021-12-24",
+        "name": "Staples Center",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2021-12-25",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2023-12-07",
+        "end_date": "2023-12-07",
+        "arena": "T-Mobile Arena",
+        "city": "Las Vegas",
+        "state": "Nevada",
+        "lat": 36.102886,
+        "lng": -115.178244,
+        "area_codes": "702"
+      }
+    ]
+  },
+  "1610612748": {
+    "name": "Miami Heat",
+    "emoji": "🔥",
+    "color": "#98002E",
+    "championships": [
+      "2005-06",
+      "2011-12",
+      "2012-13"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2021-06-03",
+        "name": "American Airlines Arena",
+        "arena": "Kaseya Center",
+        "city": "Miami",
+        "state": "Florida",
+        "lat": 25.781264,
+        "lng": -80.187967,
+        "area_codes": "305"
+      },
+      {
+        "start_date": "2021-06-04",
+        "end_date": "2023-01-13",
+        "name": "FTX Arena",
+        "arena": "Kaseya Center",
+        "city": "Miami",
+        "state": "Florida",
+        "lat": 25.781264,
+        "lng": -80.187967,
+        "area_codes": "305"
+      },
+      {
+        "start_date": "2023-01-14",
+        "end_date": "2023-04-03",
+        "name": "Miami-Dade Arena",
+        "arena": "Kaseya Center",
+        "city": "Miami",
+        "state": "Florida",
+        "lat": 25.781264,
+        "lng": -80.187967,
+        "area_codes": "305"
+      },
+      {
+        "start_date": "2023-04-04",
+        "arena": "Kaseya Center",
+        "city": "Miami",
+        "state": "Florida",
+        "lat": 25.781264,
+        "lng": -80.187967,
+        "area_codes": "305"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612749": {
+    "name": "Milwaukee Bucks",
+    "emoji": "🦌",
+    "color": "#00471B",
+    "championships": [
+      "1970-71",
+      "2020-21"
+    ],
+    "cups": [
+      "2024-25"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-30",
+        "end_date": "2018-04-26",
+        "arena": "BMO Harris Bradley Center",
+        "city": "Milwaukee",
+        "state": "Wisconsin",
+        "lat": 43.043611,
+        "lng": -87.917222,
+        "area_codes": "414"
+      },
+      {
+        "start_date": "2018-10-19",
+        "arena": "Fiserv Forum",
+        "city": "Milwaukee",
+        "state": "Wisconsin",
+        "lat": 43.044988,
+        "lng": -87.917524,
+        "area_codes": "414"
+      },
+      {
+        "start_date": "2020-01-24",
+        "end_date": "2020-01-24",
+        "arena": "Accor Arena",
+        "city": "Paris",
+        "state": "France",
+        "lat": 48.838611,
+        "lng": 2.378611,
+        "area_codes": "+33"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612750": {
+    "name": "Minnesota Timberwolves",
+    "emoji": "🐺",
+    "color": "#0C2340",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "arena": "Target Center",
+        "city": "Minneapolis",
+        "state": "Minnesota",
+        "lat": 44.979378,
+        "lng": -93.276195,
+        "area_codes": "612"
+      },
+      {
+        "start_date": "2014-11-12",
+        "end_date": "2014-11-12",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      }
+    ]
+  },
+  "1610612751": {
+    "name": "Brooklyn Nets",
+    "historical_names": [
+      "New Jersey Nets"
+    ],
+    "emoji": "🕸️",
+    "color": "#000000",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2010-04-12",
+        "arena": "Izod Center",
+        "city": "East Rutherford",
+        "state": "New Jersey",
+        "lat": 40.811389,
+        "lng": -74.068333,
+        "area_codes": "201"
+      },
+      {
+        "start_date": "2010-10-27",
+        "end_date": "2012-04-23",
+        "arena": "Prudential Center",
+        "city": "Newark",
+        "state": "New Jersey",
+        "lat": 40.733611,
+        "lng": -74.171111,
+        "area_codes": "973"
+      },
+      {
+        "start_date": "2011-03-04",
+        "end_date": "2011-03-05",
+        "arena": "The O2 Arena",
+        "city": "London",
+        "state": "United Kingdom",
+        "lat": 51.503038,
+        "lng": 0.003154,
+        "area_codes": "+44"
+      },
+      {
+        "start_date": "2012-11-03",
+        "arena": "Barclays Center",
+        "city": "Brooklyn",
+        "state": "New York",
+        "lat": 40.682585,
+        "lng": -73.97551,
+        "area_codes": "718"
+      },
+      {
+        "start_date": "2017-12-07",
+        "end_date": "2017-12-09",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612752": {
+    "name": "New York Knicks",
+    "emoji": "🏙️",
+    "color": "#006BB6",
+    "championships": [
+      "1969-70",
+      "1972-73",
+      "2025-26"
+    ],
+    "cups": [
+      "2025-26"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "arena": "Madison Square Garden",
+        "city": "New York City",
+        "state": "New York",
+        "lat": 40.750556,
+        "lng": -73.993611,
+        "area_codes": "212"
+      }
+    ]
+  },
+  "1610612753": {
+    "name": "Orlando Magic",
+    "emoji": "🪄",
+    "color": "#0077C0",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2010-04-14",
+        "arena": "Amway Arena",
+        "city": "Orlando",
+        "state": "Florida",
+        "lat": 28.550556,
+        "lng": -81.386944,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2010-10-28",
+        "end_date": "2023-12-19",
+        "name": "Amway Center",
+        "arena": "Kia Center",
+        "city": "Orlando",
+        "state": "Florida",
+        "lat": 28.539124,
+        "lng": -81.383983,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2023-12-20",
+        "arena": "Kia Center",
+        "city": "Orlando",
+        "state": "Florida",
+        "lat": 28.539124,
+        "lng": -81.383983,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2016-01-14",
+        "end_date": "2016-01-14",
+        "arena": "The O2 Arena",
+        "city": "London",
+        "state": "United Kingdom",
+        "lat": 51.503038,
+        "lng": 0.003154,
+        "area_codes": "+44"
+      },
+      {
+        "start_date": "2018-12-13",
+        "end_date": "2018-12-15",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612754": {
+    "name": "Indiana Pacers",
+    "emoji": "🏎️",
+    "color": "#002D62",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2011-12-21",
+        "name": "Conseco Fieldhouse",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763841,
+        "lng": -86.155685,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2011-12-22",
+        "end_date": "2021-09-26",
+        "name": "Bankers Life Fieldhouse",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763841,
+        "lng": -86.155685,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2021-09-27",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763841,
+        "lng": -86.155685,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612755": {
+    "name": "Philadelphia 76ers",
+    "emoji": "🔔",
+    "color": "#006BB6",
+    "championships": [
+      "1954-55",
+      "1966-67",
+      "1982-83"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2010-07-06",
+        "name": "Wachovia Center",
+        "arena": "Wells Fargo Center",
+        "city": "Philadelphia",
+        "state": "Pennsylvania",
+        "lat": 39.901121,
+        "lng": -75.172092,
+        "area_codes": "215"
+      },
+      {
+        "start_date": "2010-07-07",
+        "arena": "Wells Fargo Center",
+        "city": "Philadelphia",
+        "state": "Pennsylvania",
+        "lat": 39.901121,
+        "lng": -75.172092,
+        "area_codes": "215"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612756": {
+    "name": "Phoenix Suns",
+    "emoji": "🌵",
+    "color": "#1D1160",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2015-10-14",
+        "name": "US Airways Center",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2015-10-15",
+        "end_date": "2020-10-11",
+        "name": "Talking Stick Resort Arena",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2020-10-12",
+        "end_date": "2021-07-15",
+        "name": "Phoenix Suns Arena",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2021-07-16",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612757": {
+    "name": "Portland Trail Blazers",
+    "emoji": "🌲",
+    "color": "#E03A3E",
+    "championships": [
+      "1976-77"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-27",
+        "end_date": "2013-08-12",
+        "name": "Rose Garden",
+        "arena": "Moda Center",
+        "city": "Portland",
+        "state": "Oregon",
+        "lat": 45.531508,
+        "lng": -122.666934,
+        "area_codes": "503"
+      },
+      {
+        "start_date": "2013-08-13",
+        "arena": "Moda Center",
+        "city": "Portland",
+        "state": "Oregon",
+        "lat": 45.531508,
+        "lng": -122.666934,
+        "area_codes": "503"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612758": {
+    "name": "Sacramento Kings",
+    "historical_names": [
+      "Kansas City-Omaha Kings"
+    ],
+    "emoji": "👑",
+    "color": "#5A2D81",
+    "championships": [
+      "1950-51"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2016-04-09",
+        "arena": "Sleep Train Arena",
+        "city": "Sacramento",
+        "state": "California",
+        "lat": 38.649167,
+        "lng": -121.518056,
+        "area_codes": "916"
+      },
+      {
+        "start_date": "2016-10-27",
+        "arena": "Golden 1 Center",
+        "city": "Sacramento",
+        "state": "California",
+        "lat": 38.580205,
+        "lng": -121.499781,
+        "area_codes": "916"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612759": {
+    "name": "San Antonio Spurs",
+    "emoji": "🤠",
+    "color": "#000000",
+    "championships": [
+      "1998-99",
+      "2002-03",
+      "2004-05",
+      "2006-07",
+      "2013-14"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2023-08-02",
+        "name": "AT&T Center",
+        "arena": "Frost Bank Center",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.426909,
+        "lng": -98.437571,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2023-08-03",
+        "arena": "Frost Bank Center",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.426909,
+        "lng": -98.437571,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2022-12-17",
+        "end_date": "2022-12-17",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      },
+      {
+        "start_date": "2023-01-13",
+        "end_date": "2023-01-13",
+        "arena": "Alamodome",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.416944,
+        "lng": -98.478889,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2023-04-06",
+        "end_date": "2023-04-08",
+        "arena": "Moody Center",
+        "city": "Austin",
+        "state": "Texas",
+        "lat": 30.280833,
+        "lng": -97.730556,
+        "area_codes": "512"
+      }
+    ]
+  },
+  "1610612760": {
+    "name": "Oklahoma City Thunder",
+    "historical_names": [
+      "Seattle SuperSonics"
+    ],
+    "emoji": "⚡",
+    "color": "#007AC1",
+    "championships": [
+      "1978-79",
+      "2024-25"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2010-10-11",
+        "name": "Ford Center",
+        "arena": "Paycom Center",
+        "city": "Oklahoma City",
+        "state": "Oklahoma",
+        "lat": 35.463352,
+        "lng": -97.515195,
+        "area_codes": "405"
+      },
+      {
+        "start_date": "2010-10-12",
+        "end_date": "2011-07-21",
+        "name": "Oklahoma City Arena",
+        "arena": "Paycom Center",
+        "city": "Oklahoma City",
+        "state": "Oklahoma",
+        "lat": 35.463352,
+        "lng": -97.515195,
+        "area_codes": "405"
+      },
+      {
+        "start_date": "2011-07-22",
+        "end_date": "2021-07-26",
+        "name": "Chesapeake Energy Arena",
+        "arena": "Paycom Center",
+        "city": "Oklahoma City",
+        "state": "Oklahoma",
+        "lat": 35.463352,
+        "lng": -97.515195,
+        "area_codes": "405"
+      },
+      {
+        "start_date": "2021-07-27",
+        "arena": "Paycom Center",
+        "city": "Oklahoma City",
+        "state": "Oklahoma",
+        "lat": 35.463352,
+        "lng": -97.515195,
+        "area_codes": "405"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612761": {
+    "name": "Toronto Raptors",
+    "emoji": "🦖",
+    "color": "#CE1141",
+    "championships": [
+      "2018-19"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2018-06-30",
+        "name": "Air Canada Centre",
+        "arena": "Scotiabank Arena",
+        "city": "Toronto",
+        "state": "Ontario",
+        "lat": 43.643372,
+        "lng": -79.379157,
+        "area_codes": "416"
+      },
+      {
+        "start_date": "2018-07-01",
+        "arena": "Scotiabank Arena",
+        "city": "Toronto",
+        "state": "Ontario",
+        "lat": 43.643372,
+        "lng": -79.379157,
+        "area_codes": "416"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2020-12-23",
+        "end_date": "2021-05-16",
+        "arena": "Amalie Arena",
+        "city": "Tampa",
+        "state": "Florida",
+        "lat": 27.942778,
+        "lng": -82.451944,
+        "area_codes": "813"
+      }
+    ]
+  },
+  "1610612762": {
+    "name": "Utah Jazz",
+    "emoji": "🎷",
+    "color": "#002B5C",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2015-10-25",
+        "name": "EnergySolutions Arena",
+        "arena": "Delta Center",
+        "city": "Salt Lake City",
+        "state": "Utah",
+        "lat": 40.768182,
+        "lng": -111.901215,
+        "area_codes": "801"
+      },
+      {
+        "start_date": "2015-10-26",
+        "end_date": "2023-06-30",
+        "name": "Vivint Arena",
+        "arena": "Delta Center",
+        "city": "Salt Lake City",
+        "state": "Utah",
+        "lat": 40.768182,
+        "lng": -111.901215,
+        "area_codes": "801"
+      },
+      {
+        "start_date": "2023-07-01",
+        "arena": "Delta Center",
+        "city": "Salt Lake City",
+        "state": "Utah",
+        "lat": 40.768182,
+        "lng": -111.901215,
+        "area_codes": "801"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612763": {
+    "name": "Memphis Grizzlies",
+    "historical_names": [
+      "Vancouver Grizzlies"
+    ],
+    "emoji": "🐻",
+    "color": "#5D76A9",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "arena": "FedExForum",
+        "city": "Memphis",
+        "state": "Tennessee",
+        "lat": 35.138178,
+        "lng": -90.050601,
+        "area_codes": "901"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      }
+    ]
+  },
+  "1610612764": {
+    "name": "Washington Wizards",
+    "historical_names": [
+      "Washington Bullets",
+      "Baltimore Bullets"
+    ],
+    "emoji": "🧙‍♂️",
+    "color": "#002B5C",
+    "championships": [
+      "1947-48",
+      "1977-78"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2017-08-08",
+        "name": "Verizon Center",
+        "arena": "Capital One Arena",
+        "city": "Washington",
+        "state": "D.C.",
+        "lat": 38.89809,
+        "lng": -77.02103,
+        "area_codes": "202"
+      },
+      {
+        "start_date": "2017-08-09",
+        "arena": "Capital One Arena",
+        "city": "Washington",
+        "state": "D.C.",
+        "lat": 38.89809,
+        "lng": -77.02103,
+        "area_codes": "202"
+      },
+      {
+        "start_date": "2019-01-17",
+        "end_date": "2019-01-17",
+        "arena": "The O2 Arena",
+        "city": "London",
+        "state": "United Kingdom",
+        "lat": 51.503038,
+        "lng": 0.003154,
+        "area_codes": "+44"
+      },
+      {
+        "start_date": "2020-07-31",
+        "end_date": "2020-09-27",
+        "arena": "ESPN Wide World of Sports Complex",
+        "city": "Bay Lake",
+        "state": "Florida",
+        "lat": 28.33796,
+        "lng": -81.555457,
+        "area_codes": "407"
+      },
+      {
+        "start_date": "2024-11-02",
+        "end_date": "2024-11-02",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      }
+    ]
+  },
+  "1610612765": {
+    "name": "Detroit Pistons",
+    "emoji": "⚙️",
+    "color": "#1D42BA",
+    "championships": [
+      "1988-89",
+      "1989-90",
+      "2003-04"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2017-04-12",
+        "arena": "The Palace of Auburn Hills",
+        "city": "Auburn Hills",
+        "state": "Michigan",
+        "lat": 42.696944,
+        "lng": -83.245556,
+        "area_codes": "248"
+      },
+      {
+        "start_date": "2017-10-18",
+        "arena": "Little Caesars Arena",
+        "city": "Detroit",
+        "state": "Michigan",
+        "lat": 42.340961,
+        "lng": -83.055173,
+        "area_codes": "313"
+      },
+      {
+        "start_date": "2019-12-12",
+        "end_date": "2019-12-12",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      },
+      {
+        "start_date": "2023-01-19",
+        "end_date": "2023-01-19",
+        "arena": "Accor Arena",
+        "city": "Paris",
+        "state": "France",
+        "lat": 48.838611,
+        "lng": 2.378611,
+        "area_codes": "+33"
+      },
+      {
+        "start_date": "2025-11-01",
+        "end_date": "2025-11-01",
+        "arena": "Mexico City Arena",
+        "city": "Mexico City",
+        "state": "Mexico",
+        "lat": 19.500556,
+        "lng": -99.191389,
+        "area_codes": "+52"
+      }
+    ]
+  },
+  "1610612766": {
+    "name": "Charlotte Hornets",
+    "historical_names": [
+      "Charlotte Bobcats"
+    ],
+    "emoji": "🐝",
+    "color": "#00788C",
+    "arenas": [
+      {
+        "start_date": "2009-10-28",
+        "end_date": "2016-09-04",
+        "name": "Time Warner Cable Arena",
+        "arena": "Spectrum Center",
+        "city": "Charlotte",
+        "state": "North Carolina",
+        "lat": 35.22508,
+        "lng": -80.839404,
+        "area_codes": "704"
+      },
+      {
+        "start_date": "2016-09-05",
+        "arena": "Spectrum Center",
+        "city": "Charlotte",
+        "state": "North Carolina",
+        "lat": 35.22508,
+        "lng": -80.839404,
+        "area_codes": "704"
+      }
+    ]
+  },
+  "1610616833": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616834": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616851": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616852": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616853": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616859": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1610616860": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1611661313": {
+    "name": "New York Liberty",
+    "emoji": "🗽",
+    "color": "#6CACA0",
+    "championships": [
+      "2024"
+    ],
+    "cups": [
+      "2023"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-07",
+        "end_date": "2010-09-24",
+        "arena": "Madison Square Garden",
+        "city": "New York",
+        "state": "New York",
+        "lat": 40.750556,
+        "lng": -73.993611,
+        "area_codes": "212"
+      },
+      {
+        "start_date": "2011-06-02",
+        "end_date": "2013-09-15",
+        "arena": "Prudential Center",
+        "city": "Newark",
+        "state": "New Jersey",
+        "lat": 40.733611,
+        "lng": -74.171111,
+        "area_codes": "973"
+      },
+      {
+        "start_date": "2014-05-16",
+        "end_date": "2017-09-24",
+        "arena": "Madison Square Garden",
+        "city": "New York",
+        "state": "New York",
+        "lat": 40.750556,
+        "lng": -73.993611,
+        "area_codes": "212"
+      },
+      {
+        "start_date": "2018-05-20",
+        "end_date": "2019-09-06",
+        "arena": "Westchester County Center",
+        "city": "White Plains",
+        "state": "New York",
+        "lat": 41.0375,
+        "lng": -73.7825,
+        "area_codes": "914"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-12",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "Barclays Center",
+        "city": "Brooklyn",
+        "state": "New York",
+        "lat": 40.682661,
+        "lng": -73.975234,
+        "area_codes": "718"
+      }
+    ]
+  },
+  "1611661316": {
+    "name": "Houston Comets",
+    "emoji": "☄️",
+    "color": "#002D62",
+    "championships": [
+      "1997",
+      "1998",
+      "1999",
+      "2000"
+    ],
+    "arenas": [
+      {
+        "start_date": "1997-06-21",
+        "end_date": "2003-08-25",
+        "name": "The Summit",
+        "arena": "Compaq Center",
+        "city": "Houston",
+        "state": "Texas",
+        "lat": 29.731111,
+        "lng": -95.435278,
+        "area_codes": "713"
+      },
+      {
+        "start_date": "2004-05-20",
+        "end_date": "2007-08-19",
+        "arena": "Toyota Center",
+        "city": "Houston",
+        "state": "Texas",
+        "lat": 29.750664,
+        "lng": -95.362202,
+        "area_codes": "713"
+      },
+      {
+        "start_date": "2008-05-17",
+        "end_date": "2008-09-14",
+        "arena": "Reliant Arena",
+        "city": "Houston",
+        "state": "Texas",
+        "lat": 29.684722,
+        "lng": -95.409167,
+        "area_codes": "713"
+      }
+    ]
+  },
+  "1611661317": {
+    "name": "Phoenix Mercury",
+    "emoji": "🪐",
+    "color": "#201747",
+    "championships": [
+      "2007",
+      "2009",
+      "2014"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2015-10-14",
+        "name": "US Airways Center",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2015-10-15",
+        "end_date": "2019-09-08",
+        "name": "Talking Stick Resort Arena",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-11",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "Mortgage Matchup Center",
+        "city": "Phoenix",
+        "state": "Arizona",
+        "lat": 33.445833,
+        "lng": -112.071389,
+        "area_codes": "602"
+      }
+    ]
+  },
+  "1611661318": {
+    "name": "Sacramento Monarchs",
+    "emoji": "🦋",
+    "color": "#5A2D81",
+    "championships": [
+      "2005"
+    ],
+    "arenas": [
+      {
+        "start_date": "1997-06-23",
+        "end_date": "2009-09-04",
+        "name": "ARCO Arena",
+        "arena": "Sleep Train Arena",
+        "city": "Sacramento",
+        "state": "California",
+        "lat": 38.649167,
+        "lng": -121.518056,
+        "area_codes": "916"
+      }
+    ]
+  },
+  "1611661319": {
+    "name": "Las Vegas Aces",
+    "historical_names": [
+      "San Antonio Silver Stars",
+      "San Antonio Stars",
+      "Utah Starzz"
+    ],
+    "emoji": "♠️",
+    "color": "#000000",
+    "championships": [
+      "2022",
+      "2023",
+      "2025"
+    ],
+    "cups": [
+      "2022"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2014-08-17",
+        "name": "AT&T Center",
+        "arena": "Frost Bank Center",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.426909,
+        "lng": -98.437571,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2015-06-05",
+        "end_date": "2015-09-13",
+        "arena": "Freeman Coliseum",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.426111,
+        "lng": -98.441667,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2016-05-14",
+        "end_date": "2017-09-02",
+        "name": "AT&T Center",
+        "arena": "Frost Bank Center",
+        "city": "San Antonio",
+        "state": "Texas",
+        "lat": 29.426909,
+        "lng": -98.437571,
+        "area_codes": "210"
+      },
+      {
+        "start_date": "2018-05-27",
+        "end_date": "2021-03-08",
+        "name": "Mandalay Bay Events Center",
+        "arena": "Michelob Ultra Arena",
+        "city": "Paradise",
+        "state": "Nevada",
+        "lat": 36.090678,
+        "lng": -115.178981,
+        "area_codes": "702"
+      },
+      {
+        "start_date": "2021-03-09",
+        "arena": "Michelob Ultra Arena",
+        "city": "Paradise",
+        "state": "Nevada",
+        "lat": 36.090678,
+        "lng": -115.178981,
+        "area_codes": "702"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-13",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      }
+    ]
+  },
+  "1611661320": {
+    "name": "Los Angeles Sparks",
+    "emoji": "✨",
+    "color": "#702F8A",
+    "championships": [
+      "2001",
+      "2002",
+      "2016"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2019-09-08",
+        "name": "Staples Center",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-12",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "end_date": "2021-12-24",
+        "name": "Staples Center",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      },
+      {
+        "start_date": "2021-12-25",
+        "arena": "Crypto.com Arena",
+        "city": "Los Angeles",
+        "state": "California",
+        "lat": 34.043012,
+        "lng": -118.267254,
+        "area_codes": "213"
+      }
+    ]
+  },
+  "1611661321": {
+    "name": "Dallas Wings",
+    "historical_names": [
+      "Detroit Shock",
+      "Tulsa Shock"
+    ],
+    "emoji": "🪽",
+    "color": "#0C2340",
+    "championships": [
+      "2003",
+      "2006",
+      "2008"
+    ],
+    "arenas": [
+      {
+        "start_date": "2010-05-15",
+        "end_date": "2015-09-13",
+        "arena": "BOK Center",
+        "city": "Tulsa",
+        "state": "Oklahoma",
+        "lat": 36.153056,
+        "lng": -95.993889,
+        "area_codes": "918"
+      },
+      {
+        "start_date": "2016-05-14",
+        "end_date": "2019-09-08",
+        "arena": "College Park Center",
+        "city": "Arlington",
+        "state": "Texas",
+        "lat": 32.7275,
+        "lng": -97.108611,
+        "area_codes": "817"
+      },
+      {
+        "start_date": "2020-07-26",
+        "end_date": "2020-09-13",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "College Park Center",
+        "city": "Arlington",
+        "state": "Texas",
+        "lat": 32.7275,
+        "lng": -97.108611,
+        "area_codes": "817"
+      }
+    ]
+  },
+  "1611661322": {
+    "name": "Washington Mystics",
+    "emoji": "🔮",
+    "color": "#002B5C",
+    "championships": [
+      "2019"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-07",
+        "end_date": "2017-08-08",
+        "name": "Verizon Center",
+        "arena": "Capital One Arena",
+        "city": "Washington",
+        "state": "District of Columbia",
+        "lat": 38.898056,
+        "lng": -77.020833,
+        "area_codes": "202"
+      },
+      {
+        "start_date": "2017-08-09",
+        "end_date": "2018-09-02",
+        "arena": "Capital One Arena",
+        "city": "Washington",
+        "state": "District of Columbia",
+        "lat": 38.898056,
+        "lng": -77.020833,
+        "area_codes": "202"
+      },
+      {
+        "start_date": "2019-05-25",
+        "end_date": "2019-09-08",
+        "arena": "Entertainment and Sports Arena",
+        "city": "Washington",
+        "state": "District of Columbia",
+        "lat": 38.846972,
+        "lng": -76.991444,
+        "area_codes": "202"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-13",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "Entertainment and Sports Arena",
+        "city": "Washington",
+        "state": "District of Columbia",
+        "lat": 38.846972,
+        "lng": -76.991444,
+        "area_codes": "202"
+      }
+    ]
+  },
+  "1611661323": {
+    "name": "Connecticut Sun",
+    "historical_names": [
+      "Orlando Miracle"
+    ],
+    "emoji": "☀️",
+    "color": "#DC4405",
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "arena": "Mohegan Sun Arena",
+        "city": "Uncasville",
+        "state": "Connecticut",
+        "lat": 41.491667,
+        "lng": -72.091111,
+        "area_codes": "860"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-12",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      }
+    ]
+  },
+  "1611661324": {
+    "name": "Minnesota Lynx",
+    "emoji": "🐆",
+    "color": "#0C2340",
+    "championships": [
+      "2011",
+      "2013",
+      "2015",
+      "2017"
+    ],
+    "cups": [
+      "2024"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2016-09-17",
+        "arena": "Target Center",
+        "city": "Minneapolis",
+        "state": "Minnesota",
+        "lat": 44.979444,
+        "lng": -93.276111,
+        "area_codes": "612"
+      },
+      {
+        "start_date": "2017-05-14",
+        "end_date": "2017-09-03",
+        "arena": "Xcel Energy Center",
+        "city": "Saint Paul",
+        "state": "Minnesota",
+        "lat": 44.944722,
+        "lng": -93.101111,
+        "area_codes": "651"
+      },
+      {
+        "start_date": "2017-09-12",
+        "end_date": "2017-10-04",
+        "arena": "Williams Arena",
+        "city": "Minneapolis",
+        "state": "Minnesota",
+        "lat": 44.977778,
+        "lng": -93.229444,
+        "area_codes": "612"
+      },
+      {
+        "start_date": "2018-05-20",
+        "end_date": "2019-09-08",
+        "arena": "Target Center",
+        "city": "Minneapolis",
+        "state": "Minnesota",
+        "lat": 44.979444,
+        "lng": -93.276111,
+        "area_codes": "612"
+      },
+      {
+        "start_date": "2020-07-26",
+        "end_date": "2020-09-27",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "Target Center",
+        "city": "Minneapolis",
+        "state": "Minnesota",
+        "lat": 44.979444,
+        "lng": -93.276111,
+        "area_codes": "612"
+      }
+    ]
+  },
+  "1611661325": {
+    "name": "Indiana Fever",
+    "emoji": "🌡️",
+    "color": "#041E42",
+    "championships": [
+      "2012"
+    ],
+    "cups": [
+      "2025"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2011-12-21",
+        "name": "Conseco Fieldhouse",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763889,
+        "lng": -86.155556,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2011-12-22",
+        "end_date": "2019-09-08",
+        "name": "Bankers Life Fieldhouse",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763889,
+        "lng": -86.155556,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-09-13",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "end_date": "2022-08-14",
+        "arena": "Indiana Farmers Coliseum",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.829167,
+        "lng": -86.134722,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2022-05-08",
+        "end_date": "2022-07-31",
+        "arena": "Hinkle Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.843611,
+        "lng": -86.167222,
+        "area_codes": "317"
+      },
+      {
+        "start_date": "2023-05-19",
+        "arena": "Gainbridge Fieldhouse",
+        "city": "Indianapolis",
+        "state": "Indiana",
+        "lat": 39.763889,
+        "lng": -86.155556,
+        "area_codes": "317"
+      }
+    ]
+  },
+  "1611661327": {
+    "name": "Portland Fire",
+    "emoji": "🔥",
+    "color": "#CE1141",
+    "arenas": [
+      {
+        "start_date": "2000-05-31",
+        "end_date": "2002-08-13",
+        "name": "Rose Garden",
+        "arena": "Moda Center",
+        "city": "Portland",
+        "state": "Oregon",
+        "lat": 45.531508,
+        "lng": -122.666934,
+        "area_codes": "503"
+      }
+    ]
+  },
+  "1611661328": {
+    "name": "Seattle Storm",
+    "emoji": "⛈️",
+    "color": "#2C5234",
+    "championships": [
+      "2004",
+      "2010",
+      "2018",
+      "2020"
+    ],
+    "cups": [
+      "2021"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2018-09-12",
+        "name": "KeyArena",
+        "arena": "Climate Pledge Arena",
+        "city": "Seattle",
+        "state": "Washington",
+        "lat": 47.622222,
+        "lng": -122.353889,
+        "area_codes": "206"
+      },
+      {
+        "start_date": "2019-05-25",
+        "end_date": "2019-09-11",
+        "arena": "Angel of the Winds Arena",
+        "city": "Everett",
+        "state": "Washington",
+        "lat": 47.979167,
+        "lng": -122.203056,
+        "area_codes": "425"
+      },
+      {
+        "start_date": "2019-05-31",
+        "end_date": "2019-08-08",
+        "arena": "Hec Edmundson Pavilion",
+        "city": "Seattle",
+        "state": "Washington",
+        "lat": 47.651667,
+        "lng": -122.3025,
+        "area_codes": "206"
+      },
+      {
+        "start_date": "2020-07-25",
+        "end_date": "2020-10-06",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-15",
+        "end_date": "2021-09-26",
+        "arena": "Angel of the Winds Arena",
+        "city": "Everett",
+        "state": "Washington",
+        "lat": 47.979167,
+        "lng": -122.203056,
+        "area_codes": "425"
+      },
+      {
+        "start_date": "2022-05-06",
+        "arena": "Climate Pledge Arena",
+        "city": "Seattle",
+        "state": "Washington",
+        "lat": 47.622222,
+        "lng": -122.353889,
+        "area_codes": "206"
+      }
+    ]
+  },
+  "1611661329": {
+    "name": "Chicago Sky",
+    "emoji": "☁️",
+    "color": "#418FDE",
+    "championships": [
+      "2021"
+    ],
+    "arenas": [
+      {
+        "start_date": "2009-06-07",
+        "end_date": "2009-09-13",
+        "arena": "UIC Pavilion",
+        "city": "Chicago",
+        "state": "Illinois",
+        "lat": 41.874722,
+        "lng": -87.656111,
+        "area_codes": "312"
+      },
+      {
+        "start_date": "2010-05-22",
+        "end_date": "2017-09-03",
+        "arena": "Allstate Arena",
+        "city": "Rosemont",
+        "state": "Illinois",
+        "lat": 42.005278,
+        "lng": -87.888056,
+        "area_codes": "847"
+      },
+      {
+        "start_date": "2018-05-20",
+        "arena": "Wintrust Arena",
+        "city": "Chicago",
+        "state": "Illinois",
+        "lat": 41.853056,
+        "lng": -87.623611,
+        "area_codes": "312"
+      },
+      {
+        "start_date": "2020-07-26",
+        "end_date": "2020-09-11",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      }
+    ]
+  },
+  "1611661330": {
+    "name": "Atlanta Dream",
+    "emoji": "💭",
+    "color": "#E31837",
+    "arenas": [
+      {
+        "start_date": "2009-06-06",
+        "end_date": "2016-09-11",
+        "name": "Philips Arena",
+        "arena": "State Farm Arena",
+        "city": "Atlanta",
+        "state": "Georgia",
+        "lat": 33.757222,
+        "lng": -84.396389,
+        "area_codes": "404"
+      },
+      {
+        "start_date": "2017-05-13",
+        "end_date": "2018-09-04",
+        "arena": "McCamish Pavilion",
+        "city": "Atlanta",
+        "state": "Georgia",
+        "lat": 33.780556,
+        "lng": -84.392778,
+        "area_codes": "404"
+      },
+      {
+        "start_date": "2019-05-24",
+        "end_date": "2019-09-08",
+        "arena": "State Farm Arena",
+        "city": "Atlanta",
+        "state": "Georgia",
+        "lat": 33.757222,
+        "lng": -84.396389,
+        "area_codes": "404"
+      },
+      {
+        "start_date": "2020-07-26",
+        "end_date": "2020-09-13",
+        "arena": "IMG Academy",
+        "city": "Bradenton",
+        "state": "Florida",
+        "lat": 27.442222,
+        "lng": -82.601944,
+        "area_codes": "941"
+      },
+      {
+        "start_date": "2021-05-14",
+        "arena": "Gateway Center Arena",
+        "city": "College Park",
+        "state": "Georgia",
+        "lat": 33.651111,
+        "lng": -84.453056,
+        "area_codes": "404"
+      }
+    ]
+  },
+  "1611661331": {
+    "name": "Golden State Valkyries",
+    "emoji": "🛡️",
+    "color": "#AD96DC",
+    "arenas": [
+      {
+        "start_date": "2026-05-10",
+        "arena": "Chase Center",
+        "city": "San Francisco",
+        "state": "California",
+        "lat": 37.768056,
+        "lng": -122.3875,
+        "area_codes": "415"
+      }
+    ]
+  },
+  "1611661332": {
+    "name": "Toronto Tempo",
+    "emoji": "🥁",
+    "color": "#5C061E",
+    "arenas": [
+      {
+        "start_date": "2026-05-14",
+        "name": "Coca-Cola Coliseum",
+        "arena": "Coca-Cola Coliseum",
+        "city": "Toronto",
+        "state": "Ontario",
+        "lat": 43.633889,
+        "lng": -79.4175,
+        "area_codes": "416"
+      }
+    ]
+  },
+  "1611665409": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "1611665410": {
+    "emoji": "⭐",
+    "color": "#F5C518"
+  },
+  "special_cleveland_rockers": {
+    "name": "Cleveland Rockers",
+    "emoji": "🎸",
+    "color": "#002F6C",
+    "special": true
+  },
+  "special_team_world": {
+    "name": "Team World",
+    "emoji": "⭐",
+    "color": "#F5C518",
+    "special": true
+  },
+  "special_rising_stars": {
+    "name": "Rising Stars",
+    "emoji": "⭐",
+    "color": "#F5C518",
+    "special": true
+  },
+  "special_team_spoon": {
+    "name": "Team Spoon",
+    "emoji": "⭐",
+    "color": "#F5C518",
+    "special": true
+  }
+}

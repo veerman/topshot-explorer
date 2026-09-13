@@ -1,0 +1,432 @@
+{
+ "comment": "Recipe for extracting logos/badges from set art (see scripts/extract-set-badges.mjs). Self-contained: every entry resolves an edition to its HERO CID via the seed and unwarps the fixed quad fresh. rect = [x, y, w, h] in 1024x1024 set-art space (Steve-final via adjust.html). masks entries cut a circle (set-art space) or a colour-key filter out of the extraction.",
+ "badges": [
+  {
+   "edition": "16_199_0",
+   "rect": [
+    41,
+    925,
+    183,
+    64
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "17_221_0",
+   "rect": [
+    25,
+    37,
+    184,
+    61
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "18_236_0",
+   "rect": [
+    25,
+    38,
+    211,
+    120
+   ],
+   "name": "nba conference finals (western)"
+  },
+  {
+   "edition": "19_246_0",
+   "rect": [
+    26,
+    37,
+    211,
+    121
+   ],
+   "name": "nba conference finals (eastern)"
+  },
+  {
+   "edition": "20_256_0",
+   "rect": [
+    33,
+    869,
+    208,
+    123
+   ],
+   "name": "nba finals 2020"
+  },
+  {
+   "edition": "21_258_0",
+   "rect": [
+    33,
+    869,
+    206,
+    123
+   ],
+   "name": "nba finals 2020"
+  },
+  {
+   "edition": "34_789_0",
+   "rect": [
+    32,
+    876,
+    235,
+    114
+   ],
+   "name": "nba allstar 2021"
+  },
+  {
+   "edition": "35_815_0",
+   "rect": [
+    37,
+    870,
+    188,
+    124
+   ],
+   "name": "nba rising stars"
+  },
+  {
+   "edition": "36_836_0",
+   "rect": [
+    34,
+    877,
+    236,
+    114
+   ],
+   "name": "nba allstar 2021"
+  },
+  {
+   "edition": "39_1267_0",
+   "rect": [
+    32,
+    47,
+    224,
+    71
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "41_1460_0",
+   "rect": [
+    30,
+    875,
+    184,
+    124
+   ],
+   "name": "nba finals 2021"
+  },
+  {
+   "edition": "63_2227_0",
+   "rect": [
+    38,
+    866,
+    235,
+    118
+   ],
+   "name": "nba allstar 2022"
+  },
+  {
+   "edition": "61_2179_0",
+   "rect": [
+    41,
+    864,
+    173,
+    114
+   ],
+   "name": "nba allstar 2000 golden state"
+  },
+  {
+   "edition": "60_2122_0",
+   "rect": [
+    40,
+    870,
+    238,
+    114
+   ],
+   "name": "nba allstar 2022 cleveland"
+  },
+  {
+   "edition": "67_2523_0",
+   "rect": [
+    44,
+    880,
+    235,
+    91
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "68_2627_0",
+   "rect": [
+    803,
+    872,
+    183,
+    126
+   ],
+   "name": "nba conference finals"
+  },
+  {
+   "edition": "69_2655_0",
+   "rect": [
+    30,
+    888,
+    185,
+    95
+   ],
+   "name": "nba finals"
+  },
+  {
+   "edition": "101_3349_0",
+   "rect": [
+    48,
+    864,
+    222,
+    118
+   ],
+   "name": "nba allstar 2023 utah"
+  },
+  {
+   "edition": "105_3695_0",
+   "rect": [
+    40,
+    879,
+    211,
+    91
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "110_3939_0",
+   "rect": [
+    37,
+    874,
+    214,
+    111
+   ],
+   "name": "nba finals 2023"
+  },
+  {
+   "edition": "138_4889_0",
+   "rect": [
+    49,
+    865,
+    201,
+    98
+   ],
+   "name": "nba allstar 2024 indy"
+  },
+  {
+   "edition": "147_5330_0",
+   "rect": [
+    58,
+    861,
+    196,
+    93
+   ],
+   "name": "nba finals"
+  },
+  {
+   "edition": "181_6354_0",
+   "rect": [
+    47,
+    867,
+    204,
+    95
+   ],
+   "name": "nba allstar 2025 san francisco"
+  },
+  {
+   "edition": "186_6648_0",
+   "rect": [
+    73,
+    881,
+    207,
+    75
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "187_6642_0",
+   "rect": [
+    74,
+    879,
+    205,
+    78
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "188_6643_0",
+   "rect": [
+    73,
+    880,
+    207,
+    76
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "189_6644_0",
+   "rect": [
+    74,
+    880,
+    205,
+    76
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "213_7295_0",
+   "rect": [
+    77,
+    868,
+    198,
+    79
+   ],
+   "name": "wnba playoffs"
+  },
+  {
+   "edition": "217_7384_0",
+   "rect": [
+    81,
+    866,
+    191,
+    83
+   ],
+   "name": "wnba finals"
+  },
+  {
+   "edition": "246_8427_0",
+   "rect": [
+    401,
+    715,
+    224,
+    85
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "250_8568_0",
+   "rect": [
+    109,
+    350,
+    812,
+    304
+   ],
+   "name": "nba playoffs"
+  },
+  {
+   "edition": "250_8568_0",
+   "name": "nba logoman",
+   "rect": [
+    124,
+    378,
+    114,
+    245
+   ]
+  },
+  {
+   "edition": "217_7384_0",
+   "name": "wnba logowoman",
+   "rect": [
+    93,
+    866,
+    35,
+    83
+   ]
+  },
+  {
+   "edition": "21_258_0",
+   "name": "nba larry o'brien trophy",
+   "rect": [
+    186,
+    882,
+    53,
+    99
+   ]
+  }
+ ],
+ "masks": [
+  {
+   "set": 141,
+   "mode": "per-team",
+   "tier": "Fandom",
+   "removeBackground": "dark-flood",
+   "circle": {
+    "cx": 513.5,
+    "cy": 510.5,
+    "r": 310.5
+   }
+  },
+  {
+   "set": 141,
+   "mode": "single",
+   "playID": 5177,
+   "tier": "Rare",
+   "name": "nba playoffs",
+   "removeBackground": "dark-flood",
+   "circle": {
+    "cx": 513.5,
+    "cy": 511.5,
+    "r": 268.5
+   }
+  },
+  {
+   "set": 54,
+   "mode": "per-team",
+   "tier": "Rare",
+   "filter": "gold-on-dark"
+  },
+  {
+   "set": 53,
+   "mode": "per-team",
+   "tier": "Legendary",
+   "filter": "holo-on-dark",
+   "region": {
+    "cx": 512,
+    "cy": 512,
+    "r": 460
+   }
+  },
+  {
+   "set": 161,
+   "mode": "per-team",
+   "tier": "Legendary",
+   "filter": "bright-on-dark",
+   "region": {
+    "cx": 512,
+    "cy": 512,
+    "r": 430
+   },
+   "keepLargest": true
+  },
+  {
+   "set": 148,
+   "mode": "per-team",
+   "tier": "Rare",
+   "filter": "gold-on-dark"
+  },
+  {
+   "set": 73,
+   "mode": "per-team",
+   "tier": "Common",
+   "filter": "emboss-outline",
+   "minComponent": 600,
+   "dropBorder": true
+  },
+  {
+   "set": 171,
+   "mode": "per-team",
+   "tier": "Common",
+   "filter": "emboss-outline",
+   "minComponent": 600,
+   "dropBorder": true,
+   "minEdgeContrast": 4
+  },
+  {
+   "set": 56,
+   "mode": "per-team",
+   "tier": "Fandom",
+   "filter": "emboss-outline",
+   "minComponent": 600,
+   "dropBorder": true,
+   "minEdgeContrast": 4
+  }
+ ]
+}

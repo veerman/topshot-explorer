@@ -1,0 +1,990 @@
+{
+  "source": "https://www.basketball-reference.com/awards/hof.html",
+  "note": "Naismith Hall of Fame inductees, Player category only. Feeds the derived Hall of Fame badge; matching is by normalized full name (src/services/name-norm.js).",
+  "players": [
+    {
+      "name": "Charles Hyatt",
+      "year": 1959
+    },
+    {
+      "name": "George Mikan",
+      "year": 1959
+    },
+    {
+      "name": "Hank Luisetti",
+      "year": 1959
+    },
+    {
+      "name": "John Schommer",
+      "year": 1959
+    },
+    {
+      "name": "Branch McCracken",
+      "year": 1960
+    },
+    {
+      "name": "Charles Murphy",
+      "year": 1960
+    },
+    {
+      "name": "Ed Macauley",
+      "year": 1960
+    },
+    {
+      "name": "John Wooden",
+      "year": 1960
+    },
+    {
+      "name": "Victor Hanson",
+      "year": 1960
+    },
+    {
+      "name": "Andy Phillip",
+      "year": 1961
+    },
+    {
+      "name": "Bernard Borgmann",
+      "year": 1961
+    },
+    {
+      "name": "Bob Kurland",
+      "year": 1961
+    },
+    {
+      "name": "Christian Steinmetz",
+      "year": 1961
+    },
+    {
+      "name": "Edward Wachter",
+      "year": 1961
+    },
+    {
+      "name": "Forrest DeBernardi",
+      "year": 1961
+    },
+    {
+      "name": "John Roosma",
+      "year": 1961
+    },
+    {
+      "name": "Barney Sedran",
+      "year": 1962
+    },
+    {
+      "name": "Harlan Page",
+      "year": 1962
+    },
+    {
+      "name": "Jack McCracken",
+      "year": 1962
+    },
+    {
+      "name": "John (Cat) Thompson",
+      "year": 1962
+    },
+    {
+      "name": "Robert Gruenig",
+      "year": 1963
+    },
+    {
+      "name": "Harold Foster",
+      "year": 1964
+    },
+    {
+      "name": "John Russell",
+      "year": 1964
+    },
+    {
+      "name": "Nat Holman",
+      "year": 1964
+    },
+    {
+      "name": "Joe Lapchick",
+      "year": 1966
+    },
+    {
+      "name": "Dutch Dehnert",
+      "year": 1969
+    },
+    {
+      "name": "Bob Davies",
+      "year": 1970
+    },
+    {
+      "name": "Bob Cousy",
+      "year": 1971
+    },
+    {
+      "name": "Bob Pettit",
+      "year": 1971
+    },
+    {
+      "name": "Max Friedman",
+      "year": 1972
+    },
+    {
+      "name": "Paul Endacott",
+      "year": 1972
+    },
+    {
+      "name": "Dolph Schayes",
+      "year": 1973
+    },
+    {
+      "name": "John Beckman",
+      "year": 1973
+    },
+    {
+      "name": "Ernest Schmidt",
+      "year": 1974
+    },
+    {
+      "name": "Bill Russell",
+      "year": 1975
+    },
+    {
+      "name": "Joseph Brennan",
+      "year": 1975
+    },
+    {
+      "name": "Robert Vandivier",
+      "year": 1975
+    },
+    {
+      "name": "Bill Sharman",
+      "year": 1976
+    },
+    {
+      "name": "Ed Krause",
+      "year": 1976
+    },
+    {
+      "name": "Tom Gola",
+      "year": 1976
+    },
+    {
+      "name": "Elgin Baylor",
+      "year": 1977
+    },
+    {
+      "name": "Lauren Gale",
+      "year": 1977
+    },
+    {
+      "name": "William Johnson",
+      "year": 1977
+    },
+    {
+      "name": "Cliff Hagan",
+      "year": 1978
+    },
+    {
+      "name": "Jim Pollard",
+      "year": 1978
+    },
+    {
+      "name": "Joe Fulks",
+      "year": 1978
+    },
+    {
+      "name": "Paul Arizin",
+      "year": 1978
+    },
+    {
+      "name": "Wilt Chamberlain",
+      "year": 1979
+    },
+    {
+      "name": "Jerry Lucas",
+      "year": 1980
+    },
+    {
+      "name": "Jerry West",
+      "year": 1980
+    },
+    {
+      "name": "Oscar Robertson",
+      "year": 1980
+    },
+    {
+      "name": "Thomas Barlow",
+      "year": 1981
+    },
+    {
+      "name": "Frank Ramsey",
+      "year": 1982
+    },
+    {
+      "name": "Hal Greer",
+      "year": 1982
+    },
+    {
+      "name": "Slater Martin",
+      "year": 1982
+    },
+    {
+      "name": "Willis Reed",
+      "year": 1982
+    },
+    {
+      "name": "Bill Bradley",
+      "year": 1983
+    },
+    {
+      "name": "Dave DeBusschere",
+      "year": 1983
+    },
+    {
+      "name": "Jack Twyman",
+      "year": 1983
+    },
+    {
+      "name": "John Havlicek",
+      "year": 1984
+    },
+    {
+      "name": "Sam Jones",
+      "year": 1984
+    },
+    {
+      "name": "Al Cervi",
+      "year": 1985
+    },
+    {
+      "name": "Nate Thurmond",
+      "year": 1985
+    },
+    {
+      "name": "Billy Cunningham",
+      "year": 1986
+    },
+    {
+      "name": "Tom Heinsohn",
+      "year": 1986
+    },
+    {
+      "name": "Bob Houbregs",
+      "year": 1987
+    },
+    {
+      "name": "Bobby Wanzer",
+      "year": 1987
+    },
+    {
+      "name": "Pete Maravich",
+      "year": 1987
+    },
+    {
+      "name": "Rick Barry",
+      "year": 1987
+    },
+    {
+      "name": "Walt Frazier",
+      "year": 1987
+    },
+    {
+      "name": "Bob McDermott",
+      "year": 1988
+    },
+    {
+      "name": "Clyde Lovellette",
+      "year": 1988
+    },
+    {
+      "name": "Wes Unseld",
+      "year": 1988
+    },
+    {
+      "name": "K.C. Jones",
+      "year": 1989
+    },
+    {
+      "name": "Lenny Wilkens",
+      "year": 1989
+    },
+    {
+      "name": "Pop Gates",
+      "year": 1989
+    },
+    {
+      "name": "Dave Bing",
+      "year": 1990
+    },
+    {
+      "name": "Earl Monroe",
+      "year": 1990
+    },
+    {
+      "name": "Elvin Hayes",
+      "year": 1990
+    },
+    {
+      "name": "Neil Johnston",
+      "year": 1990
+    },
+    {
+      "name": "Dave Cowens",
+      "year": 1991
+    },
+    {
+      "name": "Harry Gallatin",
+      "year": 1991
+    },
+    {
+      "name": "Tiny Archibald",
+      "year": 1991
+    },
+    {
+      "name": "Bob Lanier",
+      "year": 1992
+    },
+    {
+      "name": "Connie Hawkins",
+      "year": 1992
+    },
+    {
+      "name": "Lusia Harris-Stewart",
+      "year": 1992
+    },
+    {
+      "name": "Nera White",
+      "year": 1992
+    },
+    {
+      "name": "Sergei Belov",
+      "year": 1992
+    },
+    {
+      "name": "Ann Meyers",
+      "year": 1993
+    },
+    {
+      "name": "Bill Walton",
+      "year": 1993
+    },
+    {
+      "name": "Calvin Murphy",
+      "year": 1993
+    },
+    {
+      "name": "Dan Issel",
+      "year": 1993
+    },
+    {
+      "name": "Dick McGuire",
+      "year": 1993
+    },
+    {
+      "name": "Julius Erving",
+      "year": 1993
+    },
+    {
+      "name": "Uljana Semjonova",
+      "year": 1993
+    },
+    {
+      "name": "Walt Bellamy",
+      "year": 1993
+    },
+    {
+      "name": "Buddy Jeannette",
+      "year": 1994
+    },
+    {
+      "name": "Carol Blazejowski",
+      "year": 1994
+    },
+    {
+      "name": "Anne Donovan",
+      "year": 1995
+    },
+    {
+      "name": "Cheryl Miller",
+      "year": 1995
+    },
+    {
+      "name": "Kareem Abdul-Jabbar",
+      "year": 1995
+    },
+    {
+      "name": "Vern Mikkelsen",
+      "year": 1995
+    },
+    {
+      "name": "David Thompson",
+      "year": 1996
+    },
+    {
+      "name": "Gail Goodrich",
+      "year": 1996
+    },
+    {
+      "name": "George Gervin",
+      "year": 1996
+    },
+    {
+      "name": "George Yardley",
+      "year": 1996
+    },
+    {
+      "name": "Kresimir Cosic",
+      "year": 1996
+    },
+    {
+      "name": "Nancy Lieberman",
+      "year": 1996
+    },
+    {
+      "name": "Alex English",
+      "year": 1997
+    },
+    {
+      "name": "Bailey Howell",
+      "year": 1997
+    },
+    {
+      "name": "Denise Curry",
+      "year": 1997
+    },
+    {
+      "name": "Joan Crawford",
+      "year": 1997
+    },
+    {
+      "name": "Arnie Risen",
+      "year": 1998
+    },
+    {
+      "name": "Larry Bird",
+      "year": 1998
+    },
+    {
+      "name": "Marques Haynes",
+      "year": 1998
+    },
+    {
+      "name": "Kevin McHale",
+      "year": 1999
+    },
+    {
+      "name": "Bob McAdoo",
+      "year": 2000
+    },
+    {
+      "name": "Isiah Thomas",
+      "year": 2000
+    },
+    {
+      "name": "Moses Malone",
+      "year": 2001
+    },
+    {
+      "name": "Drazen Petrovic",
+      "year": 2002
+    },
+    {
+      "name": "Magic Johnson",
+      "year": 2002
+    },
+    {
+      "name": "Dino Meneghin",
+      "year": 2003
+    },
+    {
+      "name": "James Worthy",
+      "year": 2003
+    },
+    {
+      "name": "Robert Parish",
+      "year": 2003
+    },
+    {
+      "name": "Clyde Drexler",
+      "year": 2004
+    },
+    {
+      "name": "Drazen Dalipagic",
+      "year": 2004
+    },
+    {
+      "name": "Lynette Woodard",
+      "year": 2004
+    },
+    {
+      "name": "Maurice Stokes",
+      "year": 2004
+    },
+    {
+      "name": "Hortencia Marcari",
+      "year": 2005
+    },
+    {
+      "name": "Charles Barkley",
+      "year": 2006
+    },
+    {
+      "name": "Dominique Wilkins",
+      "year": 2006
+    },
+    {
+      "name": "Joe Dumars",
+      "year": 2006
+    },
+    {
+      "name": "Adrian Dantley",
+      "year": 2008
+    },
+    {
+      "name": "Hakeem Olajuwon",
+      "year": 2008
+    },
+    {
+      "name": "Patrick Ewing",
+      "year": 2008
+    },
+    {
+      "name": "David Robinson",
+      "year": 2009
+    },
+    {
+      "name": "John Stockton",
+      "year": 2009
+    },
+    {
+      "name": "Michael Jordan",
+      "year": 2009
+    },
+    {
+      "name": "Cynthia Cooper-Dyke",
+      "year": 2010
+    },
+    {
+      "name": "Dennis Johnson",
+      "year": 2010
+    },
+    {
+      "name": "Gus Johnson",
+      "year": 2010
+    },
+    {
+      "name": "Karl Malone",
+      "year": 2010
+    },
+    {
+      "name": "Maciel Pereira",
+      "year": 2010
+    },
+    {
+      "name": "Scottie Pippen",
+      "year": 2010
+    },
+    {
+      "name": "Artis Gilmore",
+      "year": 2011
+    },
+    {
+      "name": "Arvydas Sabonis",
+      "year": 2011
+    },
+    {
+      "name": "Chris Mullin",
+      "year": 2011
+    },
+    {
+      "name": "Dennis Rodman",
+      "year": 2011
+    },
+    {
+      "name": "Goose Tatum",
+      "year": 2011
+    },
+    {
+      "name": "Teresa Edwards",
+      "year": 2011
+    },
+    {
+      "name": "Chet Walker",
+      "year": 2012
+    },
+    {
+      "name": "Jamaal Wilkes",
+      "year": 2012
+    },
+    {
+      "name": "Katrina McClain",
+      "year": 2012
+    },
+    {
+      "name": "Mel Daniels",
+      "year": 2012
+    },
+    {
+      "name": "Ralph Sampson",
+      "year": 2012
+    },
+    {
+      "name": "Reggie Miller",
+      "year": 2012
+    },
+    {
+      "name": "Bernard King",
+      "year": 2013
+    },
+    {
+      "name": "Dawn Staley",
+      "year": 2013
+    },
+    {
+      "name": "Gary Payton",
+      "year": 2013
+    },
+    {
+      "name": "Oscar Schmidt",
+      "year": 2013
+    },
+    {
+      "name": "Richie Guerin",
+      "year": 2013
+    },
+    {
+      "name": "Roger Brown",
+      "year": 2013
+    },
+    {
+      "name": "Alonzo Mourning",
+      "year": 2014
+    },
+    {
+      "name": "Guy Rodgers",
+      "year": 2014
+    },
+    {
+      "name": "Mitch Richmond",
+      "year": 2014
+    },
+    {
+      "name": "Nathaniel Clifton",
+      "year": 2014
+    },
+    {
+      "name": "Sarunas Marciulionis",
+      "year": 2014
+    },
+    {
+      "name": "Dikembe Mutombo",
+      "year": 2015
+    },
+    {
+      "name": "Jo Jo White",
+      "year": 2015
+    },
+    {
+      "name": "John Isaacs",
+      "year": 2015
+    },
+    {
+      "name": "Lisa Leslie",
+      "year": 2015
+    },
+    {
+      "name": "Louie Dampier",
+      "year": 2015
+    },
+    {
+      "name": "Spencer Haywood",
+      "year": 2015
+    },
+    {
+      "name": "Allen Iverson",
+      "year": 2016
+    },
+    {
+      "name": "Cumberland Posey",
+      "year": 2016
+    },
+    {
+      "name": "Shaquille O'Neal",
+      "year": 2016
+    },
+    {
+      "name": "Sheryl Swoopes",
+      "year": 2016
+    },
+    {
+      "name": "Yao Ming",
+      "year": 2016
+    },
+    {
+      "name": "Zelmo Beaty",
+      "year": 2016
+    },
+    {
+      "name": "George McGinnis",
+      "year": 2017
+    },
+    {
+      "name": "Nick Galis",
+      "year": 2017
+    },
+    {
+      "name": "Tracy McGrady",
+      "year": 2017
+    },
+    {
+      "name": "Zack Clayton",
+      "year": 2017
+    },
+    {
+      "name": "Charlie Scott",
+      "year": 2018
+    },
+    {
+      "name": "Dino Radja",
+      "year": 2018
+    },
+    {
+      "name": "Grant Hill",
+      "year": 2018
+    },
+    {
+      "name": "Jason Kidd",
+      "year": 2018
+    },
+    {
+      "name": "Katie Smith",
+      "year": 2018
+    },
+    {
+      "name": "Maurice Cheeks",
+      "year": 2018
+    },
+    {
+      "name": "Ora Mae Washington",
+      "year": 2018
+    },
+    {
+      "name": "Ray Allen",
+      "year": 2018
+    },
+    {
+      "name": "Steve Nash",
+      "year": 2018
+    },
+    {
+      "name": "Tina Thompson",
+      "year": 2018
+    },
+    {
+      "name": "Bobby Jones",
+      "year": 2019
+    },
+    {
+      "name": "Carl Braun",
+      "year": 2019
+    },
+    {
+      "name": "Charles “Chuck” Cooper",
+      "year": 2019
+    },
+    {
+      "name": "Jack Sikma",
+      "year": 2019
+    },
+    {
+      "name": "Paul Westphal",
+      "year": 2019
+    },
+    {
+      "name": "Sidney Moncrief",
+      "year": 2019
+    },
+    {
+      "name": "Teresa Weatherspoon",
+      "year": 2019
+    },
+    {
+      "name": "Vlade Divac",
+      "year": 2019
+    },
+    {
+      "name": "Kevin Garnett",
+      "year": 2020
+    },
+    {
+      "name": "Kobe Bryant",
+      "year": 2020
+    },
+    {
+      "name": "Tamika Catchings",
+      "year": 2020
+    },
+    {
+      "name": "Tim Duncan",
+      "year": 2020
+    },
+    {
+      "name": "Ben Wallace",
+      "year": 2021
+    },
+    {
+      "name": "Bob Dandridge",
+      "year": 2021
+    },
+    {
+      "name": "Chris Bosh",
+      "year": 2021
+    },
+    {
+      "name": "Chris Webber",
+      "year": 2021
+    },
+    {
+      "name": "Clarence Jenkins",
+      "year": 2021
+    },
+    {
+      "name": "Lauren Jackson",
+      "year": 2021
+    },
+    {
+      "name": "Paul Pierce",
+      "year": 2021
+    },
+    {
+      "name": "Pearl Moore",
+      "year": 2021
+    },
+    {
+      "name": "Toni Kukoc",
+      "year": 2021
+    },
+    {
+      "name": "Yolanda Griffith",
+      "year": 2021
+    },
+    {
+      "name": "Albert Pullins",
+      "year": 2022
+    },
+    {
+      "name": "Inman Jackson",
+      "year": 2022
+    },
+    {
+      "name": "Lindsay Whalen",
+      "year": 2022
+    },
+    {
+      "name": "Lou Hudson",
+      "year": 2022
+    },
+    {
+      "name": "Manu Ginobili",
+      "year": 2022
+    },
+    {
+      "name": "Radivoj Korac",
+      "year": 2022
+    },
+    {
+      "name": "Sonny Boswell",
+      "year": 2022
+    },
+    {
+      "name": "Swin Cash",
+      "year": 2022
+    },
+    {
+      "name": "Theresa Shank-Grentz",
+      "year": 2022
+    },
+    {
+      "name": "Tim Hardaway",
+      "year": 2022
+    },
+    {
+      "name": "Becky Hammon",
+      "year": 2023
+    },
+    {
+      "name": "Dirk Nowitzki",
+      "year": 2023
+    },
+    {
+      "name": "Dwyane Wade",
+      "year": 2023
+    },
+    {
+      "name": "Pau Gasol",
+      "year": 2023
+    },
+    {
+      "name": "Tony Parker",
+      "year": 2023
+    },
+    {
+      "name": "Chauncey Billups",
+      "year": 2024
+    },
+    {
+      "name": "Dick Barnett",
+      "year": 2024
+    },
+    {
+      "name": "Michael Cooper",
+      "year": 2024
+    },
+    {
+      "name": "Michele Timms",
+      "year": 2024
+    },
+    {
+      "name": "Seimone Augustus",
+      "year": 2024
+    },
+    {
+      "name": "Vince Carter",
+      "year": 2024
+    },
+    {
+      "name": "Walter Davis",
+      "year": 2024
+    },
+    {
+      "name": "Carmelo Anthony",
+      "year": 2025
+    },
+    {
+      "name": "Dwight Howard",
+      "year": 2025
+    },
+    {
+      "name": "Maya Moore",
+      "year": 2025
+    },
+    {
+      "name": "Sue Bird",
+      "year": 2025
+    },
+    {
+      "name": "Sylvia Fowles",
+      "year": 2025
+    },
+    {
+      "name": "Amar'e Stoudemire",
+      "year": 2026
+    },
+    {
+      "name": "Candace Parker",
+      "year": 2026
+    },
+    {
+      "name": "Chamique Holdsclaw",
+      "year": 2026
+    },
+    {
+      "name": "Elena Delle Donne",
+      "year": 2026
+    }
+  ]
+}

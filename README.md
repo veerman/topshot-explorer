@@ -1,0 +1,218 @@
+# Top Shot Explorer v2
+
+An offline-first block explorer for the NBA and WNBA Top Shot smart contracts on
+the Flow blockchain. The browser syncs the entire on-chain dataset (plays, sets,
+editions, IPFS media CIDs) into IndexedDB, then every page renders instantly
+from the local database. There is no backend: the app is a pure static SPA that
+talks directly to Flow's public REST API.
+
+Successor to [topshot-explorer-v1](https://github.com/veerman/topshot-explorer-v1)
+(itself forked from `rrrkren/topshot-explorer`), rebuilt from scratch on
+React 19 + Vite.
+
+Building your own Top Shot app on this code? Start with
+[docs/FOUNDATION.md](docs/FOUNDATION.md): every solved problem (reading the chain,
+the correction layer, media, marketplace, accounts) with the file that
+solves it. [AGENTS.md](AGENTS.md) is the short conventions file for
+coding agents.
+
+## Features
+
+- **Plays, Sets, Editions**: full metadata for every play and set, per-edition
+  mint counts, retired status, subedition (parallel) breakdowns, and IPFS media
+  (images and videos) resolved from the on-chain `TopShotIPFSResolver` contract.
+- **Players, Teams, Arenas**: aggregated profiles compiled locally, including
+  temporal venue resolution (which arena a game was played in based on its
+  date) and NBA/WNBA league detection.
+- **Calendar**: game anniversaries and player birthdays for every day of the
+  year, with leap-year handling.
+- **Corrections ledger**: a before/after audit of every metadata correction applied
+  on top of the raw on-chain values, including known contract mismints.
+- **Accounts**: live wallet lookups showing owned moments and active
+  marketplace sale listings with prices.
+- **Browse as an account**: enter any Flow address in the navbar and the whole
+  app annotates itself with that collection (no login, no auth; it is a lens).
+  The home page becomes a collection summary, and the Plays, Sets, Players,
+  Teams, Seasons and Arenas pages show owned/total fractions. The collection
+  (setID, playID, serial, parallel per moment) is fetched in ~2,000-moment
+  batches, cached in IndexedDB per address, and refreshed incrementally when
+  older than ten minutes (moments are immutable once minted, so a refresh only
+  re-reads the ID list and fetches data for new moments). Exit restores the
+  normal view.
+- **Smart sync**: a full first sync takes under a minute; afterwards only new
+  plays and sets are fetched incrementally, and every sync pass re-reads the
+  mint count and retired flag of every edition (open editions keep minting,
+  so counts are never allowed to go stale). Leftover placeholder rows from
+  the prototype era (fabricated mint counts or IPFS CIDs) are detected and
+  rebuilt from chain automatically. All heavy pages read from IndexedDB,
+  not the chain.
+
+## Data correction layer
+
+Raw on-chain metadata contains typos, missing values, and mismints. The app
+compiles corrections on top while always preserving the raw original (shown on
+the Corrections page):
+
+- `data/overrides/*`: fix incorrect on-chain values (plays, sets, series).
+- `data/additions/*`: add off-chain context: tiers, tags, team emoji, arena
+  history with date ranges, championships, editions data.
+- `data/dapper/*`: Dapper's own ids beside our Flow ids (play UUIDs, the old
+  site's edition and set UUIDs, Atlas edition numbers). Only the atlas scripts
+  and the Legacy page (old nbatopshot.com links resolved to pages here) read
+  them; the main bundle never loads them.
+- `data/plays_exclude.json`: known misminted play IDs.
+- `data/sets_parallels.json`: which subedition parallels each set contains.
+- `data/leagues.json`: NBA/WNBA team rosters for league detection.
+- `data/commentary.json`: the 74 narrated cuts from the original
+  nbatopshot.com, as hotlinks to Dapper's hosting (edition-level Commentary
+  badge; never enters the play tags or the homepage).
+- `data/burns.json`: moments destroyed per edition, read from Atlas. The
+  chain never lowers a mint count, so every count the app shows is minted
+  minus burned (remaining supply) unless Settings switches it off.
+
+Editing any of these files triggers an automatic database recompile on the next
+app load (no manual resync needed). The Settings page has a toggle to disable
+all corrections and view raw chain data.
+
+## Development
+
+```
+npm install
+npm run dev      # Vite dev server
+npm run build    # production build to dist/
+npm run preview  # serve the production build locally
+npm run lint     # ESLint
+```
+
+## Maintenance scripts
+
+The data files are hand-curated; these scripts keep them honest against the
+chain and against Dapper's own catalogue (Atlas, the API behind
+nbatopshot.com). Atlas is the check, never the source: the app reads nothing
+from it, every difference the comparison reports is a judgment, and what we
+accept is written into `data/additions/` as our own fact. The snapshot itself
+(`data/atlas/`) is regenerated by `atlas:harvest` whenever a fresh
+comparison is wanted.
+
+```
+npm run reconcile          strip stored tags the app derives itself (also prebuild)
+npm run ipfs:probe         probe the IPFS media of editions newer than the last run
+                           (headers only; results in scratch/ipfs-probe, merged into
+                           data/ipfs_media.json when complete)
+npm run atlas:harvest      snapshot Atlas editions to data/atlas/editions.json
+                           (headless Chrome via puppeteer-core; no login needed)
+npm run atlas:parallels    derive sets_parallels.json from the snapshot; --apply writes
+npm run atlas:tags         badges, seasons and dates vs our data; --import copies
+                           Atlas badges into additions tags (then reconcile)
+npm run wall:fold          Fold the Early Adopters wall from the hosted table into
+                           data/early_adopters.json (commit it, then deploy)
+npm run wall:reset -- --yes  Empty the hosted wall and restart at #1 (--file also
+                           empties data/early_adopters.json); for testing
+npm run atlas:editions     Atlas's numeric edition id per edition (atlasEditionID in
+                           data/dapper/editions.json, beside the old site's
+                           legacyEditionUUID) plus reward tags; --apply writes
+npm run atlas:burns        moments destroyed per edition into data/burns.json, the
+                           remaining-supply source; rerun after each harvest
+npm run atlas:autographs   which parallels are signed, into data/autographs.json;
+                           the Autograph badge follows it per parallel
+npm run atlas:refresh      the routine: one harvest, then burns and autographs
+                           applied and the three checks reported (apply a check only when it
+                           shows a new set, parallel or badge); then deploy
+```
+
+`atlas:harvest` is the only script that calls Atlas; it takes a few minutes
+and the others read its snapshot. Refresh on each data deploy, weekly at
+most: the home page shows the snapshot date beside the remaining supply. Both accept `--raw <file>` / `--save-raw <file>` (reconcile and
+atlas:tags) to reuse a saved play snapshot instead of refetching the chain.
+
+## Deployment
+
+The build output in `dist/` is fully static and runs on any host that can serve
+files with an SPA fallback (all routes rewrite to `index.html`):
+
+- Quick local serve: `npx serve -s dist`
+- nginx: `try_files $uri /index.html;`
+- Netlify: add `_redirects` with `/* /index.html 200` (the shipped
+  `public/_headers` cache/security headers are honored as-is)
+- Cloudflare, GitHub Pages, S3 + CloudFront: equivalent SPA fallback settings
+
+By default the app queries `https://rest-mainnet.onflow.org` directly from the
+browser, which is fine for personal instances: fork it, `npm run build`, serve
+`dist/` anywhere, done. Nothing in `src/` references any hosting provider.
+
+### Prebuilt database seed (optional, fast first load)
+
+`npm run seed` fetches the full chain dataset once and writes
+`public/seed/topshot-seed.json` (~15 MB raw, a few MB compressed). When a
+build ships that file, a first-time visitor bulk-loads it in seconds instead
+of walking the chain for a minute; the incremental sync then tops up anything
+newer than the snapshot and refreshes mint counts, so seed staleness never
+shows. Without the file the app full-syncs exactly as before, so forks lose
+nothing by skipping it. `deploy:cloudflare` regenerates it automatically when
+the existing one is older than 24 hours (`--if-stale`).
+
+### Optional edge cache for public deployments
+
+For a public instance with real traffic, put a caching reverse proxy in front
+of the Flow API so visitors share script results instead of each browser
+querying the public access node. The contract is host-agnostic:
+
+1. Serve `dist/` with the SPA fallback.
+2. Reverse-proxy `/flow/*` to `https://rest-mainnet.onflow.org/*`.
+3. Cache successful `POST /flow/v1/scripts` responses keyed by a hash of the
+   request body, with a short TTL (300s is the proven value). The sync engine
+   issues deterministic script bodies, so every visitor after the first hits
+   the cache.
+4. Build with the access node pointed at the proxy:
+   `VITE_FLOW_ACCESS_NODE=/flow` (any URL works, relative or absolute).
+5. Optional: answer `GET /lookup/user/<name>` with `{ username, address }`
+   for a Top Shot username, read from the public profile page on
+   nbatopshot.com (`deploy/cloudflare/lookup.js` is the reference: the
+   og:image tag carries the address; cache hits for a day, misses for an
+   hour). The navbar box then accepts usernames as well as addresses; a
+   host without the route degrades to addresses only.
+
+`deploy/cloudflare/` is one implementation of that contract (a Cloudflare
+Worker serving the static build plus the caching proxy); nginx `proxy_cache`
+or any CDN can implement the same thing. Deleting `deploy/` leaves a fully
+working app.
+
+```
+npm run build:cloudflare     # vite build --mode cloudflare (reads .env.cloudflare)
+npm run deploy:cloudflare    # build + wrangler deploy (needs `npx wrangler login` once)
+```
+
+## License
+
+[Apache 2.0](LICENSE). The name "Top Shot Explorer" is not part of that
+license (section 6); a fork should run under its own name. The bundled
+fonts (Outfit and the emoji subset in `public/fonts/`) are under the SIL
+Open Font License; see `public/fonts/OFL.txt`.
+
+## Repo layout
+
+- `src/services/`: FCL queries, IndexedDB access, the sync coordinator, and the
+  overrides/normalization pipeline.
+- `src/pages/`, `src/components/`: React pages and shared UI (DataTable, Navbar).
+- `data/`: the correction/addition datasets described above: our facts, and
+  only ours. `data/atlas/` is the latest Atlas snapshot, harvested
+  locally and read only by the `atlas:*` comparison scripts. Atlas is checked
+  against, never a source; what a comparison persuades us to absorb is written
+  into `data/additions/`.
+- `packages/mediacube/`: the 3D moment cube renderer (MIT, no
+  dependencies), vendored and linked as a `file:` dependency; the Cube Lab
+  page (`/cube`) is its test bench.
+- `scripts/`: the pipeline and deploy scripts (everything `npm run` calls) and
+  the Node JSON import hook. `scripts/lib/` is their shared code.
+- `scripts/dev/`: developer tooling. `cdp-smoke.mjs` is the headless Chrome
+  smoke harness used to verify pages (console errors, text probes, screenshots,
+  an EVAL expression against the rendered page).
+- `src/dev/`: the dev-only `/dev/emoji` page and `subset-text.txt`, the
+  list of emoji the app serves. `npm run emoji:subset` cuts the two subsets
+  in `public/fonts/` from source fonts in `src/dev/fonts/` (not
+  committed, 10 MB): `Noto-COLRv1.ttf` from googlefonts/noto-emoji (`fonts/`),
+  `TwemojiMozilla.ttf` from the mozilla/twemoji-colr release, and the two
+  OpenMoji faces from the hfg-gmuend/openmoji release. Only needed to add
+  an emoji; a local instance runs from the committed subsets.
+- `scratch/`: where the scripts write their working state (scanner and
+  sync state, probe results); not committed.

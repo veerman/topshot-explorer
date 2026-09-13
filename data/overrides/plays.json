@@ -1,0 +1,1775 @@
+{
+  "14": {
+    "Birthplace": "Anaheim, CA, USA"
+  },
+  "29": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "34": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "36": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "40": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "42": {
+    "fullName": "Lonnie Walker IV"
+  },
+  "56": {
+    "DraftTeam": "Indiana Pacers"
+  },
+  "63": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "71": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "102": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "108": {
+    "Birthplace": "Fayetteville, NC, USA"
+  },
+  "112": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "122": {
+    "Birthplace": "Douala, CMR"
+  },
+  "123": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "127": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "130": {
+    "DraftTeam": "Sacramento Kings"
+  },
+  "136": {
+    "Birthplace": "Ljubljana, SVN"
+  },
+  "140": {
+    "Birthplace": "Portland, OR, USA"
+  },
+  "159": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "160": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "185": {
+    "fullName": "Boban Marjanović"
+  },
+  "189": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "190": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "196": {
+    "fullName": "OG Anunoby"
+  },
+  "201": {
+    "Birthplace": "Ljubljana, SVN"
+  },
+  "209": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "214": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "221": {
+    "TotalYearsExperience": 5,
+    "PrimaryPosition": "SG",
+    "PlayerPosition": "G",
+    "JerseyNumber": 36,
+    "DraftYear": 2014,
+    "DraftSelection": 6,
+    "Birthdate": "1994-03-06",
+    "Birthplace": "Flower Mound, TX, USA",
+    "Height": 75,
+    "Weight": 220
+  },
+  "232": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "234": {
+    "fullName": "OG Anunoby"
+  },
+  "242": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "254": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "255": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "257": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "258": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "268": {
+    "Birthplace": "York, ME, USA"
+  },
+  "275": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "302": {
+    "fullName": "Marcus Morris Sr."
+  },
+  "305": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "306": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "308": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "309": {
+    "Birthplace": "Fayetteville, NC, USA"
+  },
+  "317": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "334": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "340": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "346": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "356": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "370": {
+    "fullName": "Manu Ginóbili"
+  },
+  "371": {
+    "Birthplace": "St. Croix, VIR"
+  },
+  "377": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "380": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "385": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "386": {
+    "Birthplace": "Anaheim, CA, USA",
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "390": {
+    "Birthplace": "Atlanta, GA, USA"
+  },
+  "405": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "406": {
+    "Birthplace": "Portland, OR, USA"
+  },
+  "408": {
+    "Birthplace": "Dallas, TX, USA"
+  },
+  "410": {
+    "Birthplace": "Lawrenceville, GA, USA"
+  },
+  "416": {
+    "Birthplace": "Ljubljana, SVN"
+  },
+  "418": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "421": {
+    "Birthplace": "York, ME, USA"
+  },
+  "424": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "438": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "440": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "454": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "467": {
+    "Birthplace": "Salt Lake City, UT, USA"
+  },
+  "471": {
+    "Birthplace": "Salisbury, NC, USA"
+  },
+  "500": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "507": {
+    "fullName": "DeMar DeRozan"
+  },
+  "508": {
+    "Birthdate": "1999-10-11"
+  },
+  "510": {
+    "Birthplace": "Douala, CMR"
+  },
+  "516": {
+    "Birthplace": "Ljubljana, SVN"
+  },
+  "524": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "526": {
+    "DraftTeam": "Sacramento Kings"
+  },
+  "538": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "539": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "544": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "557": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "585": {
+    "Birthdate": "1999-10-11"
+  },
+  "599": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "601": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "615": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "616": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "619": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "620": {
+    "Birthplace": "Milwaukee, WI, USA"
+  },
+  "637": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "648": {
+    "Birthplace": "Anaheim, CA, USA",
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "662": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "671": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "694": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "710": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "726": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "728": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "734": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "749": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "767": {
+    "Birthplace": "Brooklyn, NY, USA"
+  },
+  "781": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "788": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "790": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "801": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "809": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "816": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "832": {
+    "Birthdate": "1999-10-11"
+  },
+  "852": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "881": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "884": {
+    "Birthdate": "1999-10-11"
+  },
+  "891": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "900": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "914": {
+    "fullName": "DeMar DeRozan"
+  },
+  "922": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "933": {
+    "fullName": "Aleksej Pokuševski"
+  },
+  "942": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "943": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "946": {
+    "fullName": "Nic Claxton"
+  },
+  "947": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "963": {
+    "Birthplace": "Maywood, IL, USA"
+  },
+  "989": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1009": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "1026": {
+    "Birthplace": "Lawrenceville, GA, USA"
+  },
+  "1063": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "1082": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "1085": {
+    "Birthplace": "Gardena, CA, USA",
+    "FullName": "KJ Martin"
+  },
+  "1114": {
+    "Birthdate": "1999-10-11"
+  },
+  "1118": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1128": {
+    "Birthplace": "Winston-Salem, NC, USA",
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1139": {
+    "TotalYearsExperience": 3,
+    "PrimaryPosition": "PG",
+    "PlayerPosition": "G",
+    "JerseyNumber": 3,
+    "DraftYear": 2018,
+    "DraftRound": 1,
+    "DraftSelection": 23,
+    "DraftTeam": "Indiana Pacers",
+    "Birthdate": "1996-09-30",
+    "Birthplace": "Ruston, LA, USA",
+    "Height": 72,
+    "Weight": 185
+  },
+  "1144": {
+    "fullName": "Marcus Morris Sr."
+  },
+  "1175": {
+    "Birthplace": "Hopkins, MN, USA"
+  },
+  "1182": {
+    "fullName": "Kevin Knox II"
+  },
+  "1186": {
+    "Birthdate": "1997-07-08"
+  },
+  "1190": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1203": {
+    "Birthplace": "Anaheim, CA, USA",
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1221": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1234": {
+    "fullName": "Aleksej Pokuševski"
+  },
+  "1241": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1242": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1270": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1282": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1306": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1308": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1310": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1319": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "1327": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1339": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1344": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "1347": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "1348": {
+    "fullName": "Aleksej Pokuševski"
+  },
+  "1349": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1363": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1365": {
+    "fullName": "Nic Claxton"
+  },
+  "1369": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1389": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1422": {
+    "Birthplace": "Yokohama, JPN"
+  },
+  "1429": {
+    "fullName": "Marcus Morris Sr."
+  },
+  "1432": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "1434": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1438": {
+    "fullName": "Boban Marjanović"
+  },
+  "1456": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1459": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1461": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "1467": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1475": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1479": {
+    "DraftTeam": "Milwaukee Bucks"
+  },
+  "1482": {
+    "Birthplace": "Havre de Grace, MD, USA",
+    "NbaSeason": "2021 Summer League"
+  },
+  "1498": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "1514": {
+    "fullName": "Skylar Diggins"
+  },
+  "1526": {
+    "Birthplace": "St. Louis, MO, USA"
+  },
+  "1527": {
+    "Birthplace": "Gardena, CA, USA",
+    "DraftTeam": "Los Angeles Sparks"
+  },
+  "1561": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "1562": {
+    "DraftYear": 2013
+  },
+  "1600": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1612": {
+    "DraftTeam": "Vancouver Grizzlies"
+  },
+  "1613": {
+    "Birthplace": "St. Croix, VIR"
+  },
+  "1615": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1646": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1649": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "1675": {
+    "fullName": "Betnijah Laney-Hamilton"
+  },
+  "1679": {
+    "fullName": "Skylar Diggins"
+  },
+  "1685": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "1699": {
+    "DraftTeam": "Vancouver Grizzlies"
+  },
+  "1702": {
+    "Birthplace": "St. Croix, VIR"
+  },
+  "1732": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1746": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1764": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1769": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "1775": {
+    "DraftTeam": "New Orleans Pelicans"
+  },
+  "1816": {
+    "DraftTeam": "Memphis Grizzlies"
+  },
+  "1841": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1856": {
+    "fullName": "Betnijah Laney-Hamilton"
+  },
+  "1890": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "1893": {
+    "DraftTeam": "Utah Jazz"
+  },
+  "1911": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1921": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "1925": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "1961": {
+    "fullName": "Nic Claxton"
+  },
+  "1964": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1976": {
+    "Birthplace": "Lawrenceville, GA, USA"
+  },
+  "1979": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "1989": {
+    "Birthplace": "Brooklyn, NY, USA"
+  },
+  "1995": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2041": {
+    "Birthplace": "Puerto Plata, DOM"
+  },
+  "2049": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2052": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "2074": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2082": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2091": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2147": {
+    "DraftTeam": "Portland Trail Blazers"
+  },
+  "2158": {
+    "fullName": "Nic Claxton"
+  },
+  "2164": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2171": {
+    "Birthdate": "1997-07-08"
+  },
+  "2180": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "2182": {
+    "Birthplace": "St. Croix, VIR"
+  },
+  "2218": {
+    "fullName": "Aleksej Pokuševski"
+  },
+  "2238": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "2239": {
+    "DraftTeam": "Vancouver Grizzlies"
+  },
+  "2291": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2300": {
+    "DraftTeam": "Seattle SuperSonics",
+    "Birthplace": "Brazzaville, COG"
+  },
+  "2306": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2317": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "2339": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2358": {
+    "Birthplace": "Puerto Plata, DOM"
+  },
+  "2375": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2386": {
+    "DraftTeam": "Oklahoma City Thunder"
+  },
+  "2392": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "2400": {
+    "fullName": "Steph Curry"
+  },
+  "2431": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2448": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2455": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "2519": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2521": {
+    "fullName": "Aleksej Pokuševski"
+  },
+  "2546": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "2683": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "2720": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "2754": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "2762": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "2779": {
+    "fullName": "Skylar Diggins"
+  },
+  "2811": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "2817": {
+    "fullName": "Skylar Diggins"
+  },
+  "2883": {
+    "Birthplace": "Elmhurst, IL, USA"
+  },
+  "2946": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2948": {
+    "DraftYear": 2015
+  },
+  "2957": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "2960": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "3002": {
+    "Birthplace": "Altamonte Springs, FL, USA"
+  },
+  "3021": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3028": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "3067": {
+    "Birthplace": "Puerto Plata, DOM"
+  },
+  "3094": {
+    "fullName": "OG Anunoby"
+  },
+  "3108": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3175": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "3217": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "3235": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3250": {
+    "fullName": "OG Anunoby"
+  },
+  "3270": {
+    "Birthdate": "2002-07-05"
+  },
+  "3274": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3371": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "3420": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "3429": {
+    "fullName": "Luka Dončić"
+  },
+  "3442": {
+    "fullName": "Dennis Schröder"
+  },
+  "3468": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3480": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3496": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "3544": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "3582": {
+    "fullName": "OG Anunoby"
+  },
+  "3614": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "3643": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3644": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "3655": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3662": {
+    "NbaSeason": "2022-23"
+  },
+  "3681": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3708": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "3734": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "3794": {
+    "fullName": "OG Anunoby"
+  },
+  "3799": {
+    "Birthdate": "2002-07-05"
+  },
+  "3818": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "3902": {
+    "NbaSeason": "2022-23"
+  },
+  "3966": {
+    "NbaSeason": "2022-23"
+  },
+  "3974": {
+    "fullName": "Ivana Dojkić"
+  },
+  "3985": {
+    "fullName": "Betnijah Laney-Hamilton"
+  },
+  "4009": {
+    "DraftYear": 2014
+  },
+  "4013": {
+    "DraftYear": 2018
+  },
+  "4017": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "4022": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "4043": {
+    "Birthplace": "Phoenix, AZ, USA"
+  },
+  "4047": {
+    "DraftYear": 2014
+  },
+  "4051": {
+    "DraftYear": 2018
+  },
+  "4055": {
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "4060": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "4120": {
+    "DraftYear": 2015
+  },
+  "4136": {
+    "NbaSeason": "2022-23"
+  },
+  "4220": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "4221": {
+    "Birthplace": "Upper Marlboro, MD, USA"
+  },
+  "4223": {
+    "Birthplace": "Altamonte Springs, FL, USA"
+  },
+  "4246": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "4253": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "4259": {
+    "Birthplace": "St. Louis, MO, USA"
+  },
+  "4275": {
+    "DraftYear": 2016
+  },
+  "4279": {
+    "Birthplace": "New York City, NY, USA"
+  },
+  "4282": {
+    "Birthplace": "St. Louis, MO, USA"
+  },
+  "4304": {
+    "fullName": "OG Anunoby"
+  },
+  "4307": {
+    "Birthplace": "Upper Marlboro, MD, USA"
+  },
+  "4317": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "4388": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "4514": {
+    "Birthplace": "Monroe, LA, USA"
+  },
+  "4617": {
+    "DraftYear": 2013
+  },
+  "4631": {
+    "Birthplace": "Columbia, MO, USA"
+  },
+  "4706": {
+    "Birthplace": "Oakland, CA, USA"
+  },
+  "4710": {
+    "Birthplace": "Oakland, CA, USA"
+  },
+  "4719": {
+    "Birthplace": "Kraljevo, SRB"
+  },
+  "4801": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "4835": {
+    "fullName": "GG Jackson II"
+  },
+  "4954": {
+    "Birthplace": "Oakland, CA, USA"
+  },
+  "4956": {
+    "Birthplace": "Oakland, CA, USA"
+  },
+  "4979": {
+    "Birthplace": "Winston-Salem, NC, USA",
+    "DraftTeam": "Charlotte Hornets"
+  },
+  "4995": {
+    "fullName": "Nikola Vučević"
+  },
+  "4997": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5048": {
+    "fullName": "Vít Krejčí"
+  },
+  "5099": {
+    "DraftYear": 2018
+  },
+  "5103": {
+    "DraftYear": 2020
+  },
+  "5124": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5201": {
+    "Birthplace": "Irvine, CA, USA"
+  },
+  "5290": {
+    "Birthplace": "Dallas, TX, USA"
+  },
+  "5296": {
+    "DraftTeam": "San Antonio Silver Stars"
+  },
+  "5299": {
+    "NbaSeason": "2007-08"
+  },
+  "5302": {
+    "TotalYearsExperience": "6",
+    "NbaSeason": "2015-16"
+  },
+  "5304": {
+    "NbaSeason": "2008-09"
+  },
+  "5306": {
+    "Height": "81",
+    "Weight": "220"
+  },
+  "5329": {
+    "fullName": "Temi Fágbénlé"
+  },
+  "5346": {
+    "NbaSeason": "2023-24"
+  },
+  "5354": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5363": {
+    "fullName": "Skylar Diggins"
+  },
+  "5372": {
+    "Birthplace": "Irvine, CA, USA"
+  },
+  "5374": {
+    "fullName": "GG Jackson II"
+  },
+  "5376": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5385": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5395": {
+    "DraftYear": 2024
+  },
+  "5468": {
+    "TotalYearsExperience": "4"
+  },
+  "5473": {
+    "Birthdate": "1973-06-08"
+  },
+  "5484": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5514": {
+    "DraftTeam": "Detroit Pistons"
+  },
+  "5517": {
+    "DraftTeam": "New Orleans Hornets",
+    "TotalYearsExperience": "11"
+  },
+  "5520": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5541": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5548": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5562": {
+    "Birthplace": "Wangaratta, AUS"
+  },
+  "5563": {
+    "fullName": "Skylar Diggins"
+  },
+  "5564": {
+    "TotalYearsExperience": "0"
+  },
+  "5625": {
+    "DraftYear": 2024
+  },
+  "5632": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5639": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5640": {
+    "DraftYear": 2024
+  },
+  "5650": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "5663": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5703": {
+    "Birthplace": "Prijepolje, SRB"
+  },
+  "5720": {
+    "fullName": "Alex Sarr"
+  },
+  "5721": {
+    "fullName": "Bub Carrington"
+  },
+  "5730": {
+    "Birthdate": "2002-05-14"
+  },
+  "5732": {
+    "fullName": "Rob Dillingham"
+  },
+  "5747": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "5763": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5777": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5787": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5806": {
+    "DraftTeam": "Charlotte Bobcats"
+  },
+  "5813": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "5822": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "5859": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "5860": {
+    "TotalYearsExperience": "0"
+  },
+  "5868": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5887": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5898": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5903": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "5921": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "5923": {
+    "fullName": "Alex Sarr"
+  },
+  "5927": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "5941": {
+    "Birthplace": "The Bronx, NY, USA"
+  },
+  "6010": {
+    "Birthdate": "2004-12-08"
+  },
+  "6027": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6061": {
+    "Birthplace": "Killeen, TX, USA"
+  },
+  "6081": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "6090": {
+    "Birthdate": "2002-05-14"
+  },
+  "6098": {
+    "fullName": "Bub Carrington"
+  },
+  "6108": {
+    "fullName": "Steph Curry"
+  },
+  "6145": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6150": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6153": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "6157": {
+    "fullName": "Bub Carrington"
+  },
+  "6181": {
+    "Birthdate": "2004-12-08"
+  },
+  "6184": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "6192": {
+    "fullName": "Alex Sarr"
+  },
+  "6203": {
+    "fullName": "Steph Curry"
+  },
+  "6217": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6222": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6270": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6297": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "6309": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6348": {
+    "Birthplace": "Anaheim, CA, USA"
+  },
+  "6356": {
+    "TeamAtMomentNBAID": "1610616852"
+  },
+  "6361": {
+    "fullName": "Steph Curry"
+  },
+  "6364": {
+    "TeamAtMoment": "OGs",
+    "HomeTeamName": "OGs",
+    "HomeTeamScore": "42",
+    "AwayTeamName": "Rising Stars",
+    "AwayTeamScore": "35"
+  },
+  "6366": {
+    "HomeTeamScore": "136",
+    "AwayTeamScore": "115"
+  },
+  "6389": {
+    "fullName": "Steph Curry"
+  },
+  "6404": {
+    "fullName": "Jimmy Butler"
+  },
+  "6425": {
+    "DraftTeam": "Charlotte Bobcats"
+  },
+  "6449": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6513": {
+    "fullName": "Ronald Holland II"
+  },
+  "6522": {
+    "fullName": "Karlo Matković"
+  },
+  "6523": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "6538": {
+    "fullName": "Bub Carrington"
+  },
+  "6557": {
+    "fullName": "Karlo Matković"
+  },
+  "6562": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6563": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6565": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "6572": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6590": {
+    "fullName": "Steph Curry"
+  },
+  "6597": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6614": {
+    "fullName": "Steph Curry"
+  },
+  "6628": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6638": {
+    "fullName": "Bub Carrington"
+  },
+  "6659": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "6666": {
+    "fullName": "Steph Curry"
+  },
+  "6695": {
+    "fullName": "Steph Curry"
+  },
+  "6768": {
+    "fullName": "Steph Curry"
+  },
+  "6784": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "6859": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "6927": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "6929": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "6935": {
+    "DraftYear": 2015,
+    "Birthplace": "Wangaratta, AUS"
+  },
+  "6943": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "6953": {
+    "Birthplace": "Brussels, BEL"
+  },
+  "6961": {
+    "fullName": "Bub Carrington"
+  },
+  "6963": {
+    "fullName": "Steph Curry"
+  },
+  "6987": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "6992": {
+    "DraftTeam": "Chicago Sky"
+  },
+  "6993": {
+    "fullName": "Marine Johannès"
+  },
+  "6998": {
+    "Birthplace": "The Bronx, NY, USA",
+    "DraftTeam": "Charlotte Bobcats",
+    "TotalYearsExperience": "3"
+  },
+  "6999": {
+    "Birthplace": "The Bronx, NY, USA",
+    "DraftTeam": "Charlotte Bobcats",
+    "TotalYearsExperience": "3"
+  },
+  "7000": {
+    "Birthplace": "The Bronx, NY, USA",
+    "DraftTeam": "Charlotte Bobcats",
+    "TotalYearsExperience": "5"
+  },
+  "7001": {
+    "Birthplace": "The Bronx, NY, USA",
+    "DraftTeam": "Charlotte Bobcats"
+  },
+  "7002": {
+    "Birthplace": "The Bronx, NY, USA",
+    "DraftTeam": "Charlotte Bobcats",
+    "TotalYearsExperience": "3"
+  },
+  "7026": {
+    "DraftYear": "1990"
+  },
+  "7027": {
+    "Birthdate": "1962-08-05"
+  },
+  "7030": {
+    "DraftTeam": "Minnesota Timberwolves"
+  },
+  "7037": {
+    "TotalYearsExperience": "0"
+  },
+  "7040": {
+    "TotalYearsExperience": "0"
+  },
+  "7041": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "7056": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7087": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7126": {
+    "Birthplace": "Chicago, IL, USA"
+  },
+  "7127": {
+    "NbaSeason": "1997-98"
+  },
+  "7131": {
+    "Birthplace": "Kinshasa, COD"
+  },
+  "7133": {
+    "Birthdate": "1979-05-24"
+  },
+  "7139": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7147": {
+    "Birthplace": "Irvine, CA, USA"
+  },
+  "7150": {
+    "Birthplace": "New Orleans, LA, USA"
+  },
+  "7152": {
+    "NbaSeason": "1990-91"
+  },
+  "7154": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "7157": {
+    "NbaSeason": "2000-01"
+  },
+  "7200": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "7209": {
+    "DraftYear": 2024
+  },
+  "7210": {
+    "DraftYear": 2024
+  },
+  "7211": {
+    "DraftYear": 2024
+  },
+  "7216": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7217": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7218": {
+    "fullName": "Marine Johannès"
+  },
+  "7236": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7250": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7264": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "7306": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "7329": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "7332": {
+    "Birthplace": "New York, NY, USA"
+  },
+  "7333": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "7335": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "7337": {
+    "DraftTeam": "Chicago Sky"
+  },
+  "7373": {
+    "DraftSelection": ""
+  },
+  "7387": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7390": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7396": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "7398": {
+    "Birthplace": "Atlanta, GA, USA"
+  },
+  "7435": {
+    "fullName": "Jimmy Butler"
+  },
+  "7436": {
+    "fullName": "Steph Curry"
+  },
+  "7437": {
+    "fullName": "Alperen Şengün"
+  },
+  "7459": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7503": {
+    "Birthplace": "Atlanta, GA, USA"
+  },
+  "7533": {
+    "Birthdate": "1938-11-24"
+  },
+  "7535": {
+    "Birthdate": "1938-11-24"
+  },
+  "7537": {
+    "Birthplace": "Key West, FL, USA"
+  },
+  "7556": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7598": {
+    "Birthplace": "New Freedom, PA, USA"
+  },
+  "7619": {
+    "DraftYear": 2023
+  },
+  "7640": {
+    "Birthdate": "2005-10-16",
+    "Birthplace": "Berkeley, CA, USA"
+  },
+  "7657": {
+    "fullName": "Alperen Şengün"
+  },
+  "7664": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7680": {
+    "NbaSeason": "2025-26"
+  },
+  "7682": {
+    "fullName": "Steph Curry"
+  },
+  "7683": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7712": {
+    "fullName": "Steph Curry"
+  },
+  "7734": {
+    "DraftTeam": "New Orleans Hornets"
+  },
+  "7758": {
+    "fullName": "Jimmy Butler"
+  },
+  "7759": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7792": {
+    "fullName": "Jimmy Butler"
+  },
+  "7796": {
+    "DraftTeam": "New Jersey Nets"
+  },
+  "7835": {
+    "fullName": "Steph Curry"
+  },
+  "7836": {
+    "fullName": "Alperen Şengün"
+  },
+  "7870": {
+    "Birthplace": "Lexington, KY, USA"
+  },
+  "7904": {
+    "fullName": "GG Jackson II"
+  },
+  "7922": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7939": {
+    "fullName": "Alperen Şengün"
+  },
+  "7941": {
+    "Birthplace": "New Freedom, PA, USA"
+  },
+  "7957": {
+    "TeamAtMomentNBAID": "1610612750",
+    "NbaSeason": "1997-98"
+  },
+  "7973": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "7983": {
+    "fullName": "Steph Curry"
+  },
+  "7984": {
+    "fullName": "Alperen Şengün"
+  },
+  "7985": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8036": {
+    "fullName": "Alperen Şengün"
+  },
+  "8049": {
+    "TeamAtMomentNBAID": "1610616860"
+  },
+  "8052": {
+    "HomeTeamScore": "120",
+    "AwayTeamScore": "100"
+  },
+  "8063": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8064": {
+    "Birthplace": "Irvine, CA, USA"
+  },
+  "8106": {
+    "Birthplace": "New Freedom, PA, USA"
+  },
+  "8128": {
+    "fullName": "Steph Curry"
+  },
+  "8162": {
+    "fullName": "Steph Curry"
+  },
+  "8163": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8226": {
+    "Birthplace": "Lexington, KY, USA"
+  },
+  "8248": {
+    "Birthdate": "1936-06-26"
+  },
+  "8300": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8318": {
+    "fullName": "Alperen Şengün"
+  },
+  "8319": {
+    "Birthplace": "New Freedom, PA, USA"
+  },
+  "8322": {
+    "fullName": "GG Jackson II"
+  },
+  "8333": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8345": {
+    "Birthplace": "Scarborough, ON, CAN"
+  },
+  "8351": {
+    "DraftTeam": "Charlotte Bobcats"
+  },
+  "8354": {
+    "fullName": "Alperen Şengün"
+  },
+  "8372": {
+    "Birthplace": "Maywood, IL, USA"
+  },
+  "8458": {
+    "Birthplace": "Würzburg, DEU"
+  },
+  "8460": {
+    "DraftTeam": "Detroit Pistons"
+  },
+  "8462": {
+    "Birthplace": "Lagos, NGA"
+  },
+  "8468": {
+    "fullName": "Manu Ginóbili"
+  },
+  "8471": {
+    "Birthplace": "Tampa, FL, USA"
+  },
+  "8496": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "8550": {
+    "Birthplace": "The Bronx, NY, USA"
+  },
+  "8612": {
+    "Birthplace": "Lexington, KY, USA"
+  },
+  "8614": {
+    "TotalYearsExperience": "0"
+  },
+  "8616": {
+    "TotalYearsExperience": "0"
+  },
+  "8617": {
+    "TotalYearsExperience": "0"
+  },
+  "8620": {
+    "TeamAtMomentNBAID": "1611661319",
+    "TotalYearsExperience": "0"
+  },
+  "8653": {
+    "FullName": "Noémie Brochant"
+  },
+  "8683": {
+    "fullName": "Marine Johannès"
+  },
+  "8817": {
+    "Birthplace": "Lexington, KY, USA"
+  },
+  "8850": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "8901": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "8904": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "8918": {
+    "TotalYearsExperience": "0"
+  },
+  "8919": {
+    "TotalYearsExperience": "0"
+  },
+  "8920": {
+    "TeamAtMomentNBAID": "1611661319",
+    "DraftTeam": "San Antonio Stars"
+  },
+  "8921": {
+    "TotalYearsExperience": "0",
+    "DraftTeam": "San Antonio Stars"
+  },
+  "8922": {
+    "TotalYearsExperience": "0"
+  },
+  "8947": {
+    "FullName": "Frieda Bühner"
+  },
+  "8964": {
+    "TotalYearsExperience": "0"
+  },
+  "8979": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "9004": {
+    "Birthplace": "Edéa, CMR"
+  },
+  "9006": {
+    "Birthplace": "Dallas, TX, USA"
+  },
+  "9016": {
+    "DraftTeam": "San Antonio Stars"
+  },
+  "9021": {
+    "TotalYearsExperience": "0"
+  },
+  "9027": {
+    "Height": "80",
+    "Weight": "230",
+    "DraftTeam": "Utah Jazz"
+  },
+  "9028": {
+    "DraftTeam": "Phoenix Suns"
+  },
+  "9029": {
+    "FullName": "Toni Kukoč"
+  },
+  "9041": {
+    "FullName": "Dražen Petrović"
+  },
+  "9087": {
+    "DraftTeam": "Seattle SuperSonics"
+  },
+  "2732": {
+    "FullName": "Cheyenne Parker-Tyus"
+  },
+  "6154": {
+    "DateOfMoment": "2024-10-22 23:30:00 +0000 UTC"
+  },
+  "7182": {
+    "DateOfMoment": "2025-05-18 02:00:00 +0000 UTC"
+  }
+}

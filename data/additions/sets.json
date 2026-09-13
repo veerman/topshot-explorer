@@ -1,0 +1,801 @@
+{
+  "1": {
+    "tier": "Ultimate"
+  },
+  "2": {
+    "tier": "Common"
+  },
+  "3": {
+    "tier": "Ultimate",
+    "burned": "2023-01-11"
+  },
+  "4": {
+    "tier": "Legendary"
+  },
+  "5": {
+    "tier": "Rare"
+  },
+  "6": {
+    "tier": "Common"
+  },
+  "7": {
+    "tier": "Rare"
+  },
+  "8": {
+    "tier": "Legendary"
+  },
+  "9": {
+    "tier": "Rare"
+  },
+  "10": {
+    "tier": "Rare"
+  },
+  "11": {
+    "tier": "Rare"
+  },
+  "12": {
+    "tier": "Legendary"
+  },
+  "13": {
+    "tier": "Rare"
+  },
+  "14": {
+    "tier": "Common"
+  },
+  "15": {
+    "tier": "Rare"
+  },
+  "16": {
+    "tier": "Rare"
+  },
+  "17": {
+    "tier": "Rare"
+  },
+  "18": {
+    "tier": "Rare"
+  },
+  "19": {
+    "tier": "Rare"
+  },
+  "20": {
+    "tier": "Legendary"
+  },
+  "21": {
+    "tier": "Rare"
+  },
+  "22": {
+    "tier": "Common"
+  },
+  "23": {
+    "tier": "Legendary"
+  },
+  "24": {
+    "tier": "Rare"
+  },
+  "25": {
+    "tier": "Rare"
+  },
+  "26": {
+    "tier": "Common"
+  },
+  "27": {
+    "tier": "Ultimate",
+    "burned": "2023-01-11"
+  },
+  "28": {
+    "tier": "Legendary"
+  },
+  "29": {
+    "tier": "Rare"
+  },
+  "30": {
+    "tier": "Rare"
+  },
+  "31": {
+    "tier": "Legendary"
+  },
+  "32": {
+    "tier": "Common"
+  },
+  "33": {
+    "tier": "Common"
+  },
+  "34": {
+    "tier": "Common"
+  },
+  "35": {
+    "tier": "Rare"
+  },
+  "36": {
+    "tier": "Rare"
+  },
+  "37": {
+    "tier": "Common"
+  },
+  "38": {
+    "tier": "Rare"
+  },
+  "39": {
+    "tier": "Common"
+  },
+  "40": {
+    "tier": "Rare"
+  },
+  "41": {
+    "tier": "Legendary"
+  },
+  "42": {
+    "tier": "Ultimate",
+    "burned": "2023-01-11"
+  },
+  "43": {
+    "tier": "Fandom"
+  },
+  "44": {
+    "tier": "Common"
+  },
+  "45": {
+    "tier": "Fandom"
+  },
+  "46": {
+    "tier": "Rare"
+  },
+  "47": {
+    "tier": "Rare"
+  },
+  "48": {
+    "tier": "Common"
+  },
+  "49": {
+    "tier": "Fandom"
+  },
+  "50": {
+    "tier": "Legendary"
+  },
+  "51": {
+    "tier": "Common"
+  },
+  "52": {
+    "tier": "Ultimate",
+    "burned": "2023-01-11"
+  },
+  "53": {
+    "tier": "Legendary"
+  },
+  "54": {
+    "tier": "Rare"
+  },
+  "55": {
+    "tier": "Common"
+  },
+  "56": {
+    "tier": "Fandom"
+  },
+  "57": {
+    "tier": "Legendary"
+  },
+  "58": {
+    "tier": "Common"
+  },
+  "59": {
+    "tier": "Common"
+  },
+  "60": {
+    "tier": "Common"
+  },
+  "61": {
+    "tier": "Legendary"
+  },
+  "62": {
+    "tier": "Fandom"
+  },
+  "63": {
+    "tier": "Rare"
+  },
+  "64": {
+    "tier": "Rare"
+  },
+  "65": {
+    "tier": "Common"
+  },
+  "66": {
+    "tier": "Fandom"
+  },
+  "67": {
+    "tier": "Common"
+  },
+  "68": {
+    "tier": "Rare"
+  },
+  "69": {
+    "tier": "Legendary"
+  },
+  "70": {
+    "tier": "Fandom"
+  },
+  "71": {
+    "tier": "Rare"
+  },
+  "72": {
+    "tier": "Common"
+  },
+  "73": {
+    "tier": "Common"
+  },
+  "75": {
+    "tier": "Rare"
+  },
+  "76": {
+    "tier": "Fandom"
+  },
+  "77": {
+    "tier": "Fandom"
+  },
+  "78": {
+    "tier": "Fandom"
+  },
+  "79": {
+    "tier": "Rare"
+  },
+  "80": {
+    "tier": "Fandom"
+  },
+  "81": {
+    "tier": "Rare"
+  },
+  "82": {
+    "tier": "Legendary"
+  },
+  "83": {
+    "tier": "Rare"
+  },
+  "84": {
+    "tier": "Common"
+  },
+  "85": {
+    "tier": "Rare"
+  },
+  "86": {
+    "tier": "Fandom"
+  },
+  "87": {
+    "tier": "Fandom"
+  },
+  "88": {
+    "tier": "Fandom"
+  },
+  "89": {
+    "tier": "Rare"
+  },
+  "90": {
+    "tier": "Common"
+  },
+  "91": {
+    "tier": "Common"
+  },
+  "92": {
+    "tier": "Common"
+  },
+  "93": {
+    "tier": "Rare"
+  },
+  "94": {
+    "tier": "Rare"
+  },
+  "95": {
+    "tier": "Rare"
+  },
+  "96": {
+    "tier": "Legendary"
+  },
+  "97": {
+    "tier": "Rare"
+  },
+  "98": {
+    "tier": "Common"
+  },
+  "99": {
+    "tier": "Rare"
+  },
+  "101": {
+    "tier": "Fandom"
+  },
+  "102": {
+    "tier": "Rare"
+  },
+  "103": {
+    "tier": "Legendary"
+  },
+  "104": {
+    "tier": "Common"
+  },
+  "105": {
+    "tier": "Common"
+  },
+  "106": {
+    "tier": "Legendary"
+  },
+  "107": {
+    "tier": "Fandom"
+  },
+  "108": {
+    "tier": "Common"
+  },
+  "110": {
+    "tier": "Legendary"
+  },
+  "111": {
+    "tier": "Common"
+  },
+  "112": {
+    "tier": "Rare"
+  },
+  "113": {
+    "tier": "Common"
+  },
+  "115": {
+    "tier": "Rare"
+  },
+  "116": {
+    "tier": "Legendary"
+  },
+  "118": {
+    "tier": "Legendary"
+  },
+  "119": {
+    "tier": "Common"
+  },
+  "120": {
+    "tier": "Rare"
+  },
+  "121": {
+    "tier": "Legendary"
+  },
+  "122": {
+    "tier": "Legendary"
+  },
+  "123": {
+    "tier": "Legendary"
+  },
+  "124": {
+    "tier": "Common"
+  },
+  "125": {
+    "tier": "Common"
+  },
+  "126": {
+    "tier": "Common"
+  },
+  "127": {
+    "tier": "Rare"
+  },
+  "128": {
+    "tier": "Rare"
+  },
+  "129": {
+    "tier": "Common"
+  },
+  "130": {
+    "tier": "Rare"
+  },
+  "131": {
+    "tier": "Legendary"
+  },
+  "132": {
+    "tier": "Common"
+  },
+  "133": {
+    "tier": "Common"
+  },
+  "134": {
+    "tier": "Rare"
+  },
+  "135": {
+    "tier": "Rare"
+  },
+  "136": {
+    "tier": "Rare"
+  },
+  "137": {
+    "tier": "Common"
+  },
+  "138": {
+    "tier": "Fandom"
+  },
+  "139": {
+    "tier": "Legendary"
+  },
+  "140": {
+    "tier": "Ultimate"
+  },
+  "142": {
+    "tier": "Rare"
+  },
+  "143": {
+    "tier": "Fandom"
+  },
+  "144": {
+    "tier": "Common"
+  },
+  "145": {
+    "tier": "Common"
+  },
+  "146": {
+    "tier": "Rare"
+  },
+  "147": {
+    "tier": "Legendary"
+  },
+  "148": {
+    "tier": "Rare"
+  },
+  "149": {
+    "tier": "Rare"
+  },
+  "150": {
+    "tier": "Rare"
+  },
+  "151": {
+    "tier": "Ultimate"
+  },
+  "152": {
+    "tier": "Rare"
+  },
+  "153": {
+    "tier": "Legendary"
+  },
+  "154": {
+    "tier": "Legendary"
+  },
+  "155": {
+    "mismint": true
+  },
+  "156": {
+    "mismint": true
+  },
+  "157": {
+    "tier": "Rare"
+  },
+  "158": {
+    "mismint": true
+  },
+  "159": {
+    "tier": "Rare"
+  },
+  "160": {
+    "tier": "Legendary"
+  },
+  "161": {
+    "tier": "Legendary"
+  },
+  "162": {
+    "tier": "Legendary"
+  },
+  "164": {
+    "tier": "Common"
+  },
+  "165": {
+    "tier": "Ultimate"
+  },
+  "166": {
+    "tier": "Rare"
+  },
+  "167": {
+    "tier": "Fandom"
+  },
+  "169": {
+    "tier": "Legendary"
+  },
+  "170": {
+    "tier": "Rare"
+  },
+  "171": {
+    "tier": "Common"
+  },
+  "172": {
+    "tier": "Rare"
+  },
+  "173": {
+    "tier": "Rare"
+  },
+  "175": {
+    "tier": "Rare"
+  },
+  "176": {
+    "tier": "Ultimate"
+  },
+  "177": {
+    "tier": "Common"
+  },
+  "178": {
+    "tier": "Rare"
+  },
+  "179": {
+    "tier": "Common"
+  },
+  "180": {
+    "tier": "Rare"
+  },
+  "181": {
+    "tier": "Fandom"
+  },
+  "182": {
+    "tier": "Common"
+  },
+  "183": {
+    "tier": "Legendary"
+  },
+  "184": {
+    "tier": "Common"
+  },
+  "185": {
+    "tier": "Legendary"
+  },
+  "186": {
+    "tier": "Ultimate"
+  },
+  "187": {
+    "tier": "Legendary"
+  },
+  "188": {
+    "tier": "Rare"
+  },
+  "189": {
+    "tier": "Common"
+  },
+  "190": {
+    "tier": "Common"
+  },
+  "191": {
+    "tier": "Common"
+  },
+  "192": {
+    "tier": "Common"
+  },
+  "193": {
+    "tier": "Rare"
+  },
+  "194": {
+    "tier": "Legendary"
+  },
+  "195": {
+    "tier": "Rare"
+  },
+  "196": {
+    "tier": "Rare"
+  },
+  "197": {
+    "tier": "Rare"
+  },
+  "198": {
+    "tier": "Ultimate"
+  },
+  "199": {
+    "tier": "Rare"
+  },
+  "200": {
+    "tier": "Common"
+  },
+  "201": {
+    "tier": "Rare"
+  },
+  "202": {
+    "tier": "Legendary"
+  },
+  "203": {
+    "tier": "Common"
+  },
+  "204": {
+    "tier": "Legendary"
+  },
+  "205": {
+    "tier": "Rare"
+  },
+  "206": {
+    "tier": "Legendary"
+  },
+  "207": {
+    "tier": "Common"
+  },
+  "208": {
+    "tier": "Legendary"
+  },
+  "209": {
+    "tier": "Common"
+  },
+  "210": {
+    "tier": "Ultimate"
+  },
+  "211": {
+    "tier": "Ultimate"
+  },
+  "212": {
+    "tier": "Rare"
+  },
+  "213": {
+    "tier": "Common"
+  },
+  "214": {
+    "tier": "Rare"
+  },
+  "215": {
+    "tier": "Legendary"
+  },
+  "216": {
+    "tier": "Rare"
+  },
+  "217": {
+    "tier": "Legendary"
+  },
+  "218": {
+    "tier": "Common"
+  },
+  "219": {
+    "tier": "Common"
+  },
+  "220": {
+    "tier": "Ultimate"
+  },
+  "221": {
+    "tier": "Rare"
+  },
+  "222": {
+    "tier": "Rare"
+  },
+  "223": {
+    "tier": "Rare"
+  },
+  "224": {
+    "tier": "Fandom"
+  },
+  "225": {
+    "tier": "Common"
+  },
+  "226": {
+    "tier": "Common"
+  },
+  "227": {
+    "tier": "Rare"
+  },
+  "228": {
+    "tier": "Legendary"
+  },
+  "229": {
+    "tier": "Ultimate"
+  },
+  "230": {
+    "tier": "Ultimate"
+  },
+  "231": {
+    "tier": "Legendary"
+  },
+  "232": {
+    "tier": "Legendary"
+  },
+  "233": {
+    "tier": "Rare"
+  },
+  "234": {
+    "tier": "Rare"
+  },
+  "235": {
+    "tier": "Common"
+  },
+  "236": {
+    "tier": "Common"
+  },
+  "237": {
+    "tier": "Rare"
+  },
+  "238": {
+    "tier": "Rare"
+  },
+  "239": {
+    "tier": "Rare"
+  },
+  "240": {
+    "tier": "Common"
+  },
+  "241": {
+    "tier": "Ultimate"
+  },
+  "242": {
+    "tier": "Legendary"
+  },
+  "243": {
+    "tier": "Legendary"
+  },
+  "244": {
+    "tier": "Common"
+  },
+  "245": {
+    "tier": "Fandom"
+  },
+  "246": {
+    "tier": "Rare"
+  },
+  "247": {
+    "tier": "Legendary"
+  },
+  "248": {
+    "tier": "Rare"
+  },
+  "249": {
+    "tier": "Rare"
+  },
+  "250": {
+    "tier": "Common"
+  },
+  "251": {
+    "tier": "Ultimate"
+  },
+  "252": {
+    "tier": "Legendary"
+  },
+  "253": {
+    "tier": "Ultimate"
+  },
+  "254": {
+    "tier": "Ultimate"
+  },
+  "255": {
+    "tier": "Ultimate"
+  },
+  "256": {
+    "tier": "Rare"
+  },
+  "257": {
+    "tier": "Common"
+  },
+  "258": {
+    "tier": "Common"
+  },
+  "259": {
+    "tier": "Fandom"
+  },
+  "260": {
+    "tier": "Ultimate"
+  },
+  "261": {
+    "tier": "Legendary"
+  },
+  "262": {
+    "tier": "Rare"
+  },
+  "263": {
+    "tier": "Rare"
+  },
+  "264": {
+    "tier": "Rare"
+  },
+  "265": {
+    "tier": "Legendary"
+  },
+  "266": {
+    "tier": "Common"
+  },
+  "267": {
+    "tier": "Rare"
+  },
+  "268": {
+    "tier": "Legendary"
+  },
+  "269": {
+    "tier": "Rare"
+  },
+  "270": {
+    "tier": "Common"
+  },
+  "271": {
+    "tier": "Rare"
+  },
+  "272": {
+    "tier": "Legendary"
+  },
+  "273": {
+    "tier": "Rare"
+  },
+  "274": {
+    "tier": "Rare"
+  }
+}
