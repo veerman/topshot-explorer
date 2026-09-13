@@ -606,9 +606,11 @@ export function SetDetail() {
           if (teamId) nameTarget = `/teams/${teamId}`;
         }
       }
+      // A mismint edition says so beside the name, as the Plays page does
       const nameLink = (
         <Link to={nameTarget} style={{ fontWeight: "600" }} className="player-detail-link font-hover-glow">
           {playName}
+          {isMismintPlay(playID) && <span className="mini-badge-mismint" title="This play is a mismint!">Mismint ⚠️</span>}
         </Link>
       );
       // Badges on their own line directly under the name; a parallel's row

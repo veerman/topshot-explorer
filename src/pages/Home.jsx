@@ -1107,6 +1107,10 @@ export function Home() {
       cidsByEdition.set(`${Number(rec.setID)}_${Number(rec.playID)}`, rec.cids || {});
     });
     const agg = { NBA: new Map(), WNBA: new Map() };
+    // League totals: the core four per edition against what is expected,
+    // and the extras (any other alive file) as a plain count, since
+    // nothing beyond the core is owed
+    const totals = { NBA: { editions: 0, corePresent: 0, coreTotal: 0, extras: 0 }, WNBA: { editions: 0, corePresent: 0, coreTotal: 0, extras: 0 } };
     sets.forEach((set) => {
       const series = set.series;
       if (series === undefined || series === null) return;
@@ -1116,13 +1120,20 @@ export function Home() {
         const lg = playLeague.get(p) || "NBA";
         const cids = cidsByEdition.get(`${Number(set.id)}_${p}`) || {};
         let present = 0;
-        CORE_MEDIA_FIELDS.forEach((f) => {
-          if (cids[f] && !isDeadMediaCid(cids[f])) present++;
+        let extras = 0;
+        Object.keys(cids).forEach((f) => {
+          if (!cids[f] || isDeadMediaCid(cids[f])) return;
+          if (CORE_MEDIA_FIELDS.includes(f)) present++; else extras++;
         });
         const entry = agg[lg].get(series) || { present: 0, total: 0 };
         entry.present += present;
         entry.total += CORE_MEDIA_FIELDS.length;
         agg[lg].set(series, entry);
+        const t = totals[lg];
+        t.editions++;
+        t.corePresent += present;
+        t.coreTotal += CORE_MEDIA_FIELDS.length;
+        t.extras += extras;
       });
     });
     const toPct = (m) => {
@@ -1130,7 +1141,7 @@ export function Home() {
       m.forEach((e, series) => out.set(series, { pct: e.total > 0 ? (e.present / e.total) * 100 : null, ...e }));
       return out;
     };
-    return { NBA: toPct(agg.NBA), WNBA: toPct(agg.WNBA) };
+    return { NBA: toPct(agg.NBA), WNBA: toPct(agg.WNBA), totals };
   }, [sets, ipfsRecords, playLeague]);
 
   // Sets per league (a set's league = the leagues of its editions' plays)
@@ -1472,6 +1483,48 @@ export function Home() {
           )}
         </div>
       </div>
+      {/* Core coverage per league, in numbers: the files owed (four per
+          edition) against the files there, what is still missing, and the
+          extras as a plain count. The colour repeats the Sets page scale;
+          the numbers carry the state on their own */}
+      {ipfsBySeries && ipfsBySeries.totals && (
+        <div className="glass-panel ipfs-league-panel">
+          <table className="premium-table ipfs-league-table">
+            <thead>
+              <tr>
+                <th>League</th>
+                <th title="Editions counted; mismints excluded">Editions</th>
+                <th title="Core files present, of the number expected: the hero, player photo, video and square video of every edition, and the share that makes. A file the gateway no longer serves counts as missing.">Core files</th>
+                <th title="Core files still owed: expected minus present, and the share that makes">Missing files</th>
+                <th title="Files beyond the core four, such as the tall video. Nothing is expected; every one is a bonus.">Extra files</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["NBA", "WNBA"].map((lg) => {
+                const t = ipfsBySeries.totals[lg];
+                if (!t || t.editions === 0) return null;
+                const pct = (t.corePresent / t.coreTotal) * 100;
+                const missing = t.coreTotal - t.corePresent;
+                return (
+                  <tr key={lg}>
+                    <td className="ipfs-league-name">{lg}</td>
+                    <td className="font-mono">{fmt(t.editions)}</td>
+                    <td className="font-mono">
+                      <span className="ipfs-num">{fmt(t.corePresent)} / {fmt(t.coreTotal)}</span>
+                      <span className="ipfs-share" style={{ color: coveragePctColor(pct) }}>{pct.toFixed(1)}%</span>
+                    </td>
+                    <td className="font-mono">
+                      <span className="ipfs-num" style={missing > 0 ? { color: "var(--status-mismint)", fontWeight: 600 } : undefined}>{fmt(missing)}</span>
+                      <span className="ipfs-share" style={missing > 0 ? { color: "var(--status-mismint)" } : undefined}>{(100 - pct).toFixed(1)}%</span>
+                    </td>
+                    <td className="font-mono">{fmt(t.extras)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <h3 className="home-section-title">Corrections</h3>
       {/* What the corrections are, by kind: the ledger's own labels
@@ -1872,6 +1925,59 @@ export function Home() {
           gap: 18px 40px;
           padding: 16px 24px 18px;
           margin-bottom: 20px;
+        }
+        .ipfs-league-panel {
+          margin-top: 20px;
+          padding: 4px 10px;
+          overflow: hidden;
+        }
+        table.ipfs-league-table th {
+          cursor: default;
+          white-space: normal;
+        }
+        @media (max-width: 640px) {
+          .ipfs-league-panel {
+            padding: 2px 0;
+          }
+          table.ipfs-league-table {
+            font-size: 0.74rem;
+          }
+          table.ipfs-league-table th,
+          table.ipfs-league-table td {
+            padding: 0.5em 0.2em;
+          }
+          table.ipfs-league-table th:first-child,
+          table.ipfs-league-table td:first-child {
+            padding-left: 0.6em;
+          }
+          table.ipfs-league-table th:last-child,
+          table.ipfs-league-table td:last-child {
+            padding-right: 0.6em;
+          }
+          /* The number on one line, its share on the next */
+          table.ipfs-league-table .ipfs-share {
+            display: block;
+            margin-left: 0;
+          }
+        }
+        table.ipfs-league-table th[title] {
+          cursor: help;
+        }
+        .ipfs-league-table td.ipfs-league-name {
+          font-weight: 700;
+          letter-spacing: 0.04em;
+        }
+        table.ipfs-league-table .ipfs-num {
+          white-space: nowrap;
+        }
+        table.ipfs-league-table .ipfs-share {
+          margin-left: 0.6em;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .ipfs-league-table td:not(.ipfs-league-name),
+        .ipfs-league-table th:not(:first-child) {
+          text-align: right;
         }
         .corrections-kind {
           display: flex;
