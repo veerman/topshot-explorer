@@ -12,7 +12,7 @@ const INTANGIBLE_URL = "https://intangible.market";
 // they became permanent.
 const PILLARS = [
   { n: 1, part: "The token", word: "Owned", where: "Flow Blockchain, since 2020", what: "The moment itself, on a public ledger no company controls." },
-  { n: 2, part: "The media", word: "Permanent", where: "IPFS, since 2026", what: "The video and artwork, stored by content, so the file cannot change or vanish." },
+  { n: 2, part: "The media", word: "Permanent", where: "IPFS, since 2026", what: "The video and artwork, addressed by fingerprint: the address never changes, and anyone can host a copy." },
   { n: 3, part: "The app", word: "Open", where: "Open source, 2026", what: "The software that reads them both, on GitHub for anyone to run." }
 ];
 
@@ -73,8 +73,9 @@ export function About() {
         <h3>What makes it different</h3>
         <p>
           Top Shot is new in three ways at once. It is a digital collectible. It is secured by a public blockchain,
-          where anyone can check any claim without asking permission. And since 2026 its media is permanent, stored
-          on IPFS by content, so the file you own today is the file you own in ten years. Together with officially
+          where anyone can check any claim without asking permission. And since 2026 its media is permanent in the way
+          that matters, addressed on IPFS by its own fingerprint, so the file your moment points to can never be
+          swapped, and anyone can keep a copy. Together with officially
           licensed NBA and WNBA highlights, that makes a moment something that did not exist before: a programmable,
           licensed media asset. Software can fetch its video, pull a frame, cut a reel or build a game around it, and
           every program that does is looking at the same file, the one the ledger points to. One reference point, one
