@@ -70,6 +70,7 @@ const SECTIONS = [
       ["Draft year", "The serial equals the year the player was drafted."],
       ["Moment year", "The serial equals the year the play happened."],
       ["Birth year", "The serial equals the player's birth year."],
+      ["Area code", "The serial equals an area code of the team's home city when the play happened."],
       ["NBA at 75", "Serial 75 from the NBA's 75th anniversary season, the 2021-22 releases."]
     ]
   },

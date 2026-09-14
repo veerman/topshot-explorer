@@ -1,6 +1,7 @@
 import { SUBEDITION_MINT_COUNTS } from "../services/fcl.service";
 import setsParallels from "../../data/sets_parallels.json";
 import { isWnbaTeam } from "./display.utils";
+import teamsAdditions from "../../data/additions/teams.json";
 
 /*
  * Special-serial detection, shared by the account page filters and the
@@ -14,8 +15,55 @@ export const SPECIAL_LABELS = {
   draft: "Draft year",
   moment: "Moment year",
   birth: "Birth year",
+  area: "Area code",
   nba75: "NBA at 75"
 };
+
+/*
+ * Home area codes per team, from the curated arenas (data/additions/
+ * teams.json). A home arena is one the team played in for more than 90
+ * days (or with no dates); the 2020 bubble (58 days) and the international
+ * games (a day or two) are short stays at someone else's building and
+ * carry no code of the team's. A building renamed within its first
+ * months still counts. Only plain three-digit codes count; "+52" is a
+ * country code.
+ */
+const DAY = 86400000;
+const HOME_SPAN = 90 * DAY;
+let homeArenas = null;
+function homeArenasOf(teamId) {
+  if (!homeArenas) {
+    homeArenas = new Map();
+    Object.entries(teamsAdditions).forEach(([id, t]) => {
+      const list = [];
+      (t.arenas || []).forEach((a) => {
+        const code = /^\d{3}$/.test(String(a.area_codes || "").trim()) ? Number(a.area_codes) : null;
+        if (!code) return;
+        const start = a.start_date ? Date.parse(a.start_date) : null;
+        const end = a.end_date ? Date.parse(a.end_date) : null;
+        const span = start && end ? end - start : Infinity;
+        if (span <= HOME_SPAN) return;
+        list.push({ code, start, end });
+      });
+      homeArenas.set(id, list);
+    });
+  }
+  return homeArenas.get(String(teamId)) || [];
+}
+
+/**
+ * The area codes a serial can match for a play: the codes of the team's
+ * home arenas in use when the moment happened, or every home code the
+ * franchise has had when the date is unknown or matches none.
+ */
+export function areaCodesFor(teamId, dateOfMoment) {
+  const arenas = homeArenasOf(teamId);
+  if (arenas.length === 0) return [];
+  const t = dateOfMoment ? Date.parse(String(dateOfMoment).slice(0, 10)) : NaN;
+  const atDate = Number.isNaN(t) ? [] : arenas.filter((a) => (a.start === null || t >= a.start) && (a.end === null || t <= a.end));
+  const pick = atDate.length > 0 ? atDate : arenas;
+  return [...new Set(pick.map((a) => a.code))];
+}
 
 /** The numeric play facts a special serial can coincide with. */
 export function playSerialFacts(play) {
@@ -24,6 +72,7 @@ export function playSerialFacts(play) {
     draftYear: Number(play.DraftYear) || null,
     birthYear: play.Birthdate ? (Number(String(play.Birthdate).slice(0, 4)) || null) : null,
     momentYear: play.DateOfMoment ? (Number(String(play.DateOfMoment).slice(0, 4)) || null) : null,
+    areaCodes: areaCodesFor(play.TeamAtMomentNBAID, play.DateOfMoment),
     // NBA at 75 is an NBA badge; WNBA moments of that season carry none
     wnba: isWnbaTeam(play.TeamAtMoment)
   };
@@ -38,6 +87,7 @@ export function serialKinds(serial, pf, runSize, series) {
   if (pf?.draftYear && serial === pf.draftYear) kinds.push("draft");
   if (pf?.momentYear && serial === pf.momentYear) kinds.push("moment");
   if (pf?.birthYear && serial === pf.birthYear) kinds.push("birth");
+  if (pf?.areaCodes && pf.areaCodes.includes(serial)) kinds.push("area");
   // NBA 75th anniversary season: marketing "Series 3" is data series 4;
   // NBA moments only
   if (series === 4 && serial === 75 && !pf?.wnba) kinds.push("nba75");

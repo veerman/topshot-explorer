@@ -74,6 +74,7 @@ const SERIAL_GROUPS = [
   { label: "Draft year", kind: "draft", color: "#f472b6", what: "The year the player was drafted" },
   { label: "Moment year", kind: "moment", color: "#fb923c", what: "The year the moment happened" },
   { label: "Birth year", kind: "birth", color: "#a78bfa", what: "The year the player was born" },
+  { label: "Area code", kind: "area", color: "#2dd4bf", what: "An area code of the team's home city when the moment happened" },
   { label: "NBA 75", kind: "nba75", color: "#f87171", what: "Serial 75 in the NBA 75th anniversary season (Series 3)" }
 ];
 const SERIAL_ORDER = SERIAL_GROUPS.map((g) => g.label);
@@ -82,28 +83,35 @@ const SERIAL_WHAT = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.label, g.what
 // Account-page ?special= keys for the serial columns (serials.utils kinds)
 const SERIAL_SPECIAL_KEYS = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.label, g.kind]));
 const SERIAL_LABEL_OF_KIND = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.kind, g.label]));
-// The serial each kind names for a play (pf = playSerialFacts) on a run of
-// `count` copies in a set of `series`; null when the play has no such fact
-const serialOfKind = (kind, pf, count, series) => ({
-  first: 1,
-  jersey: pf.jersey,
-  last: count >= 2 ? count : null,
-  draft: pf.draftYear,
-  moment: pf.momentYear,
-  birth: pf.birthYear,
-  nba75: series === 4 && !pf.wnba ? 75 : null
-})[kind] || null;
+// The serials each kind names for a play (pf = playSerialFacts) on a run
+// of `count` copies in a set of `series`; empty when the play has no such
+// fact (a team has several area codes, the rest name one serial)
+const serialsOfKind = (kind, pf, count, series) => {
+  const one = {
+    first: 1,
+    jersey: pf.jersey,
+    last: count >= 2 ? count : null,
+    draft: pf.draftYear,
+    moment: pf.momentYear,
+    birth: pf.birthYear,
+    nba75: series === 4 && !pf.wnba ? 75 : null
+  };
+  if (kind === "area") return pf.areaCodes || [];
+  return one[kind] ? [one[kind]] : [];
+};
 // Which special serials exist on one mint run of `count` copies: each
-// kind's serial, when it fits inside the run and no earlier column took it
+// kind's serials, when they fit inside the run and no earlier column took
+// them
 const specialSerials = (count, pf, series) => {
   const out = {};
   if (!count || count < 1) return out;
   const claimed = new Set();
   SERIAL_GROUPS.forEach((g) => {
-    const n = serialOfKind(g.kind, pf, count, series);
-    if (!n || n < 1 || n > count || claimed.has(n)) return;
-    claimed.add(n);
-    out[g.label] = 1;
+    serialsOfKind(g.kind, pf, count, series).forEach((n) => {
+      if (!n || n < 1 || n > count || claimed.has(n)) return;
+      claimed.add(n);
+      out[g.label] = (out[g.label] || 0) + 1;
+    });
   });
   return out;
 };
