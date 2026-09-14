@@ -1130,6 +1130,13 @@ export function Home() {
     return n;
   }, [account]);
   const eraRows = accountMatrices ? accountMatrices.eras : erasBySeries;
+  const tierRows = accountMatrices ? accountMatrices.tiers : seriesTiersByLeague;
+  const parallelRows = accountMatrices ? accountMatrices.parallels : parallelsBySeries;
+  // Which leagues a by-series section draws. Public mode always draws
+  // both (an empty league there is still syncing); in account mode a
+  // league the collection has none of draws nothing, and a section with
+  // neither league goes altogether
+  const leaguesOf = (rows) => (accountMatrices ? ["NBA", "WNBA"].filter((lg) => rows[lg].length > 0) : ["NBA", "WNBA"]);
   // The collection page has no era facet yet, so era cells link only in
   // public mode (to the Plays page ?era= deep link)
   const eraLinkOf = (league) => (accountMatrices ? undefined : catalogLinkOf(league, "/plays", (label) => ({ era: ERA_KEY[label] })));
@@ -1387,9 +1394,14 @@ export function Home() {
       {/* History first: the collection strip, then the
           badges (facts about the moment's place in NBA history), then
           in-season vs historical, then the scarcity mechanics */}
-      <h3 className="home-section-title">{accountMatrices ? "Owned badges by series" : "Badges by series"}</h3>
-      <TierMatrix league="NBA" rows={badgeRows.NBA} columns={BADGE_ORDER} colors={BADGE_COLORS} headOf={(t) => <BadgeHead column={t} />} titleOf={badgeTitleFor(badgeRows.NBA, "moments")} unit="moments" totalLabel="Any badge" totalTitle={badgeTotalTitle("moments")} linkOf={badgeLinkOf("NBA")} linkText={playsText} />
-      <TierMatrix league="WNBA" rows={badgeRows.WNBA} columns={BADGE_ORDER} colors={BADGE_COLORS} headOf={(t) => <BadgeHead column={t} />} titleOf={badgeTitleFor(badgeRows.WNBA, "moments")} unit="moments" totalLabel="Any badge" totalTitle={badgeTotalTitle("moments")} linkOf={badgeLinkOf("WNBA")} linkText={playsText} />
+      {leaguesOf(badgeRows).length > 0 && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned badges by series" : "Badges by series"}</h3>
+          {leaguesOf(badgeRows).map((lg) => (
+            <TierMatrix key={lg} league={lg} rows={badgeRows[lg]} columns={BADGE_ORDER} colors={BADGE_COLORS} headOf={(t) => <BadgeHead column={t} />} titleOf={badgeTitleFor(badgeRows[lg], "moments")} unit="moments" totalLabel="Any badge" totalTitle={badgeTotalTitle("moments")} linkOf={badgeLinkOf(lg)} linkText={playsText} />
+          ))}
+        </>
+      )}
 
       <h3 className="home-section-title">{accountMatrices ? "Owned badges by player" : "Badges by player"}</h3>
       <TierMatrix rows={playerRows} columns={PLAYER_BADGE_ORDER} colors={PLAYER_BADGE_COLORS} headOf={(t) => <BadgeHead column={t} />} titleOf={badgeTitleFor(playerRows, "moments")} unit="moments" totalLabel="Total" totalTitle={playerTotalTitle("moments")} linkOf={playerLinkOf} linkText={playsText} />
@@ -1406,26 +1418,38 @@ export function Home() {
         <span className="spotlight-note" aria-live="polite">{spotlightNote}</span>
       </form>
 
-      <h3 className="home-section-title">{accountMatrices ? "Owned in-season vs historical by series" : "In-season vs historical mints by series"}</h3>
-      <SplitMatrix league="NBA" rows={eraRows.NBA} columns={ERA_ORDER} colors={ERA_COLORS} hollow={ERA_HOLLOW} titleOf={eraTitleFor(eraRows.NBA, "mints")} linkOf={eraLinkOf("NBA")} linkText={playsText} />
-      <SplitMatrix league="WNBA" rows={eraRows.WNBA} columns={ERA_ORDER} colors={ERA_COLORS} hollow={ERA_HOLLOW} titleOf={eraTitleFor(eraRows.WNBA, "mints")} linkOf={eraLinkOf("WNBA")} linkText={playsText} />
+      {leaguesOf(eraRows).length > 0 && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned in-season vs historical by series" : "In-season vs historical mints by series"}</h3>
+          {leaguesOf(eraRows).map((lg) => (
+            <SplitMatrix key={lg} league={lg} rows={eraRows[lg]} columns={ERA_ORDER} colors={ERA_COLORS} hollow={ERA_HOLLOW} titleOf={eraTitleFor(eraRows[lg], "mints")} linkOf={eraLinkOf(lg)} linkText={playsText} />
+          ))}
+        </>
+      )}
 
-      <h3 className="home-section-title">{accountMatrices ? "Owned tiers by series" : "Tiers by series"}</h3>
-      <TierMatrix league="NBA" rows={accountMatrices ? accountMatrices.tiers.NBA : seriesTiersByLeague.NBA} ipfs={accountMatrices ? undefined : (ipfsBySeries ? ipfsBySeries.NBA : null)} linkOf={tierLink("NBA")} linkText={setsText} />
-      <TierMatrix league="WNBA" rows={accountMatrices ? accountMatrices.tiers.WNBA : seriesTiersByLeague.WNBA} ipfs={accountMatrices ? undefined : (ipfsBySeries ? ipfsBySeries.WNBA : null)} linkOf={tierLink("WNBA")} linkText={setsText} />
+      {leaguesOf(tierRows).length > 0 && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned tiers by series" : "Tiers by series"}</h3>
+          {leaguesOf(tierRows).map((lg) => (
+            <TierMatrix key={lg} league={lg} rows={tierRows[lg]} ipfs={accountMatrices ? undefined : (ipfsBySeries ? ipfsBySeries[lg] : null)} linkOf={tierLink(lg)} linkText={setsText} />
+          ))}
+        </>
+      )}
 
-      <h3 className="home-section-title">{accountMatrices ? "Owned parallels by series" : "Parallels by series"}</h3>
-      <TierMatrix league="NBA" rows={accountMatrices ? accountMatrices.parallels.NBA : parallelsBySeries.NBA} columns={PARALLEL_ORDER} colors={PARALLEL_COLORS} notes={parallelsBySeries.notes.NBA} linkOf={parallelLink("NBA")} linkText={setsText} />
-      <TierMatrix league="WNBA" rows={accountMatrices ? accountMatrices.parallels.WNBA : parallelsBySeries.WNBA} columns={PARALLEL_ORDER} colors={PARALLEL_COLORS} notes={parallelsBySeries.notes.WNBA} linkOf={parallelLink("WNBA")} linkText={setsText} />
+      {leaguesOf(parallelRows).length > 0 && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned parallels by series" : "Parallels by series"}</h3>
+          {leaguesOf(parallelRows).map((lg) => (
+            <TierMatrix key={lg} league={lg} rows={parallelRows[lg]} columns={PARALLEL_ORDER} colors={PARALLEL_COLORS} notes={parallelsBySeries.notes[lg]} linkOf={parallelLink(lg)} linkText={setsText} />
+          ))}
+        </>
+      )}
 
-      {/* Owned: a league with no special serial draws nothing, and the
-          section goes when neither has one */}
-      {(!accountMatrices || accountMatrices.serials.NBA.length > 0 || accountMatrices.serials.WNBA.length > 0) && (
+      {leaguesOf(accountMatrices ? accountMatrices.serials : serialsBySeries).length > 0 && (
         <>
           <h3 className="home-section-title">{accountMatrices ? "Owned special serials by series" : "Special serials by series"}</h3>
-          {["NBA", "WNBA"].map((lg) => {
+          {leaguesOf(accountMatrices ? accountMatrices.serials : serialsBySeries).map((lg) => {
             const rows = accountMatrices ? accountMatrices.serials[lg] : serialsBySeries[lg];
-            if (accountMatrices && rows.length === 0) return null;
             return (
               <TierMatrix key={lg} league={lg} rows={rows} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" titleOf={(t, r, v) => (v === undefined ? SERIAL_WHAT[t] : `${t}: ${fmt(v)} serials`)} totalTitle={serialTotalTitle} linkOf={accountMatrices ? linkOfFor(lg, (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
             );
