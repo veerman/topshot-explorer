@@ -65,13 +65,14 @@ const SUBS_BY_GROUP = (() => {
 // set per mint run (standard and each parallel). The kinds and the rules
 // are the collection page's (utils/serials.utils: serialKinds), in its
 // order. A serial that qualifies twice (jersey 1, a last mint equal to
-// the draft year) counts once, under the first column that claims it, so
-// the columns sum to the total.
+// the draft year) counts in both columns and once in the total, the way
+// the badge matrix counts a moment with two badges.
 const SERIAL_GROUPS = [
   { label: "#1", kind: "first", color: "#facc15", what: "Serial 1" },
   { label: "Jersey", kind: "jersey", color: "#4ade80", what: "The player's jersey number in the moment" },
   { label: "Last", kind: "last", color: "#60a5fa", what: "The last serial of the mint run" },
   { label: "Draft year", kind: "draft", color: "#f472b6", what: "The year the player was drafted" },
+  { label: "Draft pick", kind: "pick", color: "#a3e635", what: "The player's overall draft pick" },
   { label: "Moment year", kind: "moment", color: "#fb923c", what: "The year the moment happened" },
   { label: "Birth year", kind: "birth", color: "#a78bfa", what: "The year the player was born" },
   { label: "Area code", kind: "area", color: "#2dd4bf", what: "An area code of the team's home city when the moment happened" },
@@ -92,6 +93,7 @@ const serialsOfKind = (kind, pf, count, series) => {
     jersey: pf.jersey,
     last: count >= 2 ? count : null,
     draft: pf.draftYear,
+    pick: pf.draftPick,
     moment: pf.momentYear,
     birth: pf.birthYear,
     nba75: series === 4 && !pf.wnba ? 75 : null
@@ -99,21 +101,28 @@ const serialsOfKind = (kind, pf, count, series) => {
   if (kind === "area") return pf.areaCodes || [];
   return one[kind] ? [one[kind]] : [];
 };
-// Which special serials exist on one mint run of `count` copies: each
-// kind's serials, when they fit inside the run and no earlier column took
-// them
+// Which special serials exist on one mint run of `count` copies: per
+// column, each kind's serials that fit inside the run (a serial counts in
+// every column it qualifies for), and how many distinct serials qualify
+// at all (the total)
 const specialSerials = (count, pf, series) => {
-  const out = {};
-  if (!count || count < 1) return out;
-  const claimed = new Set();
+  const cols = {};
+  const distinct = new Set();
+  if (!count || count < 1) return { cols, unique: 0 };
   SERIAL_GROUPS.forEach((g) => {
     serialsOfKind(g.kind, pf, count, series).forEach((n) => {
-      if (!n || n < 1 || n > count || claimed.has(n)) return;
-      claimed.add(n);
-      out[g.label] = (out[g.label] || 0) + 1;
+      if (!n || n < 1 || n > count) return;
+      distinct.add(n);
+      cols[g.label] = (cols[g.label] || 0) + 1;
     });
   });
-  return out;
+  return { cols, unique: distinct.size };
+};
+// Hover for the serial total column: the distinct count, then every way
+// they qualify (one serial can be the jersey number and the draft pick)
+const serialTotalTitle = (rows, v) => {
+  const hits = rows.reduce((s, r) => s + (r.hits || 0), 0);
+  return `${fmt(v)} special ${v === 1 ? "serial" : "serials"}; ${fmt(hits)} ${hits === 1 ? "qualification" : "qualifications"} in all (one serial can qualify several ways)`;
 };
 
 // Badges by series: one aligned column per badge GROUP, a cell counting
@@ -888,8 +897,10 @@ export function Home() {
       (setsParallels[String(ed.setID)] || []).forEach((subID) => runs.push(Number(SUBEDITION_MINT_COUNTS[subID]) || 0));
       const entry = bySeries[lg].get(s.series) || { series: s.series, total: 0, tiers: {} };
       runs.forEach((count) => {
-        Object.entries(specialSerials(count, pf, series)).forEach(([k, n]) => {
-          entry.total += n;
+        const { cols, unique } = specialSerials(count, pf, series);
+        entry.total += unique;
+        Object.entries(cols).forEach(([k, n]) => {
+          entry.hits = (entry.hits || 0) + n;
           entry.tiers[k] = (entry.tiers[k] || 0) + n;
         });
       });
@@ -1029,13 +1040,19 @@ export function Home() {
       if (!s || s.series === undefined || s.series === null) return;
       const lg = playLeague.get(playID) || "NBA";
       if (sub > 0 && Number(SUBEDITION_MINT_COUNTS[sub]) > 0) add(pars, lg, s.series, parallelGroup(Number(SUBEDITION_MINT_COUNTS[sub])), list.length);
-      // The collection page's rule, first kind wins (serialKinds lists
-      // them in column order)
+      // The collection page's rule (serialKinds): a serial counts in every
+      // column it qualifies for and once in the total, as a moment with
+      // several badges does above
       const runSize = runSizeFor(setID, sub, edCount.get(`${setID}_${playID}`));
       const pf = playFacts.get(playID) || {};
       list.forEach((serial) => {
         const kinds = serialKinds(Number(serial), pf, runSize, Number(s.series));
-        if (kinds.length > 0) add(sers, lg, s.series, SERIAL_LABEL_OF_KIND[kinds[0]], 1);
+        if (kinds.length === 0) return;
+        const e = sers[lg].get(s.series) || { series: s.series, total: 0, tiers: {} };
+        e.total += 1;
+        e.hits = (e.hits || 0) + kinds.length;
+        kinds.forEach((k) => { e.tiers[SERIAL_LABEL_OF_KIND[k]] = (e.tiers[SERIAL_LABEL_OF_KIND[k]] || 0) + 1; });
+        sers[lg].set(s.series, e);
       });
     });
     const toRows = (m) => [...m.values()].sort((a, b) => Number(a.series) - Number(b.series));
@@ -1410,7 +1427,7 @@ export function Home() {
             const rows = accountMatrices ? accountMatrices.serials[lg] : serialsBySeries[lg];
             if (accountMatrices && rows.length === 0) return null;
             return (
-              <TierMatrix key={lg} league={lg} rows={rows} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" titleOf={(t, r, v) => (v === undefined ? SERIAL_WHAT[t] : `${t}: ${fmt(v)} serials`)} linkOf={accountMatrices ? linkOfFor(lg, (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
+              <TierMatrix key={lg} league={lg} rows={rows} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" titleOf={(t, r, v) => (v === undefined ? SERIAL_WHAT[t] : `${t}: ${fmt(v)} serials`)} totalTitle={serialTotalTitle} linkOf={accountMatrices ? linkOfFor(lg, (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
             );
           })}
         </>

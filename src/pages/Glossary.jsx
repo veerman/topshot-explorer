@@ -68,6 +68,7 @@ const SECTIONS = [
       ["Jersey number", "The serial equals the number the player wore in the play."],
       ["Last serial", "The highest serial of the run."],
       ["Draft year", "The serial equals the year the player was drafted."],
+      ["Draft pick", "The serial equals the player's overall draft position."],
       ["Moment year", "The serial equals the year the play happened."],
       ["Birth year", "The serial equals the player's birth year."],
       ["Area code", "The serial equals an area code of the team's home city when the play happened."],

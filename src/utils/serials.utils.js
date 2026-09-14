@@ -13,6 +13,7 @@ export const SPECIAL_LABELS = {
   jersey: "Jersey number",
   last: "Last serial",
   draft: "Draft year",
+  pick: "Draft pick",
   moment: "Moment year",
   birth: "Birth year",
   area: "Area code",
@@ -70,6 +71,7 @@ export function playSerialFacts(play) {
   return {
     jersey: Number(play.JerseyNumber) || null,
     draftYear: Number(play.DraftYear) || null,
+    draftPick: Number(play.DraftSelection) || null,
     birthYear: play.Birthdate ? (Number(String(play.Birthdate).slice(0, 4)) || null) : null,
     momentYear: play.DateOfMoment ? (Number(String(play.DateOfMoment).slice(0, 4)) || null) : null,
     areaCodes: areaCodesFor(play.TeamAtMomentNBAID, play.DateOfMoment),
@@ -85,6 +87,7 @@ export function serialKinds(serial, pf, runSize, series) {
   if (pf?.jersey && serial === pf.jersey) kinds.push("jersey");
   if (runSize && serial === runSize) kinds.push("last");
   if (pf?.draftYear && serial === pf.draftYear) kinds.push("draft");
+  if (pf?.draftPick && serial === pf.draftPick) kinds.push("pick");
   if (pf?.momentYear && serial === pf.momentYear) kinds.push("moment");
   if (pf?.birthYear && serial === pf.birthYear) kinds.push("birth");
   if (pf?.areaCodes && pf.areaCodes.includes(serial)) kinds.push("area");
