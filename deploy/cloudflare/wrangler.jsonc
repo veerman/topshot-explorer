@@ -44,9 +44,11 @@
     { "name": "PROXY_LIMIT", "namespace_id": "1003", "simple": { "limit": 600, "period": 60 } }
   ],
   "limits": { "cpu_ms": 60000 },
-  // Test deploy. At cutover this becomes the apex + www (release them from
-  // the v1 worker FIRST; two Workers cannot hold the same custom domain).
+  // The apex and www are the site; v2.topshotexplorer.com stays so links
+  // shared before the cutover keep working
   "routes": [
+    { "pattern": "topshotexplorer.com", "custom_domain": true },
+    { "pattern": "www.topshotexplorer.com", "custom_domain": true },
     { "pattern": "v2.topshotexplorer.com", "custom_domain": true }
   ]
 }

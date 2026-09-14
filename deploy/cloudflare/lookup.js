@@ -12,7 +12,7 @@
 // the username and the address is kept: no login ids, no images.
 
 export const USERNAME_RE = /^[A-Za-z0-9_.-]{1,40}$/;
-const PAGE_UA = "TopShotExplorer/2 (+https://v2.topshotexplorer.com; username lookup)";
+const PAGE_UA = "TopShotExplorer/2 (+https://topshotexplorer.com; username lookup)";
 
 export const profilePageUrl = (name) => `https://nbatopshot.com/collection/${encodeURIComponent(name)}`;
 
