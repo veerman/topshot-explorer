@@ -19,6 +19,7 @@ import setsAdditions from "../../data/additions/sets.json";
 import editionsAdditions from "../../data/additions/editions.json";
 import teamsAdditions from "../../data/additions/teams.json";
 import { TIER_ORDER, TIER_COLORS, coveragePctColor, formatDateISO } from "../utils/display.utils";
+import { playSerialFacts, serialKinds, runSizeFor } from "../utils/serials.utils";
 import { isBurnedSet, isMismintSet } from "../services/set.status";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { OwnedFraction } from "../components/OwnedFraction";
@@ -61,25 +62,51 @@ const SUBS_BY_GROUP = (() => {
 })();
 
 // Special serials: the serial numbers collectors chase on an edition, one
-// set per parallel (standard included). A serial that qualifies twice
-// (jersey 1, or a last mint equal to the jersey) counts once, under the
-// first column that claims it, so the columns sum to the total.
+// set per mint run (standard and each parallel). The kinds and the rules
+// are the collection page's (utils/serials.utils: serialKinds), in its
+// order. A serial that qualifies twice (jersey 1, a last mint equal to
+// the draft year) counts once, under the first column that claims it, so
+// the columns sum to the total.
 const SERIAL_GROUPS = [
-  { label: "#1", color: "#facc15" },
-  { label: "Jersey", color: "#4ade80" },
-  { label: "Last", color: "#60a5fa" }
+  { label: "#1", kind: "first", color: "#facc15", what: "Serial 1" },
+  { label: "Jersey", kind: "jersey", color: "#4ade80", what: "The player's jersey number in the moment" },
+  { label: "Last", kind: "last", color: "#60a5fa", what: "The last serial of the mint run" },
+  { label: "Draft year", kind: "draft", color: "#f472b6", what: "The year the player was drafted" },
+  { label: "Moment year", kind: "moment", color: "#fb923c", what: "The year the moment happened" },
+  { label: "Birth year", kind: "birth", color: "#a78bfa", what: "The year the player was born" },
+  { label: "Draft pick", kind: "pick", color: "#2dd4bf", what: "The player's overall draft pick" },
+  { label: "NBA 75", kind: "nba75", color: "#f87171", what: "Serial 75 in the NBA 75th anniversary season (Series 3)" }
 ];
 const SERIAL_ORDER = SERIAL_GROUPS.map((g) => g.label);
 const SERIAL_COLORS = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.label, g.color]));
+const SERIAL_WHAT = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.label, g.what]));
 // Account-page ?special= keys for the serial columns (serials.utils kinds)
-const SERIAL_SPECIAL_KEYS = { "#1": "first", "Jersey": "jersey", "Last": "last" };
-// Which special serials exist on one mint run of `count` copies
-const specialSerials = (count, jersey) => {
+const SERIAL_SPECIAL_KEYS = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.label, g.kind]));
+const SERIAL_LABEL_OF_KIND = Object.fromEntries(SERIAL_GROUPS.map((g) => [g.kind, g.label]));
+// The serial each kind names for a play (pf = playSerialFacts) on a run of
+// `count` copies in a set of `series`; null when the play has no such fact
+const serialOfKind = (kind, pf, count, series) => ({
+  first: 1,
+  jersey: pf.jersey,
+  last: count >= 2 ? count : null,
+  draft: pf.draftYear,
+  moment: pf.momentYear,
+  birth: pf.birthYear,
+  pick: pf.draftPick,
+  nba75: series === 4 && !pf.wnba ? 75 : null
+})[kind] || null;
+// Which special serials exist on one mint run of `count` copies: each
+// kind's serial, when it fits inside the run and no earlier column took it
+const specialSerials = (count, pf, series) => {
   const out = {};
-  if (count < 1) return out;
-  out["#1"] = 1;
-  if (jersey && jersey >= 2 && jersey <= count) out.Jersey = 1;
-  if (count >= 2 && count !== jersey) out.Last = 1;
+  if (!count || count < 1) return out;
+  const claimed = new Set();
+  SERIAL_GROUPS.forEach((g) => {
+    const n = serialOfKind(g.kind, pf, count, series);
+    if (!n || n < 1 || n > count || claimed.has(n)) return;
+    claimed.add(n);
+    out[g.label] = 1;
+  });
   return out;
 };
 
@@ -828,37 +855,34 @@ export function Home() {
     };
   }, [sets, editions, playLeague]);
 
-  // Jersey number per play (the number on the player's back in that
-  // moment); team moments and unknowns carry none
-  const playJersey = useMemo(() => {
-    const m = new Map();
-    plays.forEach((p) => {
-      const j = String(p.JerseyNumber ?? "").trim();
-      if (/^\d+$/.test(j) && Number(j) >= 1) m.set(String(p.playID), Number(j));
-    });
-    return m;
-  }, [plays]);
+  // The numeric facts a special serial can coincide with, per play: jersey
+  // number, draft year and pick, birth year, moment year (team moments and
+  // unknowns carry none)
+  const playFacts = useMemo(() => new Map(plays.map((p) => [String(p.playID), playSerialFacts(p)])), [plays]);
 
   // Special serials per league and series: every mint run of an edition
-  // (standard = its mint count, each parallel = the subedition's fixed
-  // count) has a #1, a last mint, and a jersey match when the jersey
-  // number fits inside the run (LeBron's 23 exists in a 99-copy Club
-  // Collection run, not in a 10-copy Diced run)
+  // (standard = the edition total minus its parallels, each parallel =
+  // the subedition's fixed count, the collection page's runSizeFor) has a
+  // #1, a last mint, and each other kind when its serial fits inside the
+  // run (LeBron's 23 exists in a 99-copy Club Collection run, not in a
+  // 10-copy Diced run; a 2003 draft year needs a run of 2003 or more)
   const serialsBySeries = useMemo(() => {
     if (sets.length === 0 || editions.length === 0 || playLeague.size === 0) return { NBA: [], WNBA: [] };
     const setById = new Map(sets.map((s) => [String(s.id ?? s.setID), s]));
     const bySeries = { NBA: new Map(), WNBA: new Map() };
+    const NO_FACTS = {};
     editions.forEach((ed) => {
       const s = setById.get(String(ed.setID));
       if (!s || s.series === undefined || s.series === null) return;
       if (isMismintPlay(ed.playID) || isBurnedSet(ed.setID)) return;
       const lg = playLeague.get(String(ed.playID)) || "NBA";
-      const jersey = playJersey.get(String(ed.playID)) || 0;
-      const runs = [Number(ed.momentCount) || 0];
+      const pf = playFacts.get(String(ed.playID)) || NO_FACTS;
+      const series = Number(s.series);
+      const runs = [runSizeFor(ed.setID, 0, ed.momentCount)];
       (setsParallels[String(ed.setID)] || []).forEach((subID) => runs.push(Number(SUBEDITION_MINT_COUNTS[subID]) || 0));
       const entry = bySeries[lg].get(s.series) || { series: s.series, total: 0, tiers: {} };
       runs.forEach((count) => {
-        Object.entries(specialSerials(count, jersey)).forEach(([k, n]) => {
+        Object.entries(specialSerials(count, pf, series)).forEach(([k, n]) => {
           entry.total += n;
           entry.tiers[k] = (entry.tiers[k] || 0) + n;
         });
@@ -867,7 +891,7 @@ export function Home() {
     });
     const toRows = (m) => [...m.values()].sort((a, b) => Number(a.series) - Number(b.series));
     return { NBA: toRows(bySeries.NBA), WNBA: toRows(bySeries.WNBA) };
-  }, [sets, editions, playLeague, playJersey]);
+  }, [sets, editions, playLeague, playFacts]);
 
   // Badges per league, series and badge column: every minted moment of an
   // edition carries its play's badges plus the edition's own reward tags,
@@ -998,14 +1022,14 @@ export function Home() {
       const s = setById.get(setID);
       if (!s || s.series === undefined || s.series === null) return;
       const lg = playLeague.get(playID) || "NBA";
-      const runSize = sub > 0 ? (Number(SUBEDITION_MINT_COUNTS[sub]) || 0) : (edCount.get(`${setID}_${playID}`) || 0);
-      if (sub > 0 && runSize > 0) add(pars, lg, s.series, parallelGroup(runSize), list.length);
-      const jersey = playJersey.get(playID) || 0;
+      if (sub > 0 && Number(SUBEDITION_MINT_COUNTS[sub]) > 0) add(pars, lg, s.series, parallelGroup(Number(SUBEDITION_MINT_COUNTS[sub])), list.length);
+      // The collection page's rule, first kind wins (serialKinds lists
+      // them in column order)
+      const runSize = runSizeFor(setID, sub, edCount.get(`${setID}_${playID}`));
+      const pf = playFacts.get(playID) || {};
       list.forEach((serial) => {
-        const col = serial === 1 ? "#1"
-          : (jersey >= 2 && serial === jersey) ? "Jersey"
-            : (runSize >= 2 && serial === runSize) ? "Last" : null;
-        if (col) add(sers, lg, s.series, col, 1);
+        const kinds = serialKinds(Number(serial), pf, runSize, Number(s.series));
+        if (kinds.length > 0) add(sers, lg, s.series, SERIAL_LABEL_OF_KIND[kinds[0]], 1);
       });
     });
     const toRows = (m) => [...m.values()].sort((a, b) => Number(a.series) - Number(b.series));
@@ -1017,7 +1041,7 @@ export function Home() {
       eras: { NBA: toRows(eras.NBA), WNBA: toRows(eras.WNBA) },
       players: [...players.values()].map((r) => ({ ...r, other: undefined }))
     };
-  }, [owned, sets, editions, playLeague, playJersey, playTags, playEra, spotlightNames, spotlightPlay]);
+  }, [owned, sets, editions, playLeague, playFacts, playTags, playEra, spotlightNames, spotlightPlay]);
 
   // Account mode: every matrix cell deep-links into the collection,
   // filtered to exactly what it counts. Param names and values mirror the
@@ -1371,9 +1395,20 @@ export function Home() {
       <TierMatrix league="NBA" rows={accountMatrices ? accountMatrices.parallels.NBA : parallelsBySeries.NBA} columns={PARALLEL_ORDER} colors={PARALLEL_COLORS} notes={parallelsBySeries.notes.NBA} linkOf={parallelLink("NBA")} linkText={setsText} />
       <TierMatrix league="WNBA" rows={accountMatrices ? accountMatrices.parallels.WNBA : parallelsBySeries.WNBA} columns={PARALLEL_ORDER} colors={PARALLEL_COLORS} notes={parallelsBySeries.notes.WNBA} linkOf={parallelLink("WNBA")} linkText={setsText} />
 
-      <h3 className="home-section-title">{accountMatrices ? "Owned special serials by series" : "Special serials by series"}</h3>
-      <TierMatrix league="NBA" rows={accountMatrices ? accountMatrices.serials.NBA : serialsBySeries.NBA} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" linkOf={accountMatrices ? linkOfFor("NBA", (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
-      <TierMatrix league="WNBA" rows={accountMatrices ? accountMatrices.serials.WNBA : serialsBySeries.WNBA} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" linkOf={accountMatrices ? linkOfFor("WNBA", (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
+      {/* Owned: a league with no special serial draws nothing, and the
+          section goes when neither has one */}
+      {(!accountMatrices || accountMatrices.serials.NBA.length > 0 || accountMatrices.serials.WNBA.length > 0) && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned special serials by series" : "Special serials by series"}</h3>
+          {["NBA", "WNBA"].map((lg) => {
+            const rows = accountMatrices ? accountMatrices.serials[lg] : serialsBySeries[lg];
+            if (accountMatrices && rows.length === 0) return null;
+            return (
+              <TierMatrix key={lg} league={lg} rows={rows} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" titleOf={(t, r, v) => (v === undefined ? SERIAL_WHAT[t] : `${t}: ${fmt(v)} serials`)} linkOf={accountMatrices ? linkOfFor(lg, (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
+            );
+          })}
+        </>
+      )}
 
       <h3 className="home-section-title">Players, teams and arenas</h3>
       <div className="stats-metric-grid">

@@ -1,5 +1,6 @@
 import { SUBEDITION_MINT_COUNTS } from "../services/fcl.service";
 import setsParallels from "../../data/sets_parallels.json";
+import { isWnbaTeam } from "./display.utils";
 
 /*
  * Special-serial detection, shared by the account page filters and the
@@ -24,7 +25,9 @@ export function playSerialFacts(play) {
     draftYear: Number(play.DraftYear) || null,
     draftPick: Number(play.DraftSelection) || null,
     birthYear: play.Birthdate ? (Number(String(play.Birthdate).slice(0, 4)) || null) : null,
-    momentYear: play.DateOfMoment ? (Number(String(play.DateOfMoment).slice(0, 4)) || null) : null
+    momentYear: play.DateOfMoment ? (Number(String(play.DateOfMoment).slice(0, 4)) || null) : null,
+    // NBA at 75 is an NBA badge; WNBA moments of that season carry none
+    wnba: isWnbaTeam(play.TeamAtMoment)
   };
 }
 
@@ -38,8 +41,9 @@ export function serialKinds(serial, pf, runSize, series) {
   if (pf?.momentYear && serial === pf.momentYear) kinds.push("moment");
   if (pf?.birthYear && serial === pf.birthYear) kinds.push("birth");
   if (pf?.draftPick && serial === pf.draftPick) kinds.push("pick");
-  // NBA 75th anniversary season: marketing "Series 3" is data series 4
-  if (series === 4 && serial === 75) kinds.push("nba75");
+  // NBA 75th anniversary season: marketing "Series 3" is data series 4;
+  // NBA moments only
+  if (series === 4 && serial === 75 && !pf?.wnba) kinds.push("nba75");
   return kinds;
 }
 
