@@ -11,7 +11,7 @@ const INTANGIBLE_URL = "https://intangible.market";
 // three, so the whole stack reads at a glance; the order is the order
 // they became permanent.
 const PILLARS = [
-  { n: 1, part: "The token", word: "Owned", where: "Flow Blockchain, since 2020", what: "The moment itself, on a public ledger no company controls." },
+  { n: 1, part: "The token", word: "Owned", where: "Flow Blockchain, since 2020", what: "The moment itself, on a public ledger no company controls, with the keys in your own hands if you want them." },
   { n: 2, part: "The media", word: "Permanent", where: "IPFS, since 2026", what: "The video and artwork, addressed by fingerprint: the address never changes, and anyone can host a copy." },
   { n: 3, part: "The app", word: "Open", where: "Open source, 2026", what: "The software that reads them both, on GitHub for anyone to run." }
 ];
@@ -77,14 +77,15 @@ export function About() {
           that matters, addressed on IPFS by its own fingerprint, so the file your moment points to can never be
           swapped, and anyone can keep a copy. Together with officially
           licensed NBA and WNBA highlights, that makes a moment something that did not exist before: a programmable,
-          licensed media asset. Software can fetch its video, pull a frame, cut a reel or build a game around it, and
-          every program that does is looking at the same file, the one the ledger points to. One reference point, one
-          source of truth, and a way to catalogue, timestamp and curate basketball history that anyone can verify.
+          licensed media asset. Software can find a moment&apos;s video and artwork and show them, and every program
+          that does is looking at the same files, the ones the ledger points to. One reference point, one source of
+          truth, and a way to catalogue, timestamp and curate basketball history that anyone can verify.
         </p>
 
         <h3>Three parts of ownership</h3>
         <p>
-          A collectible should outlive its maker in every part: the token, the media, and the software you use to
+          If someone else can take it away, you never owned it. A collectible should outlive its maker in every
+          part: the token, the media, and the software you use to
           look at them. Dapper Labs made the first two permanent. This app is the third.
         </p>
         <ol className="pillars" aria-label="The three parts of ownership">
@@ -98,7 +99,7 @@ export function About() {
           ))}
         </ol>
         <p className="pillars-caption">
-          With all three in the open, the whole stack is decentralized, and no single company can shut Top Shot down.
+          With all three in the open, nothing about a moment depends on a single company.
         </p>
 
         <h3>Why 2026</h3>
@@ -167,11 +168,10 @@ export function About() {
           I have been building third-party Top Shot tools since 2020, starting with some of the first collection
           tools, and I never stopped. Some are still online at{" "}
           <a href={INTANGIBLE_URL} target="_blank" rel="noopener noreferrer">intangible.market</a>; many have been
-          retired. This is the fourth or fifth explorer I have built from scratch, and most of the others nobody saw.
-          They never felt finished: my eye for the data has always run ahead of my eye for an interface, and I would
-          rather ship nothing than ship something unpolished. New AI tooling finally let me finish the polish that
-          always stopped me, so this release is six years of iterations. I wanted a great experience from day one, not
-          a coming soon. Software is never done, and this is the beginning, not the end.
+          retired. This is the third explorer I have built from scratch, and the first with the polish I always
+          wanted. My eye for the data has always run ahead of my eye for an interface, and new AI tooling finally let
+          me finish it, so this release is six years of iterations. I wanted a great experience from day one, not a
+          coming soon. Software is never done, and this is the beginning, not the end.
         </p>
         <p className="mt-12">
           topshotexplorer.com itself began as <a href={ORIGINAL_REPO} target="_blank" rel="noopener noreferrer">Eric
@@ -185,10 +185,9 @@ export function About() {
         <h3>Open source, yours to keep</h3>
         <p>
           This is not a personal project with my name on it. It belongs to anyone who has ever collected a moment,
-          anyone who cares about NBA and WNBA history, and anyone who wants to build something fun with licensed
-          basketball media. Fork it, clone it, run it, change it, use it as the starting point for the app you have in
-          mind, and when you build something, share it. I want to see it. I plan to keep Top Shot Explorer online for
-          a long time, but you do not have to take my word for it: a copy on your own machine is as good as this one.
+          anyone who cares about NBA and WNBA history, and anyone who wants to build a better tool for collectors.
+          Fork it, clone it, run it, change it, use it as the starting point for the app you have in mind, and when
+          you build something, share it. I want to see it. A copy on your own machine is as good as this one.
           Built by a software developer and basketball nerd who loves building things, loves collecting, and loves
           curating NBA history. Steve Veerman.
         </p>

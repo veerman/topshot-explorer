@@ -67,7 +67,7 @@ export function EarlyAdopters() {
       <div className="glass-panel ea-head">
         <h1 className="ea-title">Early Adopters</h1>
         <p className="text-muted ea-lead">
-          The first collectors to put their name on the almanac, in the order they did. Sign with your linked wallet, or your Dapper wallet. It confers nothing; it says they were here.
+          The first collectors to put their name on the almanac, in the order they did. Sign with your linked wallet, or your Dapper wallet. The list ships with the code, in the order people signed. It confers nothing; it says they were here.
         </p>
         <div className="ea-count">
           <span className="ea-count-num font-mono">{fmt(w.total)}</span>
