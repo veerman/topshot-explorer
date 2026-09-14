@@ -74,7 +74,6 @@ const SERIAL_GROUPS = [
   { label: "Draft year", kind: "draft", color: "#f472b6", what: "The year the player was drafted" },
   { label: "Moment year", kind: "moment", color: "#fb923c", what: "The year the moment happened" },
   { label: "Birth year", kind: "birth", color: "#a78bfa", what: "The year the player was born" },
-  { label: "Draft pick", kind: "pick", color: "#2dd4bf", what: "The player's overall draft pick" },
   { label: "NBA 75", kind: "nba75", color: "#f87171", what: "Serial 75 in the NBA 75th anniversary season (Series 3)" }
 ];
 const SERIAL_ORDER = SERIAL_GROUPS.map((g) => g.label);
@@ -92,7 +91,6 @@ const serialOfKind = (kind, pf, count, series) => ({
   draft: pf.draftYear,
   moment: pf.momentYear,
   birth: pf.birthYear,
-  pick: pf.draftPick,
   nba75: series === 4 && !pf.wnba ? 75 : null
 })[kind] || null;
 // Which special serials exist on one mint run of `count` copies: each

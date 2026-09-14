@@ -14,7 +14,6 @@ export const SPECIAL_LABELS = {
   draft: "Draft year",
   moment: "Moment year",
   birth: "Birth year",
-  pick: "Draft pick",
   nba75: "NBA at 75"
 };
 
@@ -23,7 +22,6 @@ export function playSerialFacts(play) {
   return {
     jersey: Number(play.JerseyNumber) || null,
     draftYear: Number(play.DraftYear) || null,
-    draftPick: Number(play.DraftSelection) || null,
     birthYear: play.Birthdate ? (Number(String(play.Birthdate).slice(0, 4)) || null) : null,
     momentYear: play.DateOfMoment ? (Number(String(play.DateOfMoment).slice(0, 4)) || null) : null,
     // NBA at 75 is an NBA badge; WNBA moments of that season carry none
@@ -40,7 +38,6 @@ export function serialKinds(serial, pf, runSize, series) {
   if (pf?.draftYear && serial === pf.draftYear) kinds.push("draft");
   if (pf?.momentYear && serial === pf.momentYear) kinds.push("moment");
   if (pf?.birthYear && serial === pf.birthYear) kinds.push("birth");
-  if (pf?.draftPick && serial === pf.draftPick) kinds.push("pick");
   // NBA 75th anniversary season: marketing "Series 3" is data series 4;
   // NBA moments only
   if (series === 4 && serial === 75 && !pf?.wnba) kinds.push("nba75");
