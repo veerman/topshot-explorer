@@ -19,7 +19,7 @@ import { Supply, SupplyWord } from "../components/Supply";
 import { getSeriesInfo, resolveVenue, getCalculatedPlayTags, parseMomentDate, isMismintPlay, editionTags, withTags } from "../services/overrides.service";
 import { getMediaTypeLabel } from "../services/ipfs.analysis";
 import { LoadError } from "../components/LoadError";
-import { buildTeamNameMap, getLeagueBadge, getLeagueName, renderTeamLink as renderTeamLinkShared, getTierBadgeClass, scrubSentinels, buildMatchupSides, renderMatchupCell, formatDateISO, buildSeriesSeasonMap, seasonHintForPlay, getSeasonFallback, renderSeasonChip, playerPath } from "../utils/display.utils";
+import { buildTeamNameMap, getLeagueBadge, getLeagueName, renderTeamLink as renderTeamLinkShared, getTierBadgeClass, scrubSentinels, buildMatchupSides, renderMatchupCell, formatDateISO, buildSeriesSeasonMap, seasonHintForPlay, getSeasonFallback, renderSeasonChip, playerPath, buildPlayToSets } from "../utils/display.utils";
 import setsParallels from "../../data/sets_parallels.json";
 import playsAdditions from "../../data/additions/plays.json";
 import setsAdditions from "../../data/additions/sets.json";
@@ -161,7 +161,7 @@ export function EditionDetail() {
         if (isStale()) return;
 
         if (!dbSet) {
-          setError(`Set ID #${setID} not found in database.`);
+          setError(`Set ${setID} not found in database.`);
           setLoading(false);
           return;
         }
@@ -251,11 +251,7 @@ export function EditionDetail() {
   // Season fallback for undated plays: shown as a chip, never as a date
   const seasonFallback = useMemo(() => {
     if (!matchingPlay || matchingPlay.DateOfMoment) return null;
-    const mapping = {};
-    allSets.forEach((set) => (set.playIDs || []).forEach((pid) => {
-      (mapping[pid] = mapping[pid] || []).push({ series: set.series });
-    }));
-    const seriesSeasonMap = buildSeriesSeasonMap(allPlays, mapping);
+    const seriesSeasonMap = buildSeriesSeasonMap(allPlays, buildPlayToSets(allSets));
     return getSeasonFallback(matchingPlay, seasonHintForPlay(matchingPlay, matchingSets, seriesSeasonMap));
   }, [matchingPlay, allPlays, allSets, matchingSets]);
 
@@ -351,24 +347,34 @@ export function EditionDetail() {
   };
   const badgeTo = (tag) => (owned ? collectionLink({ badge: tag }) : `/plays?badge=${encodeURIComponent(tag)}`);
   const chipHint = owned ? "click to see yours" : "click to see them all";
+  // Copies of this edition in the account's collection: every parallel in
+  // the collapsed view, one run when the page is narrowed to a subedition
+  const ownedHere = owned?.index
+    ? (hasExplicitSub
+      ? (owned.index.serials.get(`${Number(setID)}_${Number(playID)}_${Number(subeditionID)}`) || []).length
+      : (owned.index.byEdition.get(`${Number(setID)}_${Number(playID)}`) || 0))
+    : null;
+  const ownedParams = { set: String(setID), play: String(playID), ...(hasExplicitSub ? { sub: String(subeditionID) } : {}) };
 
   // PlayCategory and PlayType are frequently the same string ("3 Pointer"),
   // so collapse them rather than printing the value twice.
-  const playTypeLabel = [...new Set(
+  const playTypeParts = [...new Set(
     [matchingPlay?.PlayCategory, matchingPlay?.PlayType]
       .map((v) => String(v || "").trim())
       .filter(Boolean)
-  )].join(" • ");
+  )];
+  const playTypeLabel = playTypeParts.join(" • ");
 
   // The header and the Set & Parallel Context panel both already name this
   // set, so the overview lists only the OTHER sets carrying the same play
   // (the links cell renders from this same list, so they cannot disagree)
   const otherSets = matchingSets.filter((s) => String(s.id) !== String(setID));
   const setsCell = otherSets.length > 0 ? (
-    <div className="d-flex flex-wrap gap-8">
+    // One set per line, on the value's right edge like the rows around it
+    <div className="d-flex" style={{ flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
       {otherSets.map((s) => (
         <Link key={s.id} to={`/editions/${s.id}_${playID}`} className="set-link" style={{ fontSize: "0.8rem" }} title={`${s.setName} (Series ${s.series})`}>
-          #{s.id} {s.setName}
+          {s.setName}
         </Link>
       ))}
     </div>
@@ -395,53 +401,10 @@ export function EditionDetail() {
 
   return (
     <div className="edition-detail-container">
-      {/* Back to Parent Set navigation */}
-      <div className="d-flex align-center justify-between" style={{ marginBottom: "20px" }}>
-        <Link to={`/sets/${setID}`} className="text-muted hover-glow-nav" style={{ textDecoration: "none", fontSize: "0.95rem" }}>
-          ← Back to Set: <span style={{ color: "var(--primary-hover)", fontWeight: "500" }}>{setMeta.setName}</span>
-        </Link>
-        <Link to={`/plays/${playID}`} className="text-muted hover-glow-nav" style={{ textDecoration: "none", fontSize: "0.95rem" }}>
-          View Play #{playID} details →
-        </Link>
-      </div>
-
       {/* Header Panel */}
       <div className={`glass-panel detail-header ${isMismint ? "border-mismint" : ""}`}>
         <div className="d-flex align-center justify-between flex-wrap gap-10">
           <div>
-            <div className="d-flex align-center gap-10 flex-wrap">
-              <Link to={chipTo.set} className="play-id-tag play-id-link" title={owned ? "This set; click to see yours" : "Opens the set"}>Set #{setID}</Link>
-              <Link to={chipTo.series} className="play-id-tag play-id-link" style={{ background: "rgba(59, 130, 246, 0.12)", color: "var(--accent-nba)" }} title={`This series; ${chipHint}`}>
-                {seriesName}
-              </Link>
-              {isCollapsedView ? (
-                <span className="badge badge-standard" title="The whole edition: the standard run and every parallel combined; pick one below to narrow the page">Standard + {associatedSubIDs.length} {associatedSubIDs.length === 1 ? "parallel" : "parallels"}</span>
-              ) : chipTo.parallel ? (
-                <Link to={chipTo.parallel} className={`badge ${subeditionID === 0 ? "badge-standard" : "badge-parallel"} badge-link`} title={`This parallel; ${chipHint}`}>
-                  {subeditionID === 0 ? "Standard Edition" : `${subeditionName} Parallel`}
-                </Link>
-              ) : subeditionID === 0 ? (
-                <span className="badge badge-standard">Standard Edition</span>
-              ) : (
-                <span className="badge badge-parallel">{subeditionName} Parallel</span>
-              )}
-              {supplementData?.tier && (chipTo.tier ? (
-                <Link to={chipTo.tier} className={`badge ${getTierBadgeClass(supplementData.tier)} badge-link`} style={{ textTransform: "uppercase" }} title={`This tier; ${chipHint}`}>
-                  {supplementData.tier}
-                </Link>
-              ) : (
-                <span className={`badge ${getTierBadgeClass(supplementData.tier)}`} style={{ textTransform: "uppercase" }}>
-                  {supplementData.tier}
-                </span>
-              ))}
-              {getSetStatus(setID).burned && (
-                <span className="badge badge-danger" title={`Every moment in this set was burned by Top Shot on ${getSetStatus(setID).burned}`} style={{ cursor: "help" }}>
-                  Burned
-                </span>
-              )}
-              {matchingPlay && getLeagueBadge(matchingPlay.TeamAtMoment, chipTo.league)}
-              {isMismint && <span className="badge badge-warning">Mismint ⚠️</span>}
-            </div>
             <h1 className="player-title">
               {!isTeamMoment ? (
                 <Link to={playerPath(displayName)} className="player-detail-link font-hover-glow" style={{ color: "#fff", textDecoration: "none" }}>
@@ -455,9 +418,62 @@ export function EditionDetail() {
               {playTypeLabel}
               {/* The team is already the title on a team moment; repeating it
                   here would say the same thing twice */}
-              {!isTeamMoment && <>{playTypeLabel && " • "}{matchingPlay ? renderTeamLink(matchingPlay.TeamAtMoment) : ""}</>}
+              {!isTeamMoment && matchingPlay && (
+                <span style={{ marginLeft: playTypeLabel ? "12px" : 0 }}>{renderTeamLink(matchingPlay.TeamAtMoment)}</span>
+              )}
             </p>
             {badgesHere.length > 0 && <div className="mt-12"><Badges tags={badgesHere} linkOf={badgeTo} /></div>}
+            {/* The edition's facts, under the name: series, set, play, tier,
+                run, league, then its id (as it reads in the URL: set id, play
+                id, and the subedition when the page is narrowed to one) and
+                the account's copies while browsing as one */}
+            <div className="d-flex align-center gap-10 flex-wrap mt-12">
+              <Link to={chipTo.series} className="play-id-tag play-id-link" style={{ background: "rgba(59, 130, 246, 0.12)", color: "var(--accent-nba)" }} title={`This series; ${chipHint}`}>
+                {seriesName}
+              </Link>
+              <Link to={chipTo.set} className="play-id-tag play-id-link" title={`Set ${setID}; ${owned ? "click to see yours" : "opens the set"}`}>{setMeta.setName}</Link>
+              <Link to={`/plays/${playID}`} className="play-id-tag play-id-link" title="Opens the play">Play ID: {playID}</Link>
+              {supplementData?.tier && (chipTo.tier ? (
+                <Link to={chipTo.tier} className={`badge ${getTierBadgeClass(supplementData.tier)} badge-link`} style={{ textTransform: "uppercase" }} title={`This tier; ${chipHint}`}>
+                  {supplementData.tier}
+                </Link>
+              ) : (
+                <span className={`badge ${getTierBadgeClass(supplementData.tier)}`} style={{ textTransform: "uppercase" }}>
+                  {supplementData.tier}
+                </span>
+              ))}
+              {isCollapsedView ? (
+                <span className="badge badge-standard" title="The whole edition: the standard run and every parallel combined; pick one below to narrow the page">Standard + {associatedSubIDs.length} {associatedSubIDs.length === 1 ? "parallel" : "parallels"}</span>
+              ) : chipTo.parallel ? (
+                <Link to={chipTo.parallel} className={`badge ${subeditionID === 0 ? "badge-standard" : "badge-parallel"} badge-link`} title={`This parallel; ${chipHint}`}>
+                  {subeditionID === 0 ? "Standard Edition" : `${subeditionName} Parallel`}
+                </Link>
+              ) : subeditionID === 0 ? (
+                <span className="badge badge-standard">Standard Edition</span>
+              ) : (
+                <span className="badge badge-parallel">{subeditionName} Parallel</span>
+              )}
+              {matchingPlay && getLeagueBadge(matchingPlay.TeamAtMoment, chipTo.league)}
+              <span className="play-id-tag" style={{ color: "#fff" }} title="Edition id: set id, underscore, play id, then the subedition when there is one">
+                Edition ID: {hasExplicitSub ? `${setID}_${playID}_${subeditionID}` : `${setID}_${playID}`}
+              </span>
+              {getSetStatus(setID).burned && (
+                <span className="badge badge-danger" title={`Every moment in this set was burned by Top Shot on ${getSetStatus(setID).burned}`} style={{ cursor: "help" }}>
+                  Burned
+                </span>
+              )}
+              {isMismint && <span className="badge badge-warning">Mismint ⚠️</span>}
+              {ownedHere !== null && (
+                <Link
+                  to={ownedHere > 0 ? collectionLink(ownedParams) : chipTo.set}
+                  className="play-id-tag play-id-link"
+                  style={ownedHere > 0 ? { color: "#fff" } : { color: "var(--text-muted)" }}
+                  title={ownedHere > 0 ? "Copies of this edition in the collection; click to see them" : "None of this edition in the collection; click to see the set's"}
+                >
+                  Owned: {ownedHere.toLocaleString()}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
@@ -536,12 +552,15 @@ export function EditionDetail() {
             )}
           </div>
 
-          {/* Media Assets: the same lines the set page rows show */}
+          {/* Media Assets: the same lines the set page rows show, grouped
+              the way its coverage panel names them, plus the files not
+              registered on chain (the commentary cut) */}
           <div className="glass-panel mt-20 toggler-panel panel-assets">
             <h3>Media Assets</h3>
             {ipfsRecord && ipfsRecord.cids ? (
               <div className="mt-15">
                 <MediaStack
+                  grouped
                   cids={cids}
                   ipfsMedia={ipfsMedia}
                   activeUrl={activeVideo}
@@ -583,15 +602,10 @@ export function EditionDetail() {
                 })) : "-"}
               </span>
             </div>
-            <div className="summary-grid summary-grid-aligned mt-12" style={{ "--rows": otherSets.length > 0 ? 4 : 2 }}>
-              <div className="summary-item">
-                <span className="summary-label">Play ID</span>
-                <span className="summary-value font-mono"><Link to={`/plays/${playID}`} className="font-hover-glow" style={{ color: "#fff", textDecoration: "none" }}>#{playID}</Link></span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Category</span>
-                <span className="summary-value">{playTypeLabel || "-"}</span>
-              </div>
+            {/* The game only: the play id and category already sit in the
+                header, so this panel holds the date, the season and the
+                other sets carrying the play */}
+            <div className="summary-grid summary-grid-aligned mt-12" style={{ "--rows": otherSets.length > 0 ? 2 : 1 }}>
               <div className="summary-item">
                 <span className="summary-label">Date</span>
                 <span className="summary-value">
@@ -626,19 +640,9 @@ export function EditionDetail() {
           {/* Set & Parallel Context Block */}
           <div className="glass-panel mt-20 toggler-panel panel-context">
             <h3 className="section-title-accent">Set & Parallel Context</h3>
-            <div className="summary-grid summary-grid-aligned mt-20" style={{ "--rows": 3 }}>
-              <div className="summary-item">
-                <span className="summary-label">Set</span>
-                <span className="summary-value">
-                  <Link to={`/sets/${setID}`} className="font-hover-glow" style={{ color: "var(--primary-hover)", fontWeight: "600", textDecoration: "none" }}>
-                    {setMeta.setName}
-                  </Link>
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Series</span>
-                <span className="summary-value text-accent font-mono" style={{ fontSize: "0.9rem" }}>{seriesName}</span>
-              </div>
+            {/* Supply only: the set and series are named in the header, so
+                this panel holds the states, the count and the parallels */}
+            <div className="summary-grid summary-grid-aligned mt-20" style={{ "--rows": 2 }}>
               <div className="summary-item">
                 <span className="summary-label">Set Status</span>
                 <span className="summary-value">
@@ -770,13 +774,6 @@ export function EditionDetail() {
           font-size: 0.8rem;
           padding: 8px 10px 10px;
           margin: 0;
-        }
-        .hover-glow-nav {
-          transition: var(--transition-smooth);
-        }
-        .hover-glow-nav:hover {
-          color: #fff !important;
-          text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
         }
         .prominent-media-card {
           padding: 24px;

@@ -529,6 +529,30 @@ export function getTeamEmoji(teamName, nbaID) {
   return emojiByName().get(String(teamName).trim().toLowerCase()) || "";
 }
 
+/*
+ * The key a play's team is grouped and linked by: its on-chain team id
+ * (the NBA/WNBA stats id Dapper Labs copies), or, when the play carries
+ * none, the teams.json key of the special entry whose name matches the
+ * team at moment ("special_team_spoon"). A squad Dapper Labs never gave
+ * an id still gets a Teams row and a page that way, without the app
+ * inventing an id. Plays with neither return "" and group nowhere.
+ */
+let specialKeyByNameCache = null;
+export function teamKeyForPlay(play) {
+  const id = String(play?.TeamAtMomentNBAID || "").trim();
+  if (id) return id;
+  if (!specialKeyByNameCache) {
+    specialKeyByNameCache = new Map();
+    Object.entries(teamsAdditions).forEach(([key, team]) => {
+      if (team.special && team.name) specialKeyByNameCache.set(team.name.trim().toLowerCase(), key);
+    });
+  }
+  return specialKeyByNameCache.get(String(play?.TeamAtMoment || "").trim().toLowerCase()) || "";
+}
+
+/** True for a team key that is a name-grouped special entry, not a stats id */
+export const isNameKeyedTeam = (key) => String(key || "").startsWith("special_");
+
 // { "lowercased team name": nbaID } from teams.json, historical names
 // included; special entries (all-star sides, defunct teams with no
 // franchise page) contribute their emoji via getTeamEmoji but never an id,

@@ -1,6 +1,6 @@
 import { editionBadges } from "../services/autograph.service";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getRecord, getSetEditionsDB, getSetIPFSDB, getAllPlaysDB } from "../services/db.service";
 import {
   CORE_MEDIA_FIELDS,
@@ -91,6 +91,14 @@ export function SetDetail() {
   const [collapseSubeditions, setCollapseSubeditions] = useState(true);
   const [runtimeSilhouettes, setRuntimeSilhouettes] = useState(() => new Set());
   const [expandedPlays, setExpandedPlays] = useState(() => new Set());
+  const navigate = useNavigate();
+  // Folds or unfolds one play's subeditions (the caret cell's click)
+  const togglePlay = (playKey) => setExpandedPlays((prev) => {
+    const next = new Set(prev);
+    if (next.has(playKey)) next.delete(playKey);
+    else next.add(playKey);
+    return next;
+  });
   // Lazy per-CID media metadata (dimensions, duration, size, dead CIDs)
   const ipfsMedia = useIpfsMedia();
   // Browsing as an account: Minted becomes owned/total, honouring the
@@ -389,7 +397,9 @@ export function SetDetail() {
         align: "center",
         sortValue: (_val, rec) => (rec.hasCube ? 1 : 0),
         filterValue: (_val, rec) => (rec.hasCube ? 1 : 0),
-        filterTitle: "1 = has an interactive cube (square video, or a player photo when the edition has none), 0 = none"
+        filterTitle: "1 = has an interactive cube (square video, or a player photo when the edition has none), 0 = none",
+        // Media columns stay out of the row's click (the row opens the edition)
+        noRowClick: true
       },
       { key: "fullName", text: "Full Name" }
     ];
@@ -451,7 +461,8 @@ export function SetDetail() {
         // numeric filters skip them.
         sortValue: (_val, rec) => (rec.ipfsCoreCount === undefined ? undefined : rec.ipfsCoreCount * 100 + (rec.ipfsExtrasCount || 0)),
         filterValue: (_val, rec) => rec.ipfsCoreCount,
-        filterTitle: "Filter by how many of the four core files exist (e.g. <4 for incomplete, 4 for complete)"
+        filterTitle: "Filter by how many of the four core files exist (e.g. <4 for incomplete, 4 for complete)",
+        noRowClick: true
       });
     }
 
@@ -500,7 +511,7 @@ export function SetDetail() {
         withTags(matchingPlay ? getCalculatedPlayTags(matchingPlay, null, tsdIndex, mintClock) : [], editionTags(setID, playID)),
         Boolean(commentaryFor(setID, playID))
       ), setID, playID);
-      let playName = `Play #${playID}`;
+      let playName = `Play ${playID}`;
       if (matchingPlay) {
         if (matchingPlay.FullName && matchingPlay.FullName.trim() !== "") {
           playName = matchingPlay.FullName.trim();
@@ -637,8 +648,16 @@ export function SetDetail() {
           const collapsedKey = `${setID}_${playID}`;
           records.push({
             playOrder: edition.playOrder,
+            // The caret cell folds and unfolds the subeditions; the rest of
+            // the row opens the edition
             editionID: (
-              <span className="font-mono subedition-toggle" title={isExpanded ? "Collapse subeditions" : "Expand subeditions"}>
+              <span
+                data-no-row-click
+                className="font-mono subedition-toggle"
+                style={{ display: "block", cursor: "pointer" }}
+                title={isExpanded ? "Collapse subeditions" : "Expand subeditions"}
+                onClick={() => togglePlay(String(playID))}
+              >
                 <span className="subedition-caret">{isExpanded ? "▾" : "▸"}</span>
                 {collapsedKey}
               </span>
@@ -661,7 +680,8 @@ export function SetDetail() {
             editionSortKey: editionSortKey(setID, playID),
             _groupId: String(playID),
             _groupOrder: 0,
-            _clickable: true
+            _clickable: true,
+            _rowTo: `/editions/${collapsedKey}`
           });
 
           if (!isExpanded) return;
@@ -703,11 +723,12 @@ export function SetDetail() {
             }),
             id: `${playID}_${subID}`,
             editionSortKey: editionSortKey(setID, playID, subID),
+            _clickable: true,
+            _rowTo: `/editions/${subKey}`,
             ...(collapseSubeditions ? {
               _groupId: String(playID),
               _groupOrder: childIdx + 1,
-              _rowClass: "subedition-child-row",
-              _clickable: true
+              _rowClass: "subedition-child-row"
             } : {})
           });
         });
@@ -726,7 +747,9 @@ export function SetDetail() {
           totalMintedRaw: supplyOf(edition.momentCount, setID, playID),
           ...ipfsCells,
           id: playID,
-          editionSortKey: editionSortKey(setID, playID)
+          editionSortKey: editionSortKey(setID, playID),
+          _clickable: true,
+          _rowTo: `/editions/${standardKey}`
         });
       }
     });
@@ -757,7 +780,7 @@ export function SetDetail() {
     return (
       <div className="glass-panel text-center" style={{ padding: "40px" }}>
         <h3>⚠️ Set Not Found</h3>
-        <p className="text-muted mt-8">Set ID #{setID} is not mapped in the local database.</p>
+        <p className="text-muted mt-8">Set {setID} is not mapped in the local database.</p>
         <Link to="/sets" className="btn-primary mt-20">← Back to Sets</Link>
       </div>
     );
@@ -866,7 +889,7 @@ export function SetDetail() {
           </div>
           <div className="set-header-text">
             <div className="d-flex align-center flex-wrap gap-10">
-              <span className="set-id-tag">Set #{setID}</span>
+              <span className="set-id-tag">Set ID: {setID}</span>
               <span className="set-id-tag" style={{ background: "rgba(59, 130, 246, 0.12)", color: "var(--accent-nba)" }}>
                 Series {setMeta.series}
               </span>
@@ -975,7 +998,10 @@ export function SetDetail() {
                 </div>
               );
             })()}
-            <OwnedSpecials specialCounts={ownedSetSummary.specialCounts} />
+            <OwnedSpecials
+              specialCounts={ownedSetSummary.specialCounts}
+              linkFor={(k) => `/account/${owned.address}?set=${setID}&special=${encodeURIComponent(k)}`}
+            />
             {ownedSetSummary.totalOwned === 0 && (
               <p className="text-muted mt-8" style={{ fontSize: "0.85rem" }}>None owned.</p>
             )}
@@ -1106,16 +1132,9 @@ export function SetDetail() {
           </div>
         )}
         <DataTable
-          onRowClick={(rec) => {
-            if (!rec._groupId) return;
-            setExpandedPlays((prev) => {
-              const next = new Set(prev);
-              if (next.has(rec._groupId)) next.delete(rec._groupId);
-              else next.add(rec._groupId);
-              return next;
-            });
-          }}
+          onRowClick={(rec) => { if (rec._rowTo) navigate(rec._rowTo); }}
           columns={columns}
+          ownedFilter={owned ? "totalMinted" : ""}
           records={visibleRecords}
           defaultSortColumn="editionID"
           defaultSortOrder="asc"

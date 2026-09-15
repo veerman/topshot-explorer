@@ -2325,6 +2325,20 @@
     "emoji": "⭐",
     "color": "#F5C518"
   },
+  "1611665415": {
+    "name": "Team Coop",
+    "id_note": "stats.wnba.com team id (2026 All-Star Game 1032600001, home side). Dapper Labs wrote the play under the player's franchise; the override on play 8951 restores this id.",
+    "emoji": "⭐",
+    "color": "#F5C518",
+    "special": true
+  },
+  "1611665416": {
+    "name": "Team Spoon",
+    "id_note": "stats.wnba.com team id (2026 All-Star Game 1032600001, visiting side). Dapper Labs wrote the play under the player's franchise; the override on play 8950 restores this id.",
+    "emoji": "⭐",
+    "color": "#F5C518",
+    "special": true
+  },
   "special_cleveland_rockers": {
     "name": "Cleveland Rockers",
     "emoji": "🎸",
@@ -2339,12 +2353,6 @@
   },
   "special_rising_stars": {
     "name": "Rising Stars",
-    "emoji": "⭐",
-    "color": "#F5C518",
-    "special": true
-  },
-  "special_team_spoon": {
-    "name": "Team Spoon",
     "emoji": "⭐",
     "color": "#F5C518",
     "special": true

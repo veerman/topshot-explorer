@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllTeamsDB } from "../services/db.service";
 import { harmonizePlayerProfiles } from "../services/relationship.service";
 import { DataTable } from "../components/DataTable";
 import playsExclude from "../../data/plays_exclude.json";
 import { isMismintPlay } from "../services/overrides.service";
-import { buildTeamNameMap, isNbaTeam, isWnbaTeam, scrubSentinels, blankZeroedFields, buildMatchupSides, renderMatchupCell, playerPath, calendarKey } from "../utils/display.utils";
+import { buildTeamNameMap, isNbaTeam, isWnbaTeam, scrubSentinels, blankZeroedFields, buildMatchupSides, renderMatchupCell, playerPath, calendarKey, buildPlayToSets } from "../utils/display.utils";
 import { useUrlParam } from "../hooks/useUrlParam";
 import { LoadError } from "../components/LoadError";
 import { Loader } from "../components/Loader";
 import { toQuery } from "../utils/query";
+import { editionsColumn, editionRowFacts, setsByIdDesc } from "../components/EditionsColumn";
+import { ownedPlaysColumn, ownedPlayFacts } from "../components/PlayTable";
+import { useAccountCollection } from "../hooks/useAccountCollection";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -35,6 +38,8 @@ const dayLink = (dateKey) => `/calendar/${dateKey}${window.location.search || ""
  * every date/year navigation.
  */
 function CalendarDayDetail({ date, getDayEvents, sets, selectedYear, teamNameMap }) {
+  const navigate = useNavigate();
+  const owned = useAccountCollection();
   const parts = date.split("-");
   const monthName = MONTH_NAMES[parseInt(parts[0]) - 1] || "Unknown";
   const dayVal = parseInt(parts[1]) || 0;
@@ -42,28 +47,14 @@ function CalendarDayDetail({ date, getDayEvents, sets, selectedYear, teamNameMap
   // Same day-event resolution (incl. leap-year folding) as the grid view
   const { games: matchedPlays, birthdays: birthdayPlayers } = getDayEvents(parts[0], parts[1]);
 
-  // Build play to sets mappings (depends only on the sets store)
-  const playToSetsMap = useMemo(() => {
-    const map = {};
-    sets.forEach((set) => {
-      if (set.playIDs) {
-        set.playIDs.forEach((pID) => {
-          if (!map[pID]) map[pID] = [];
-          map[pID].push({
-            id: set.id,
-            name: set.setName,
-            series: set.series,
-            locked: set.locked
-          });
-        });
-      }
-    });
-    return map;
-  }, [sets]);
+  // Play to sets mapping (depends only on the sets store)
+  const playToSetsMap = useMemo(() => buildPlayToSets(sets), [sets]);
 
   const playsColumns = [
-    { key: "playID", text: "Play ID" },
-    { key: "SetIDs", text: "Set IDs", filterValue: (_val, rec) => rec.SetIDs_ids || [] },
+    ...(owned ? [ownedPlaysColumn()] : []),
+    // The play's editions, as on the Plays page (the row opens the
+    // edition when the play has one)
+    editionsColumn(),
     { key: "FullName", text: "Player Name" },
     { key: "PlayCategory", text: "Category" },
     { key: "DateOfMomentLocal", text: "Year" },
@@ -100,27 +91,8 @@ function CalendarDayDetail({ date, getDayEvents, sets, selectedYear, teamNameMap
       metadata.DateOfMomentLocal = "";
     }
 
-    // Generate Set Links cell: each set id opens THIS play's edition in
-    // that set (set + play = edition), not the whole set
-    const matchingSets = playToSetsMap[playID] || [];
-    const setLinks = matchingSets.length > 0 ? (
-      <div className="set-links-cell">
-        {matchingSets.map((s, idx) => (
-          <React.Fragment key={s.id}>
-            {idx > 0 && ", "}
-            <Link
-              to={`/editions/${Number(s.id)}_${Number(playID)}`}
-              className="set-link"
-              title={`${s.name} (Series ${s.series}); opens edition ${Number(s.id)}_${Number(playID)}`}
-            >
-              {s.id}
-            </Link>
-          </React.Fragment>
-        ))}
-      </div>
-    ) : (
-      <span className="text-muted">-</span>
-    );
+    // The play's editions (shared Editions column), highest set first
+    const matchingSets = setsByIdDesc(playToSetsMap[playID]);
 
     // Player name link; a team moment is named after its team and links to
     // the team page instead
@@ -144,20 +116,15 @@ function CalendarDayDetail({ date, getDayEvents, sets, selectedYear, teamNameMap
       <span className="player-detail-link">{nameInner}</span>
     );
 
-    const playIDCell = (
-      <Link to={`/plays/${playID}`} className="font-mono team-id-badge" style={{ display: "inline-block" }}>
-        {playID}
-      </Link>
-    );
-
     return {
       ...metadata,
       playID_raw: Number(playID),
-      playID: playIDCell,
+      playID: String(playID),
+      isMismint,
+      ...editionRowFacts(matchingSets, playID),
+      ...ownedPlayFacts(playID, matchingSets, owned),
       FullName: fullNameCell,
       DateOfMomentLocal: dateOfMomentCell,
-      SetIDs: setLinks,
-      SetIDs_ids: matchingSets.map((s) => Number(s.id)),
       matchup: matchupCell
     };
   });
@@ -216,13 +183,15 @@ function CalendarDayDetail({ date, getDayEvents, sets, selectedYear, teamNameMap
         ) : (
           <DataTable
             columns={playsColumns}
+            ownedFilter={owned ? "Owned" : ""}
             records={playsRecords}
             keyColumn="playID_raw"
-            defaultSortColumn="playID_raw"
+            defaultSortColumn="EditionIDs"
             defaultSortOrder="desc"
             defaultPageSize={1000}
             hidePageSizeSelector={true}
             mismints={playsExclude}
+            onRowClick={(rec) => navigate(rec._rowTo)}
             mismintKey="playID_raw"
           />
         )}

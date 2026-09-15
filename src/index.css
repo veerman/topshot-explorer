@@ -509,6 +509,21 @@ table.premium-table tr.filter-row th {
   border-color: var(--primary);
   background: rgba(139, 92, 246, 0.1);
 }
+/* The Show switch (All / Owned / Missing) beside the Filters button */
+.owned-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+
+/* Zebra rows: every other row a shade lighter so the eye can follow a
+   row across a wide table. Kept at the lowest specificity (:where), so
+   hover, mismint and child-row tints still win. Row groups render 1,000
+   rows per tbody (an even count), so the stripe never flips at a seam. */
+.premium-table :where(tbody tr:nth-child(even)) td {
+  background: rgba(255, 255, 255, 0.025);
+}
 
 /* Highlight Mismint Rows */
 table.premium-table tr.mismint-row td {
@@ -754,6 +769,17 @@ table.premium-table tr.mismint-row:hover td {
   color: var(--primary-hover);
 }
 
+/* An id chip the browsed account holds none of: dimmed AND dashed, so the
+   difference never rests on colour alone */
+.set-link-unowned {
+  opacity: 0.45;
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.set-link-unowned:hover {
+  opacity: 1;
+}
+
 /* The reward glyph beside a set id: the badge belongs to that edition */
 .set-link-mark {
   font-family: var(--font-emoji, inherit);
@@ -922,10 +948,12 @@ table.premium-table tr.mismint-row:hover td {
   flex: 1;
   min-width: 0;
 }
+/* The cell hugs its content and sits at the value's right edge, so the
+   team names stay beside their scores instead of drifting to the label */
 .matchup-summary-wide .matchup-cell {
-  width: 100%;
-  max-width: none;
-  margin-inline: 0;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto 0;
 }
 .matchup-summary-wide .matchup-team {
   white-space: nowrap;
@@ -1230,6 +1258,13 @@ table.premium-table tr.mismint-row:hover td {
   color: #fff;
   white-space: nowrap;
 }
+a.special-chip {
+  text-decoration: none;
+}
+a.special-chip:hover {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.15);
+}
 .special-chip-count {
   color: var(--text-muted);
   font-family: var(--font-mono);
@@ -1253,6 +1288,12 @@ table.premium-table tr.mismint-row:hover td {
 }
 .id-grid.id-grid-left > * {
   text-align: left;
+}
+/* Ids that end in the same field (edition ids and play ids together) line
+   up on their right edge, with the chip's own padding kept on both sides */
+.id-grid.id-grid-right > * {
+  text-align: right;
+  padding-right: 8px;
 }
 
 /* Stat strip: label-over-number figures in a wrapping row (set header;
@@ -1493,6 +1534,11 @@ td:hover .supply-b,
   text-align: right;
   overflow-wrap: anywhere;
 }
+/* A pill in a value keeps its text on the column's right edge like the
+   plain values above and below it: its own end padding hangs into the gap */
+.summary-grid-aligned .summary-value > .badge {
+  margin-right: -12px;
+}
 .summary-grid-aligned .summary-item-tall {
   grid-row: span 2;
 }
@@ -1548,6 +1594,20 @@ span.ipfs-line {
 }
 .toggler-panel .ipfs-stack-extras {
   margin-top: 6px;
+}
+/* Group headings inside a grouped stack (the edition page): IPFS Core,
+   IPFS Extras, and the files not registered on chain */
+.ipfs-stack-head {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+.ipfs-stack > .ipfs-stack-head:first-child {
+  margin-top: 0;
 }
 
 /* Owned moments of a set with parallels: one row per parallel */

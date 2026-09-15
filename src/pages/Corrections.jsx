@@ -58,7 +58,7 @@ function CopyButton({ text, label = "Copy JSON" }) {
 function PlayRef({ id, context }) {
   return (
     <span className="finding-play-ref">
-      <Link to={`/plays/${id}`} className="finding-row-play font-mono">#{id}</Link>
+      <Link to={`/plays/${id}`} className="finding-row-play font-mono">{id}</Link>
       {context && <span className="chip-context"> {context}</span>}
     </span>
   );
@@ -276,7 +276,7 @@ function TagGroup({ group, showNames, queuedMap, ignoredSet, showIgnored, onQueu
             title={f.blocked ? f.blockedReason : undefined}
           >
             <Link to={`/plays/${f.playIDs[0]}`} className="play-chip-link font-mono">
-              {showNames ? `${f.title} ` : ""}#{f.playIDs[0]}
+              {showNames ? `${f.title} ` : ""}{f.playIDs[0]}
             </Link>
             {/* A team moment's title is its team; do not say it twice */}
             {f.context && <span className="chip-context"> · {showNames && f.context.startsWith(`${f.title} · `) ? f.context.slice(f.title.length + 3) : f.context}</span>}
@@ -401,7 +401,7 @@ export function Corrections() {
   // signs a parallel, and no correction reconciles the two, so they show
   // below as known disagreements instead.
   const findingsCount = audits
-    ? audits.nameConflicts.length + audits.profileConflicts.length + audits.boundsFindings.length + audits.teamFindings.length + audits.seasonFindings.length + audits.tagCount
+    ? audits.nameConflicts.length + audits.profileConflicts.length + audits.boundsFindings.length + audits.teamFindings.length + audits.matchupFindings.length + audits.seasonFindings.length + audits.tagCount
     : 0;
 
   // Queue operations. One queued fix per finding; picking another candidate
@@ -716,6 +716,18 @@ export function Corrections() {
               title="Team ID / Name Mismatches"
               intro="The team name is not a current or historical name of its team ID in teams.json: wrong ID or name on the play, or an alias missing from teams.json."
               findings={audits.teamFindings}
+              queuedMap={queuedMap}
+              ignoredSet={ignoredSet}
+              showIgnored={showIgnored}
+              onQueue={queueFix}
+              onUnqueue={unqueueFix}
+              onIgnore={ignoreFinding}
+              onRestore={restoreFinding}
+            />
+            <FindingsCategory
+              title="Matchups"
+              intro="A team playing itself, or an All-Star squad playing a franchise: a player's franchise written where a squad belongs. Look up the game and override the team names."
+              findings={audits.matchupFindings}
               queuedMap={queuedMap}
               ignoredSet={ignoredSet}
               showIgnored={showIgnored}

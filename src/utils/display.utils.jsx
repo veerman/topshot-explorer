@@ -337,15 +337,31 @@ export function renderTeamLink(teamName, teamNameMap, options = {}) {
 }
 
 /**
- * Sort key for edition ids ("setID_playID[_subeditionID]"): each numeric
- * group zero-padded so plain string comparison orders by set id, then play
- * id, then subedition id (a missing subedition sorts before subedition 0).
+ * playID -> [{ id, name, series, locked }] from the sets store, in store
+ * order (lowest set first). Every page that needs a play's sets builds it
+ * here; buildSeriesSeasonMap reads the same shape.
  */
-export function editionSortKey(...ids) {
-  return ids
-    .filter((v) => v !== undefined && v !== null && v !== "")
-    .map((v) => String(v).padStart(8, "0"))
-    .join("_");
+export function buildPlayToSets(sets) {
+  const mapping = {};
+  (sets || []).forEach((set) => {
+    (set.playIDs || []).forEach((playID) => {
+      if (!mapping[playID]) mapping[playID] = [];
+      mapping[playID].push({ id: set.id, name: set.setName, series: set.series, locked: set.locked });
+    });
+  });
+  return mapping;
+}
+
+/**
+ * Sort key for an edition id ("setID_playID[_subeditionID]"), the same rule
+ * for every edition column in the app: play id first, then subedition id
+ * (a missing subedition sorts before subedition 0), then set id. One number,
+ * so the table compares it numerically; set and subedition ids each get
+ * four digits of room.
+ */
+export function editionSortKey(setID, playID, subID) {
+  const sub = subID === undefined || subID === null || subID === "" ? 0 : Number(subID) + 1;
+  return Number(playID) * 1e7 + sub * 1e4 + (Number(setID) || 0);
 }
 
 /**
@@ -369,7 +385,7 @@ export function playSummary(meta, playID) {
   const category = (meta?.PlayCategory || meta?.PlayType || "").trim();
   const raw = meta?.DateOfMoment;
   const date = raw ? (formatDateISO(parseMomentDate(raw)) || String(raw).slice(0, 10)) : "";
-  return [date, category].filter(Boolean).join(" · ") || `Play #${playID}`;
+  return [date, category].filter(Boolean).join(" · ") || `Play ${playID}`;
 }
 
 /**

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useOwnedPct, toggleOwnedPct } from "../hooks/useOwnedPct";
 
 /*
@@ -16,7 +17,9 @@ function pctString(owned, total) {
   return `${pct.toFixed(pct % 1 === 0 ? 0 : 1)}%`;
 }
 
-export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct = false }) {
+/** With `to`, the fraction is a link (the list pages open the detail
+ *  page on its missing rows: ?f_<owned column>=0). */
+export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct = false, to }) {
   const complete = greenWhenFull && total > 0 && owned >= total;
   const pctText = pctString(owned, total);
   const fracText = `${Number(owned).toLocaleString()}/${Number(total).toLocaleString()}`;
@@ -34,11 +37,13 @@ export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct 
     );
   }
 
+  const Tag = to ? Link : "span";
   return (
-    <span
-      className={`font-mono owned-fraction${complete ? " owned-complete" : ""}`}
-      title={title ? `${title} (${pctText})` : pctText}
-      style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25, verticalAlign: "middle", cursor: "help" }}
+    <Tag
+      {...(to ? { to } : {})}
+      className={`font-mono owned-fraction${complete ? " owned-complete" : ""}${to ? " owned-fraction-link" : ""}`}
+      title={to ? `${title ? `${title} (${pctText}). ` : ""}Click to see what is missing` : (title ? `${title} (${pctText})` : pctText)}
+      style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25, verticalAlign: "middle", cursor: to ? "pointer" : "help", textDecoration: "none" }}
     >
       <span
         style={{
@@ -55,7 +60,7 @@ export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct 
       <span style={{ color: "var(--text-muted)", fontSize: "0.82em", paddingTop: "1px", textAlign: "right" }}>
         {Number(total).toLocaleString()}
       </span>
-    </span>
+    </Tag>
   );
 }
 

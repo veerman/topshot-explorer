@@ -200,7 +200,7 @@ export function buildCorrectionLedger(playsRaw, playsCorrected) {
       records.push({
         playID,
         fullName: correctedPlay.FullName,
-        rawFullNameString: rawPlay?.FullName || `Play #${playID}`,
+        rawFullNameString: rawPlay?.FullName || `Play ${playID}`,
         isMismint,
         diffs,
         // Context additions are not corrections; the count reflects real ones
@@ -471,9 +471,9 @@ export function detectTagMismatches(plays, upstream) {
             // (buildTsdIndex) shares the badge only with a twin, the same
             // play category; a different highlight from that game is not
             // a debut, whatever Dapper stored
-            premise = `same game as the derived debut #${primary.playID} (${debutDate}) but a different highlight (${play.PlayCategory || "no category"} vs ${primary.PlayCategory || "no category"}); only a twin of the debut shares the badge`;
+            premise = `same game as the derived debut, play ${primary.playID}, (${debutDate}) but a different highlight (${play.PlayCategory || "no category"} vs ${primary.PlayCategory || "no category"}); only a twin of the debut shares the badge`;
           } else {
-            premise = `derived debut for "${playerName || play.TeamAtMoment}" is #${primary.playID}${debutDate ? ` (${debutDate})` : ""}`;
+            premise = `derived debut for "${playerName || play.TeamAtMoment}" is play ${primary.playID}${debutDate ? ` (${debutDate})` : ""}`;
           }
         } else {
           premise = "no qualifying debut data for this name (excluded or all-star)";
@@ -706,6 +706,53 @@ export function detectTeamNameIdMismatches(plays) {
   return [...groups.values()].sort((a, b) => a.playIDs[0] - b.playIDs[0]);
 }
 
+/*
+ * Matchup sanity: a team cannot play itself, and an All-Star squad (the
+ * star-emoji entities in teams.json) plays another squad, never a
+ * franchise. Both shapes come from Dapper Labs writing a player's franchise
+ * where a squad belongs (the 2026 WNBA All-Star Game did both). No fix is
+ * offered: the right opponent has to be looked up.
+ */
+export function detectMatchupFindings(plays) {
+  const findings = [];
+  // A squad is a name the chain pairs with a star-emoji team id (the plays
+  // carry both the name and the id, so the squads name themselves), or a
+  // star-emoji entry teams.json knows by name. A franchise is a name that
+  // resolves to a franchise id in teams.json.
+  const squadNames = new Set();
+  plays.forEach((play) => {
+    const name = String(play.TeamAtMoment || "").trim().toLowerCase();
+    if (name && getTeamEmoji(play.TeamAtMoment, play.TeamAtMomentNBAID) === "⭐") squadNames.add(name);
+  });
+  const franchiseIds = getAdditionsTeamNameMap();
+  const isSquad = (name) => squadNames.has(name.toLowerCase()) || getTeamEmoji(name, "") === "⭐";
+  const isFranchise = (name) => Boolean(franchiseIds[name.toLowerCase()]) && !isSquad(name);
+  plays.forEach((play) => {
+    const home = String(play.HomeTeamName || "").trim();
+    const away = String(play.AwayTeamName || "").trim();
+    if (!home || !away) return;
+    const who = play.FullName || play.TeamAtMoment || `Play ${play.playID}`;
+    let premise = null;
+    if (home.toLowerCase() === away.toLowerCase()) {
+      premise = `home and away are both "${home}"; a team cannot play itself`;
+    } else if ((isSquad(home) && isFranchise(away)) || (isSquad(away) && isFranchise(home))) {
+      const [squad, franchise] = isSquad(home) ? [home, away] : [away, home];
+      premise = `"${squad}" is an All-Star squad and "${franchise}" a franchise; the other squad is missing`;
+    }
+    if (!premise) return;
+    findings.push({
+      key: `matchup:${play.playID}`,
+      title: who,
+      field: "HomeTeamName / AwayTeamName",
+      premise,
+      values: [{ value: `${away} at ${home}`, count: 1, playIDs: [play.playID] }],
+      playIDs: [play.playID],
+      fixes: []
+    });
+  });
+  return findings.sort((a, b) => a.playIDs[0] - b.playIDs[0]);
+}
+
 /**
  * Runs every detector over the compiled plays, in dependency order: names and
  * bios first, then tags with upstream findings feeding the blocking logic.
@@ -772,6 +819,7 @@ export function runDataAudits(plays) {
   const profileConflicts = detectProfileConflicts(plays);
   const boundsFindings = detectOutOfBoundsValues(plays);
   const teamFindings = detectTeamNameIdMismatches(plays);
+  const matchupFindings = detectMatchupFindings(plays);
   const seasonFindings = detectSeasonWindowFindings(plays);
   const autographFindings = detectAutographFindings(plays);
 
@@ -801,7 +849,7 @@ export function runDataAudits(plays) {
   // Every finding carries a context line per play it names, so the page can
   // show team, date, season and category next to each play ID
   const contextById = new Map(plays.map((p) => [Number(p.playID), playContext(p)]));
-  [nameConflicts, profileConflicts, boundsFindings, teamFindings, seasonFindings, autographFindings, tagMismatches].forEach((list) => {
+  [nameConflicts, profileConflicts, boundsFindings, teamFindings, matchupFindings, seasonFindings, autographFindings, tagMismatches].forEach((list) => {
     list.forEach((f) => {
       f.contexts = {};
       f.playIDs.forEach((id) => { f.contexts[id] = contextById.get(Number(id)) || ""; });
@@ -813,6 +861,7 @@ export function runDataAudits(plays) {
     profileConflicts,
     boundsFindings,
     teamFindings,
+    matchupFindings,
     seasonFindings,
     autographFindings,
     tagSections,

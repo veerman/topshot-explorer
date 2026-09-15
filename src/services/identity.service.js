@@ -43,7 +43,7 @@ export function buildIdentityContext(plays, sets) {
     const team = (play?.TeamAtMoment || "").trim();
     const facts = {
       play,
-      setName: sRec?.setName || sRec?.name || `Set #${sid}`,
+      setName: sRec?.setName || sRec?.name || `Set ${sid}`,
       series: sRec?.series != null ? Number(sRec.series) : null,
       player: (play?.FullName || "").trim(),
       team,

@@ -6,7 +6,7 @@
   getSetCIDs,
   fetchPlayBatch
 } from "./fcl.service";
-import { compilePlayMetadata, compileSetMetadata, buildNameAliases, standardizePlayKeys } from "./overrides.service";
+import { compilePlayMetadata, compileSetMetadata, buildNameAliases, standardizePlayKeys, teamKeyForPlay } from "./overrides.service";
 import {
   saveSyncStatsDB,
   getSyncStatsDB,
@@ -34,6 +34,13 @@ import setsAdditions from "../../data/additions/sets.json";
 import seriesOverrides from "../../data/overrides/series.json";
 import seriesAdditions from "../../data/additions/series.json";
 import editionsAdditions from "../../data/additions/editions.json";
+
+// Progress chatter: on in development, and in production only when the
+// console asks for it (localStorage.debugSync = "1"). Warnings and errors
+// always print.
+const DEBUG_SYNC = import.meta.env.DEV
+  || (typeof localStorage !== "undefined" && localStorage.getItem("debugSync") === "1");
+const log = (...args) => { if (DEBUG_SYNC) console.log(...args); };
 
 // Central Sync Status State
 let currentStatus = {
@@ -86,7 +93,7 @@ export function cyrb128(str) {
 
 // Bump when normalization logic changes (e.g. date formatting) so cached
 // databases recompile their plays/sets from the stored _raw backups once.
-const NORMALIZATION_VERSION = "4"; // 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
+const NORMALIZATION_VERSION = "5"; // 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
 
 // The inputs are static imports, so the hash cannot change within a session;
 // computing it once avoids re-serializing over a megabyte of JSON per call.
@@ -155,7 +162,7 @@ async function fetchAllSetDetails(progressStart, progressEnd) {
       detailedIPFS.push(...ipfsRecords);
     } catch (err) {
       failedSets++;
-      console.warn(`Failed to sync detailed set details for set #${set.id}:`, err);
+      console.warn(`Failed to sync detailed set details for set ${set.id}:`, err);
     }
 
     const progress = progressStart + Math.round(((i + 1) / sets.length) * (progressEnd - progressStart));
@@ -192,13 +199,13 @@ async function applyNameAliasPass() {
     return compilePlayMetadata(p.playID, rawCopy);
   }).filter(Boolean);
   await savePlaysDB(recompiled);
-  console.log(`Name aliases: ${aliases.size} canonical spellings; recompiled ${recompiled.length} plays.`);
+  log(`Name aliases: ${aliases.size} canonical spellings; recompiled ${recompiled.length} plays.`);
 }
 
 // Background database compiler. Returns true on success so callers only
 // persist the new overrides hash when the recompile actually landed.
 export async function recompileDatabase(newHash) {
-  console.log("Recompiling plays and sets database with new overrides/additions configurations...");
+  log("Recompiling plays and sets database with new overrides/additions configurations...");
   try {
     // 1. Recompile Plays from raw backups (aliases first: they come from
     // the overrides plus every play's raw name). Both raw reads are
@@ -238,7 +245,7 @@ export async function recompileDatabase(newHash) {
       await saveSyncStatsDB(stats);
     }
     
-    console.log("Database recompilation completed successfully!");
+    log("Database recompilation completed successfully!");
     return true;
   } catch (err) {
     console.error("Failed to recompile IndexedDB plays/sets database:", err);
@@ -248,15 +255,16 @@ export async function recompileDatabase(newHash) {
 
 // Automatically rebuild unique teams collection from plays
 export async function rebuildTeams() {
-  console.log("Rebuilding unique teams collection in IndexedDB...");
+  log("Rebuilding unique teams collection in IndexedDB...");
   try {
     const plays = await getAllPlaysDB();
     const teamsMap = {};
     
     plays.forEach((play) => {
-      const nbaID = play.TeamAtMomentNBAID;
+      // The stats id, or the special entry's key for a squad without one
+      const nbaID = teamKeyForPlay(play);
       if (!nbaID) return;
-      
+
       const cleanNbaID = String(nbaID);
       if (!teamsMap[cleanNbaID]) {
         teamsMap[cleanNbaID] = {
@@ -279,7 +287,7 @@ export async function rebuildTeams() {
       TeamID: data.TeamID
     }));
     await saveTeamsDB(teamsArray);
-    console.log(`Teams collection rebuilt successfully with ${teamsArray.length} teams.`);
+    log(`Teams collection rebuilt successfully with ${teamsArray.length} teams.`);
   } catch (err) {
     console.error("Failed to rebuild teams collection:", err);
   }
@@ -326,7 +334,7 @@ async function refreshMintCounts() {
   if (changed.length > 0) {
     await saveEditionsDB(changed);
 
-    console.log(`Mint-count refresh: updated ${changed.length} of ${editions.length} editions.`);
+    log(`Mint-count refresh: updated ${changed.length} of ${editions.length} editions.`);
   }
   return changed.length;
 }
@@ -358,7 +366,7 @@ async function tryLoadSeedDatabase() {
   if (!seed || !seed.stats || !seed.playsRaw || !Array.isArray(seed.setsOverview) || !Array.isArray(seed.setDetails)) {
     return null;
   }
-  console.log(`Seeding database from prebuilt snapshot (generated ${seed.generatedAt})...`);
+  log(`Seeding database from prebuilt snapshot (generated ${seed.generatedAt})...`);
   updateStatus({ stage: "Loading prebuilt database...", progressPercent: 5 });
 
   // Sets overview, then the edition/IPFS detail rows, exactly as the
@@ -402,7 +410,7 @@ async function tryLoadSeedDatabase() {
     overridesHash: getCurrentOverridesHash()
   };
   await saveSyncStatsDB(stats);
-  console.log(`Seed loaded: ${entries.length} plays, ${seed.setsOverview.length} sets, ${detailedEditions.length} editions.`);
+  log(`Seed loaded: ${entries.length} plays, ${seed.setsOverview.length} sets, ${detailedEditions.length} editions.`);
   return stats;
 }
 
@@ -431,7 +439,7 @@ export async function runSmartSync() {
       const existingPlays = await getAllPlaysDB();
       const existingSets = await getAllSetsDB();
       if (existingPlays.length > 0 && existingSets.length > 0) {
-        console.log("Sync stats were missing, but database is already populated. Reconstructing sync stats...");
+        log("Sync stats were missing, but database is already populated. Reconstructing sync stats...");
         const maxPlayID = Math.max(...existingPlays.map((p) => Number(p.playID)), 0);
         const maxSetID = Math.max(...existingSets.map((s) => Number(s.id)), 0);
         
@@ -453,7 +461,7 @@ export async function runSmartSync() {
 
     // Auto-compilation check if overrides configuration changed
     if (cachedStats && cachedStats.overridesHash !== currentHash) {
-      console.log("Local overrides/additions changes detected. Recompiling database plays & sets...");
+      log("Local overrides/additions changes detected. Recompiling database plays & sets...");
       updateStatus({
         isSyncing: true,
         stage: "Recompiling data overrides...",
@@ -474,13 +482,13 @@ export async function runSmartSync() {
     if (!cachedStats) {
       cachedStats = await tryLoadSeedDatabase();
       if (!cachedStats) {
-        console.log("No DB cache discovered. Initiating Phased Full Sync...");
+        log("No DB cache discovered. Initiating Phased Full Sync...");
         await performPhasedFullSync(liveStats);
         return;
       }
     }
 
-    console.log("DB sync cache found. Processing incremental checks...", { cachedStats, liveStats });
+    log("DB sync cache found. Processing incremental checks...", { cachedStats, liveStats });
     
     let playsToFetch = [];
     let setsToFetch = [];
@@ -535,7 +543,7 @@ export async function runSmartSync() {
       const hasFakeCids = existingIpfs.some((rec) =>
         Object.values(rec.cids || {}).some((cid) => cid && String(cid).length < 46));
       if (existingSets.length > 0 && (existingEditions.length === 0 || hasFakeCids)) {
-        console.log(hasFakeCids
+        log(hasFakeCids
           ? "Fabricated placeholder IPFS CIDs detected. Rebuilding editions & IPFS details from chain..."
           : "Editions store is empty despite synced sets. Backfilling editions & IPFS details...");
         updateStatus({ stage: "Phase 4: Syncing IPFS CIDs & edition details...", progressPercent: 5 });
@@ -575,7 +583,7 @@ export async function runSmartSync() {
         });
         await saveEditionsDB(placeholders);
 
-        console.log(`Edition placeholder heal: created ${placeholders.length} rows for ${editionBare.length} sets.`);
+        log(`Edition placeholder heal: created ${placeholders.length} rows for ${editionBare.length} sets.`);
       }
 
       // Self-heal 4 (2026-09-02): the biggest sets (27 and 52, Platinum
@@ -606,7 +614,7 @@ export async function runSmartSync() {
             if (healed.length > 0) {
               await saveIPFSCIDsDB(healed);
 
-              console.log(`IPFS light heal: backfilled ${healed.length} editions across ${bare.length} sets.`);
+              log(`IPFS light heal: backfilled ${healed.length} editions across ${bare.length} sets.`);
             }
           }
           localStorage.setItem("ipfs_light_heal_v1", "done");
@@ -689,7 +697,7 @@ export async function runSmartSync() {
 
       // Check if any open sets expanded due to play additions on-chain
       try {
-        console.log("Checking open sets for on-chain expansions...");
+        log("Checking open sets for on-chain expansions...");
         const cachedSets = await getAllSetsDB();
         const openSets = cachedSets.filter(s => !s.locked);
         
@@ -707,7 +715,7 @@ export async function runSmartSync() {
                                   liveSet.playIDs.length !== cachedPlayIDs.size;
               
               if (hasNewPlays) {
-                console.log(`Detected expanded open set #${openSet.id} (${openSet.setName})`);
+                log(`Detected expanded open set ${openSet.id} (${openSet.setName})`);
                 expandedSets.push(liveSet);
               }
             }
@@ -721,15 +729,15 @@ export async function runSmartSync() {
             
             // 2. Fetch fresh set details (editions + IPFS media) for the expanded sets
             for (const set of expandedSets) {
-              console.log(`Re-syncing editions/IPFS CIDs for expanded set #${set.id}`);
+              log(`Re-syncing editions/IPFS CIDs for expanded set ${set.id}`);
               const setDetails = await getSetDetails(set.id);
               const { editions, ipfsRecords } = mapSetDetailsToRecords(setDetails);
               await saveEditionsDB(editions);
               await saveIPFSCIDsDB(ipfsRecords);
             }
-            console.log("Successfully updated all expanded sets.");
+            log("Successfully updated all expanded sets.");
           } else {
-            console.log("No open sets expanded.");
+            log("No open sets expanded.");
           }
         }
       } catch (err) {
@@ -756,7 +764,7 @@ export async function runSmartSync() {
           await saveEditionsDB(editions);
           await saveIPFSCIDsDB(ipfsRecords);
         } catch (err) {
-          console.warn(`Failed to sync set details for set #${id}:`, err);
+          console.warn(`Failed to sync set details for set ${id}:`, err);
         }
       }
     }
@@ -827,7 +835,7 @@ async function performPhasedFullSync(liveStats) {
     // PHASE 1: Load Sets Overview (takes < 200ms)
     // ----------------------------------------------------
     updateStatus({ stage: "Phase 1: Loading sets overview...", progressPercent: 5 });
-    console.log("Phase 1: Querying sets list overview...");
+    log("Phase 1: Querying sets list overview...");
     const setsOverview = await getSetsOverview();
     
     // Save sets overview data immediately to DB
@@ -857,7 +865,7 @@ async function performPhasedFullSync(liveStats) {
 
     // The overrides & additions files are already statically imported and
     // bundled; log their sizes for visibility without re-importing anything.
-    console.log("Phase 2 complete: Local overrides & additions files verified.", {
+    log("Phase 2 complete: Local overrides & additions files verified.", {
       overrides: {
         series: Object.keys(seriesOverrides).length,
         sets: Object.keys(setsOverrides).length,
@@ -876,7 +884,7 @@ async function performPhasedFullSync(liveStats) {
     // PHASE 3: Load Plays Metadata (takes ~ 10 seconds)
     // ----------------------------------------------------
     updateStatus({ stage: "Phase 3: Syncing plays metadata database...", progressPercent: 15 });
-    console.log(`Phase 3: Syncing ${maxPlayID} play metadata records...`);
+    log(`Phase 3: Syncing ${maxPlayID} play metadata records...`);
     
     const allPlayIDs = Array.from({ length: maxPlayID }, (_, i) => i + 1);
     let playsSynced = 0;
@@ -910,7 +918,7 @@ async function performPhasedFullSync(liveStats) {
     // ----------------------------------------------------
     await applyNameAliasPass();
     updateStatus({ stage: "Phase 4: Syncing IPFS CIDs & edition details...", progressPercent: 60 });
-    console.log("Phase 4: Querying detailed set edition mint counts and IPFS media files...");
+    log("Phase 4: Querying detailed set edition mint counts and IPFS media files...");
     
     const detailedEditions = [];
     const detailedIPFS = [];
@@ -923,7 +931,7 @@ async function performPhasedFullSync(liveStats) {
         detailedEditions.push(...editions);
         detailedIPFS.push(...ipfsRecords);
       } catch (err) {
-        console.warn(`Failed to sync detailed set details for set #${set.id}:`, err);
+        console.warn(`Failed to sync detailed set details for set ${set.id}:`, err);
       }
 
       // IPFS sync progress scales from 60% up to 98%
@@ -948,7 +956,7 @@ async function performPhasedFullSync(liveStats) {
       progressPercent: 100
     });
 
-    console.log("Phased Full Sync completed successfully!");
+    log("Phased Full Sync completed successfully!");
 
   } catch (err) {
     console.error("Phased Full Sync failed:", err);

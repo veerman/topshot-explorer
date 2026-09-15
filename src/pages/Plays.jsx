@@ -1,22 +1,21 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { DataTable } from "../components/DataTable";
 import { getAllPlaysDB, getAllSetsDB, getAllTeamsDB } from "../services/db.service";
 import { useSyncStatus, useReloadOnSyncComplete } from "../hooks/useSyncStatus";
 import { useLoad } from "../hooks/useLoad";
 import { LoadError } from "../components/LoadError";
 
-import { parseMomentDate, buildTsdIndex, buildMintClock, getCalculatedPlayTags, momentContext, parentSeason, isMismintPlay, withTags, playEditionTags, playRewardEditions, badgeDef, compareBadges, getSeriesInfo, mintEra, MINT_ERAS } from "../services/overrides.service";
+import { buildTsdIndex, buildMintClock, momentContext, parentSeason, compareBadges, getSeriesInfo, mintEra, MINT_ERAS } from "../services/overrides.service";
 import { useUrlParam } from "../hooks/useUrlParam";
-import { buildTeamNameMap, scrubSentinels, blankZeroedFields, buildMatchupSides, renderMatchupCell, getLeagueName, formatDateISO, buildSeriesSeasonMap, seasonHintForPlay, getSeasonFallback, renderSeasonChip, playerPath } from "../utils/display.utils";
+import { buildTeamNameMap, getLeagueName, buildSeriesSeasonMap } from "../utils/display.utils";
 import playsExclude from "../../data/plays_exclude.json";
 import { LeagueFilter } from "../components/LeagueFilter";
-import { Badges } from "../components/Badges";
 import { MultiSelect } from "../components/MultiSelect";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { useFacetFilters, writeFilters, cascadeOf } from "../hooks/useFacetFilters";
-import { playHasCommentary, withCommentary } from "../services/commentary.service";
 import { toQuery } from "../utils/query";
+import { playTableColumns, buildPlayRecord, buildPlayToSets } from "../components/PlayTable";
 
 // The tag-consistency audit lives on the Corrections page (Open Findings tab),
 // backed by detectTagMismatches in audit.service.js.
@@ -46,7 +45,6 @@ export function Plays() {
   const [teamNameMap, setTeamNameMap] = useState({});
   const [loadError, setLoadError] = useState("");
   const owned = useAccountCollection();
-  const accountMode = Boolean(owned);
 
   // 3. Load Plays from IndexedDB. Reload once whenever a sync pass finishes.
   const loadPlays = async () => {
@@ -58,22 +56,7 @@ export function Plays() {
         ]);
         setPlays(records);
 
-        // Build playID -> [setID] mapping from the offline sets store
-        const mapping = {};
-        sets.forEach((set) => {
-          if (set.playIDs) {
-            set.playIDs.forEach((playID) => {
-              if (!mapping[playID]) mapping[playID] = [];
-              mapping[playID].push({
-                id: set.id,
-                name: set.setName,
-                series: set.series,
-                locked: set.locked
-              });
-            });
-          }
-        });
-        setPlayToSets(mapping);
+        setPlayToSets(buildPlayToSets(sets));
 
         setTeamNameMap(buildTeamNameMap(allTeams));
         setLoadError("");
@@ -86,154 +69,8 @@ export function Plays() {
   useLoad(loadPlays, []);
   useReloadOnSyncComplete(loadPlays);
 
-  // 4. Columns Definition (Simplified to exactly 9 fields, in specified order)
-  const columns = useMemo(() => {
-    return [
-      // Only while browsing as an account: how many of this play's moments
-      // the address owns, across every set and parallel
-      ...(owned ? [{
-        key: "Owned",
-        text: "Owned",
-        align: "right",
-        sortValue: (_val, rec) => rec.Owned,
-        render: (val) => (val > 0
-          ? <span className="font-mono" style={{ color: "#fff", fontWeight: 600 }}>{Number(val).toLocaleString()}</span>
-          : <span className="text-muted">·</span>)
-      }] : []),
-      {
-        key: "playID",
-        text: "Play ID",
-        sortValue: (val, rec) => rec.playID_raw,
-        render: (val) => (
-          <Link to={`/plays/${val}`} className="font-mono team-id-badge" style={{ display: "inline-block" }}>
-            {val}
-          </Link>
-        )
-      },
-      {
-        key: "SetIDs",
-        text: "Set IDs",
-        sortValue: (val, rec) => rec.matchingSets?.[0]?.id || 0,
-        // A plain-number filter matches ANY of the play's set IDs exactly
-        filterValue: (val, rec) => (rec.matchingSets || []).map((s) => Number(s.id)),
-        render: (val, rec) => {
-          const matchingSets = rec.matchingSets || [];
-          if (matchingSets.length === 0) return <span className="text-muted">-</span>;
-
-          // Split matching sets into chunks of 3 per line
-          const chunks = [];
-          for (let i = 0; i < matchingSets.length; i += 3) {
-            chunks.push(matchingSets.slice(i, i + 3));
-          }
-
-          return (
-            <div className="set-links-cell" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {chunks.map((chunk, cIdx) => (
-                <div key={cIdx} style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-                  {chunk.map((s, idx) => {
-                    // A reward badge belongs to ONE edition, not the play:
-                    // its glyph marks that set id
-                    const reward = rec.rewardBySet && rec.rewardBySet[s.id];
-                    return (
-                      <React.Fragment key={s.id}>
-                        {idx > 0 && ", "}
-                        <Link to={`/editions/${s.id}_${rec.playID}`} className="set-link" title={`Edition ${s.id}_${rec.playID}: ${s.name} (Series ${s.series})${reward ? `; ${reward.join(", ")}` : ""}`}>
-                          {s.id}
-                        </Link>
-                        {reward && (
-                          <span className="set-link-mark" title={`Edition ${s.id}_${rec.playID}: ${reward.join(", ")}`}>
-                            {reward.map((t) => (badgeDef(t) || {}).emoji || "").join("")}
-                          </span>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          );
-        }
-      },
-      {
-        key: "FullName",
-        text: "Player Name",
-        render: (val, rec) => {
-          // A team moment is named after its team and links to the team page
-          const playerName = val && val.trim() !== "" ? val.trim() : "";
-          const teamName = rec.TeamAtMoment && rec.TeamAtMoment.trim() !== "" ? rec.TeamAtMoment.trim() : "";
-          const displayName = playerName || teamName || "Team Moment";
-          const teamId = !playerName && teamName ? teamNameMap[teamName.toLowerCase()] : null;
-          const target = playerName
-            ? playerPath(playerName)
-            : (teamId ? `/teams/${teamId}` : null);
-          const inner = (
-            <>
-              {displayName}
-              {rec.isMismint && <span className="mini-badge-mismint" title="This play is a mismint!">Mismint ⚠️</span>}
-            </>
-          );
-          const nameEl = target ? (
-            <Link to={target} className="player-detail-link font-hover-glow">{inner}</Link>
-          ) : (
-            <span className="player-detail-link">{inner}</span>
-          );
-          // Badges sit on their own line directly under the name; a reward
-          // badge's hover names the edition that earned it
-          return (
-            <div className="name-cell">
-              {nameEl}
-              <Badges tags={rec.badges} titles={rec.badgeTitles} />
-            </div>
-          );
-        }
-      },
-      {
-        key: "PlayCategory",
-        text: "Category"
-      },
-      {
-        key: "DateOfMomentLocal",
-        text: "Date",
-        // Undated plays sort on their synthetic end-of-season instant, so
-        // they file in at the tail of their season instead of clumping at
-        // the top or bottom
-        sortValue: (val, rec) => rec.DateOfMoment || (rec.seasonFallback ? rec.seasonFallback.sortDate : ""),
-        render: (val, rec) => {
-          if (!rec.DateOfMoment) {
-            return rec.seasonFallback ? renderSeasonChip(rec.seasonFallback) : "-";
-          }
-          const dObj = parseMomentDate(rec.DateOfMoment);
-          if (!dObj) return rec.DateOfMoment;
-          // Calendar keys come from the stored Eastern-time date string so
-          // they always match the calendar page grouping
-          const dateMatch = String(rec.DateOfMoment).match(/^(\d{4})-(\d{2})-(\d{2})/);
-          const dateKey = dateMatch
-            ? `${dateMatch[2]}-${dateMatch[3]}`
-            : `${String(dObj.getMonth() + 1).padStart(2, "0")}-${String(dObj.getDate()).padStart(2, "0")}`;
-
-          const dateStr = formatDateISO(dObj);
-
-          return (
-            <Link to={`/calendar/${dateKey}`} className="date-calendar-link font-hover-glow" style={{ textDecoration: "none" }}>
-              <span style={{ display: "none" }}>{rec.DateOfMoment}</span>
-              <span style={{ fontWeight: "600" }}>{dateStr}</span>
-            </Link>
-          );
-        }
-      },
-      {
-        // Stacked box-score cell (away on top, home below, US convention).
-        // rec.matchup holds a plain-text version so search/filters still
-        // match team names and scores.
-        key: "matchup",
-        align: "center",
-        text: "Matchup",
-        sortValue: (val, rec) => rec.AwayTeamName || "",
-        render: (val, rec) => renderMatchupCell(buildMatchupSides(rec, teamNameMap))
-      }
-    ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamNameMap, accountMode]);
+  // 4. Columns: the shared one-row-per-play table (PlayTable)
+  const columns = useMemo(() => playTableColumns({ teamNameMap, owned }), [teamNameMap, owned]);
 
   // League filter: a play's league comes from its team at moment (non-WNBA
   // teams bucket as NBA, matching the Players/Teams pages)
@@ -302,85 +139,11 @@ export function Plays() {
   // Majority season per series, for undated plays with no season field
   const seriesSeasonMap = useMemo(() => buildSeriesSeasonMap(plays, playToSets), [plays, playToSets]);
 
-  // 5. Normalization & Row Formatting (Extremely fast, returning lightweight JSON objects)
-  const tableRecords = useMemo(() => {
-    return leagueFilteredPlays.map((meta) => {
-      const playID = meta.playID;
-      const isMismint = isMismintPlay(playID);
-
-      // Normalization fixes
-      const metadata = blankZeroedFields(
-        scrubSentinels(meta),
-        ["HomeTeamScore", "AwayTeamScore", "DraftYear", "Weight"]
-      );
-
-      if (metadata.Birthplace) {
-        metadata.Birthplace = metadata.Birthplace.split(",")
-          .map((item) => item.trim())
-          .filter((item) => item)
-          .join(", ");
-      }
-
-      // Plain-text mirror of the stacked matchup cell so search and the
-      // per-column filter can match team names and scores
-      const matchup = [metadata.AwayTeamName, metadata.AwayTeamScore, metadata.HomeTeamName, metadata.HomeTeamScore]
-        .filter((v) => v !== undefined && v !== null && String(v).trim() !== "")
-        .join(" ");
-
-      const matchingSets = playToSets[playID] || [];
-
-      // Format local moment date display string (for search)
-      let DateOfMomentLocal = "";
-      let seasonFallback = null;
-      if (metadata.DateOfMoment) {
-        const dObj = parseMomentDate(metadata.DateOfMoment);
-        if (dObj) {
-          DateOfMomentLocal = formatDateISO(dObj);
-        } else {
-          DateOfMomentLocal = metadata.DateOfMoment;
-        }
-      } else {
-        seasonFallback = getSeasonFallback(metadata, seasonHintForPlay(metadata, matchingSets, seriesSeasonMap));
-        // Searchable text for the chip ("2022-23 season" matches searches)
-        if (seasonFallback) DateOfMomentLocal = `${seasonFallback.season} season`;
-      }
-
-      // Edition-level badges, by the set that earned them: the hover text
-      // per badge ("Challenge Reward: Holo MMXX (4_133)") and the marks
-      // beside the set ids
-      const rewardEditions = playRewardEditions(playID);
-      let badgeTitles = null, rewardBySet = null;
-      if (rewardEditions.length > 0) {
-        badgeTitles = {}; rewardBySet = {};
-        const setName = (sid) => (matchingSets.find((s) => Number(s.id) === sid) || {}).name || `Set #${sid}`;
-        rewardEditions.forEach(({ setID, tags }) => {
-          rewardBySet[setID] = tags;
-          tags.forEach((t) => {
-            const where = `${setName(setID)} (${setID}_${playID})`;
-            badgeTitles[t] = badgeTitles[t] ? `${badgeTitles[t]}, ${where}` : `${t}: ${where}`;
-          });
-        });
-      }
-
-      return {
-        ...metadata,
-        playID_raw: Number(playID),
-        playID: String(playID),
-        isMismint,
-        matchingSets,
-        badgeTitles,
-        rewardBySet,
-        DateOfMomentLocal,
-        seasonFallback,
-        matchup,
-        Owned: owned ? (owned.index?.byPlay.get(Number(playID)) || 0) : undefined,
-        // Derived tags (badges on the front end), from the compiled play,
-        // plus Commentary when any edition of the play has a narrated cut
-        // Plus the edition-level tags of any of its editions (reward sets)
-        badges: withCommentary(withTags(getCalculatedPlayTags(meta, null, tsdIndex, mintClock), playEditionTags(playID)), playHasCommentary(playID))
-      };
-    });
-  }, [leagueFilteredPlays, playToSets, seriesSeasonMap, tsdIndex, mintClock, owned]);
+  // 5. Rows, through the shared builder (PlayTable)
+  const tableRecords = useMemo(
+    () => leagueFilteredPlays.map((meta) => buildPlayRecord(meta, { playToSets, seriesSeasonMap, tsdIndex, mintClock, owned })),
+    [leagueFilteredPlays, playToSets, seriesSeasonMap, tsdIndex, mintClock, owned]
+  );
 
   // Badge names in the URL compare with spaces and punctuation ignored
   // ("rookie-mint" from the home page is the "Rookie Mint" badge), so the
@@ -443,7 +206,7 @@ export function Plays() {
       <div className="glass-panel info-banner">
         <h2>Plays</h2>
         <p className="text-muted mt-8" style={{ fontSize: "0.95rem" }}>
-          Every play: the player, the game, the date, and the sets it appears in.
+          Every play: the player, the game, the date, and its editions.
         </p>
 
         {/* Only in the empty state; once the table is up, its removal would
@@ -528,10 +291,12 @@ export function Plays() {
                 and rendering all ~8.5k rows at once. */}
             <DataTable
               columns={columns}
+              ownedFilter={owned ? "Owned" : ""}
               records={filteredRecords}
               keyColumn="playID_raw"
-              defaultSortColumn="playID_raw"
+              defaultSortColumn="EditionIDs"
               defaultSortOrder="desc"
+              onRowClick={(rec) => navigate(rec._rowTo)}
               pageSizeOptions={[100, 1000, "All"]}
               mismints={playsExclude}
             />

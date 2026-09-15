@@ -9,7 +9,7 @@ import { getRecord, getAllPlaysDB, getAllSetsDB, getAllTeamsDB } from "../servic
 import { isMismintPlay } from "../services/overrides.service";
 import playsAdditions from "../../data/additions/plays.json";
 import { resolveVenue, getCalculatedPlayTags, compilePlayMetadata, parseMomentDate, playRewardEditions, badgeDef } from "../services/overrides.service";
-import { buildTeamNameMap, getLeagueBadge, renderTeamLink as renderTeamLinkShared, getTierBadgeClass, scrubSentinels, buildMatchupSides, renderMatchupCell, formatDateISO, buildSeriesSeasonMap, seasonHintForPlay, getSeasonFallback, renderSeasonChip, playerPath } from "../utils/display.utils";
+import { buildTeamNameMap, getLeagueBadge, renderTeamLink as renderTeamLinkShared, getTierBadgeClass, scrubSentinels, buildMatchupSides, renderMatchupCell, formatDateISO, buildSeriesSeasonMap, seasonHintForPlay, getSeasonFallback, renderSeasonChip, playerPath, buildPlayToSets } from "../utils/display.utils";
 
 export function PlayDetail() {
   const { playID } = useParams();
@@ -24,7 +24,7 @@ export function PlayDetail() {
     const calculatedPlayTags = getCalculatedPlayTags(playMeta, allPlays);
     // Edition-level badges (rewards) ride along naming their edition,
     // since they belong to one set of the play, not to the play itself
-    const setName = (sid) => (matchingSets.find((s) => Number(s.id) === sid) || {}).setName || `Set #${sid}`;
+    const setName = (sid) => (matchingSets.find((s) => Number(s.id) === sid) || {}).setName || `Set ${sid}`;
     const editionTagsNamed = playRewardEditions(pID).flatMap(({ setID, tags }) => tags.map((t) => `${t}: ${setName(setID)} (${setID}_${pID})`));
     return {
       ...staticAdditions,
@@ -100,7 +100,7 @@ export function PlayDetail() {
         if (isStale()) return;
 
         if (!metadata) {
-          setError(`Play ID #${playID} metadata could not be fetched on-chain.`);
+          setError(`Play ${playID} metadata could not be fetched on-chain.`);
           setLoading(false);
           return;
         }
@@ -141,17 +141,13 @@ export function PlayDetail() {
   // Season fallback for undated plays: shown as a chip, never as a date
   const seasonFallback = useMemo(() => {
     if (!playMeta || playMeta.DateOfMoment) return null;
-    const mapping = {};
-    allSets.forEach((set) => (set.playIDs || []).forEach((pid) => {
-      (mapping[pid] = mapping[pid] || []).push({ series: set.series });
-    }));
-    const seriesSeasonMap = buildSeriesSeasonMap(allPlays, mapping);
+    const seriesSeasonMap = buildSeriesSeasonMap(allPlays, buildPlayToSets(allSets));
     return getSeasonFallback(playMeta, seasonHintForPlay(playMeta, matchingSets, seriesSeasonMap));
   }, [playMeta, allPlays, allSets, matchingSets]);
 
   if (loading) {
     return (
-      <Loader message={<>Loading metadata for Play ID #{playID}...</>} />
+      <Loader message={<>Loading metadata for play {playID}...</>} />
     );
   }
 
@@ -184,7 +180,7 @@ export function PlayDetail() {
         const reward = (playRewardEditions(playID).find((r) => r.setID === Number(s.id)) || {}).tags;
         return (
           <Link key={s.id} to={`/editions/${s.id}_${playID}`} className="set-link" style={{ fontSize: "0.8rem" }} title={`${s.setName} (Series ${s.series})${reward ? `; ${reward.join(", ")}` : ""}`}>
-            #{s.id} {s.setName}
+            {s.setName}
             {reward && <span className="set-link-mark">{reward.map((t) => (badgeDef(t) || {}).emoji || "").join("")}</span>}
           </Link>
         );
@@ -204,7 +200,7 @@ export function PlayDetail() {
     const one = subs.length === 1 && subs[0] !== 0 ? `_${subs[0]}` : "";
     return [(
       <Link key={s.id} to={`/editions/${s.id}_${playID}${one}`} className="set-link" style={{ fontSize: "0.8rem" }}>
-        #{s.id} {s.setName}{subs.length === 1 && subs[0] === 0 ? "" : ` (${subs.map((sub) => subeditionLabel(sub)).join(", ")})`}
+        {s.setName}{subs.length === 1 && subs[0] === 0 ? "" : ` (${subs.map((sub) => subeditionLabel(sub)).join(", ")})`}
       </Link>
     )];
   });
@@ -237,7 +233,7 @@ export function PlayDetail() {
         <div className="d-flex align-center justify-between flex-wrap gap-10">
           <div>
             <div className="d-flex align-center gap-10 flex-wrap">
-              <span className="play-id-tag">Play #{playID}</span>
+              <span className="play-id-tag">Play ID: {playID}</span>
               {supplementData?.tier && (
                 <span className={`badge ${getTierBadgeClass(supplementData.tier)}`} style={{ textTransform: "uppercase" }}>
                   {supplementData.tier}
@@ -259,7 +255,9 @@ export function PlayDetail() {
               {playTypeLabel}
               {/* The team is already the title on a team moment; repeating it
                   here would say the same thing twice */}
-              {!isTeamMoment && <>{playTypeLabel && " • "}{renderTeamLink(playMeta.TeamAtMoment)}</>}
+              {!isTeamMoment && (
+                <span style={{ marginLeft: playTypeLabel ? "12px" : 0 }}>{renderTeamLink(playMeta.TeamAtMoment)}</span>
+              )}
             </p>
           </div>
         </div>

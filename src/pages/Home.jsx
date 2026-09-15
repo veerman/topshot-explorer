@@ -5,20 +5,20 @@ import { supplyOf, otherSupplyOf, burnsAsOf, signedSupplyOf, isRemainingSupply }
 import { editionBadges, signedSubs } from "../services/autograph.service";
 import { Supply, SupplyWord } from "../components/Supply";
 import setsParallels from "../../data/sets_parallels.json";
-import { getAllPlaysDB, getAllPlaysRawDB, getAllSetsDB, getAllEditionsDB, getAllIPFSDB } from "../services/db.service";
+import { getAllPlaysDB, getAllPlaysRawDB, getAllSetsDB, getAllEditionsDB, getAllIPFSDB, getAllTeamsDB } from "../services/db.service";
 import { CORE_MEDIA_FIELDS, isDeadMediaCid, isMismintPlay, formatCoveragePct } from "../services/ipfs.analysis";
 // Baked by scripts/build-ipfs-summary.mjs; the four media stat cards
 // read this instead of pulling the 5.7MB per-CID lookup on the landing page
 import ipfsMediaStats from "../../data/ipfs_media_summary.json";
 import { subscribeSyncStatus, isSyncCompleteStage } from "../services/sync.coordinator";
 import { runDataAudits, buildCorrectionLedger, summarizeLedger } from "../services/audit.service";
-import { getCalculatedPlayTags, buildTsdIndex, buildMintClock, getSeriesInfo, isWnbaTeamId as isWnbaId, TAG_BADGES, ROOKIE_TAGS, REWARD_TAGS, editionTags, withTags, mintEra, parentSeason } from "../services/overrides.service";
+import { getCalculatedPlayTags, buildTsdIndex, buildMintClock, getSeriesInfo, isWnbaTeamId as isWnbaId, TAG_BADGES, ROOKIE_TAGS, REWARD_TAGS, editionTags, withTags, mintEra, parentSeason, resolveVenue } from "../services/overrides.service";
 import { PARALLEL_ORDER, PARALLEL_COLORS, parallelGroup } from "../services/parallel.groups";
 import playsExclude from "../../data/plays_exclude.json";
 import setsAdditions from "../../data/additions/sets.json";
 import editionsAdditions from "../../data/additions/editions.json";
 import teamsAdditions from "../../data/additions/teams.json";
-import { TIER_ORDER, TIER_COLORS, coveragePctColor, formatDateISO } from "../utils/display.utils";
+import { TIER_ORDER, TIER_COLORS, coveragePctColor, formatDateISO, buildTeamNameMap } from "../utils/display.utils";
 import { playSerialFacts, serialKinds, runSizeFor } from "../utils/serials.utils";
 import { isBurnedSet, isMismintSet } from "../services/set.status";
 import { useAccountCollection } from "../hooks/useAccountCollection";
@@ -641,6 +641,7 @@ export function Home() {
   const [plays, setPlays] = useState([]);
   const [playsRaw, setPlaysRaw] = useState([]);
   const [sets, setSets] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [editions, setEditions] = useState([]);
   const [ipfsRecords, setIpfsRecords] = useState([]);
   const [openFindings, setOpenFindings] = useState(null);
@@ -663,13 +664,14 @@ export function Home() {
       });
 
     const loadLocal = () => {
-      Promise.all([getAllPlaysDB(), getAllPlaysRawDB(), getAllSetsDB(), getAllEditionsDB(), getAllIPFSDB()])
-        .then(([dbPlays, dbPlaysRaw, dbSets, dbEditions, dbIpfs]) => {
+      Promise.all([getAllPlaysDB(), getAllPlaysRawDB(), getAllSetsDB(), getAllEditionsDB(), getAllIPFSDB(), getAllTeamsDB()])
+        .then(([dbPlays, dbPlaysRaw, dbSets, dbEditions, dbIpfs, dbTeams]) => {
           setPlays(dbPlays);
           setPlaysRaw(dbPlaysRaw);
           setSets(dbSets);
           setEditions(dbEditions);
           setIpfsRecords(dbIpfs);
+          setTeams(dbTeams);
           setLoadError("");
         })
         .catch((e) => {
@@ -1225,24 +1227,39 @@ export function Home() {
     return summarizeLedger(buildCorrectionLedger(playsRaw, plays));
   }, [playsRaw, plays]);
 
-  // Franchises and distinct arenas from the curated teams file, split by league
+  // Franchises from the curated teams file, split by league
   const franchiseStats = useMemo(() => {
     let nbaTeams = 0, wnbaTeams = 0;
-    const nbaArenas = new Set(), wnbaArenas = new Set();
     Object.entries(teamsAdditions).forEach(([id, t]) => {
       if (!t.name || t.special) return;
-      const wnba = isWnbaId(id);
-      if (wnba) wnbaTeams++; else nbaTeams++;
-      (t.arenas || []).forEach((a) => { if (a.arena) (wnba ? wnbaArenas : nbaArenas).add(a.arena); });
+      if (isWnbaId(id)) wnbaTeams++; else nbaTeams++;
     });
-    // Shared buildings (Lakers/Sparks in Crypto.com Arena) count once in the
-    // headline but appear in both league splits
-    const distinctArenas = new Set([...nbaArenas, ...wnbaArenas]).size;
-    return {
-      teams: { nba: nbaTeams, wnba: wnbaTeams },
-      arenas: { total: distinctArenas, nba: nbaArenas.size, wnba: wnbaArenas.size }
-    };
+    return { teams: { nba: nbaTeams, wnba: wnbaTeams } };
   }, []);
+
+  // Arenas as the Arenas page counts them: distinct venues that hosted a
+  // moment (the home team's building at the time of the game), split by
+  // the home team's league, plus the owned subset while browsing as an
+  // account. Both sides resolve the same way, so owned never exceeds all.
+  const arenaStats = useMemo(() => {
+    const byPlay = owned?.index ? owned.index.byPlay : null;
+    const nameMap = buildTeamNameMap(teams);
+    const all = { nba: new Set(), wnba: new Set() };
+    const mine = { nba: new Set(), wnba: new Set() };
+    plays.forEach((p) => {
+      if (isMismintPlay(p.playID) || !p.HomeTeamName) return;
+      const homeTeamId = nameMap[p.HomeTeamName.trim().toLowerCase()];
+      if (!homeTeamId) return;
+      const venue = resolveVenue(homeTeamId, p.DateOfMoment);
+      if (!venue || !venue.arena) return;
+      const league = isWnbaId(String(homeTeamId)) ? "wnba" : "nba";
+      const key = venue.arena.trim().toLowerCase();
+      all[league].add(key);
+      if (byPlay && (byPlay.get(Number(p.playID)) || 0) > 0) mine[league].add(key);
+    });
+    const count = (sets) => ({ total: new Set([...sets.nba, ...sets.wnba]).size, nba: sets.nba.size, wnba: sets.wnba.size });
+    return { all: count(all), owned: byPlay ? count(mine) : null };
+  }, [owned, plays, teams]);
 
   // Owned counterpart of franchiseStats: distinct non-special franchises the
   // browsed address holds at least one moment of
@@ -1268,7 +1285,7 @@ export function Home() {
         const a = runDataAudits(plays);
         setOpenFindings(
           a.nameConflicts.length + a.profileConflicts.length + a.boundsFindings.length +
-          a.teamFindings.length + a.seasonFindings.length + a.tagCount
+          a.teamFindings.length + a.matchupFindings.length + a.seasonFindings.length + a.tagCount
         );
       } catch (e) {
         console.error("Home page audit pass failed:", e);
@@ -1344,56 +1361,9 @@ export function Home() {
 
       {profile && <CollectorProfile profile={profile} address={owned.address} />}
 
-      <h3 className="home-section-title">The collection</h3>
-      <div className="stats-metric-grid">
-        <MetricCard
-          to="/plays"
-          value={owned && loaded
-            ? <OwnedFraction owned={owned.index ? [...owned.index.byPlay.keys()].filter((id) => !isMismintPlay(id)).length : 0} total={realPlayCount} greenWhenFull />
-            : loaded ? fmt(realPlayCount) : (stats ? fmt(stats.nextPlayID - 1) : "...")}
-          label="Plays"
-          desc={peopleStats
-            ? (owned
-              ? ownedSplitDesc(peopleStats.ownedPlayCounts.NBA, peopleStats.playCounts.NBA, peopleStats.ownedPlayCounts.WNBA, peopleStats.playCounts.WNBA)
-              : splitDesc(peopleStats.playCounts.NBA, peopleStats.playCounts.WNBA))
-            : undefined}
-        />
-        <MetricCard
-          to="/sets"
-          value={owned && loaded
-            ? <OwnedFraction owned={owned.index ? [...owned.index.bySet.keys()].filter((id) => !isMismintSet(id)).length : 0} total={visibleSets.length} greenWhenFull />
-            : loaded ? fmt(visibleSets.length) : (stats ? fmt(stats.nextSetID - 1) : "...")}
-          label="Sets"
-          desc={setSplit
-            ? `${seriesCount} series · ${splitDesc(setSplit.nba, setSplit.wnba)}`
-            : (seriesCount ? `across ${seriesCount} series` : undefined)}
-        />
-        {/* The local total leaves out burned sets, mismint editions and
-            (by default) burned moments; the on-chain totalSupply counts them
-            all, so it only fills in before the editions have synced */}
-        <MetricCard
-          value={owned && owned.index
-            ? <OwnedFraction owned={ownedRealTotal} total={mintTotals.NBA + mintTotals.WNBA} />
-            : mintTotals.NBA + mintTotals.WNBA > 0
-              ? <Supply shown={mintTotals.NBA + mintTotals.WNBA} other={mintTotals.otherNBA + mintTotals.otherWNBA} format={fmt} />
-              : (stats ? fmt(stats.totalSupply) : "...")}
-          label={<SupplyWord remaining="Moments Remaining" minted="Moments Minted" />}
-          desc={mintTotals.NBA > 0 ? `NBA ${fmtShort(mintTotals.NBA)} · WNBA ${fmtShort(mintTotals.WNBA)}` : undefined}
-          // Remaining is a snapshot: burns keep happening, so the figure
-          // carries the date the burn counts were read. The mint count is
-          // not a snapshot, so the line swaps out with it
-          note={mintTotals.NBA > 0 && burnsAsOf() ? <SupplyWord remaining={`as of ${formatDateISO(new Date(burnsAsOf()))}`} minted="" /> : undefined}
-        />
-        <MetricCard
-          value={bridgeStats ? fmt(bridgeStats.current) : "..."}
-          label="On Flow EVM"
-          desc={bridgeStats && bridgeStats.allTime ? `${fmt(bridgeStats.allTime)} bridged all-time` : undefined}
-        />
-      </div>
-
-      {/* History first: the collection strip, then the
-          badges (facts about the moment's place in NBA history), then
-          in-season vs historical, then the scarcity mechanics */}
+      {/* History first: the badges (facts about the moment's place in NBA
+          history), then the scarcity mechanics, then in-season vs
+          historical; the people and the collection strip close */}
       {leaguesOf(badgeRows).length > 0 && (
         <>
           <h3 className="home-section-title">{accountMatrices ? "Owned badges by series" : "Badges by series"}</h3>
@@ -1417,15 +1387,6 @@ export function Home() {
         ))}
         <span className="spotlight-note" aria-live="polite">{spotlightNote}</span>
       </form>
-
-      {leaguesOf(eraRows).length > 0 && (
-        <>
-          <h3 className="home-section-title">{accountMatrices ? "Owned in-season vs historical by series" : "In-season vs historical mints by series"}</h3>
-          {leaguesOf(eraRows).map((lg) => (
-            <SplitMatrix key={lg} league={lg} rows={eraRows[lg]} columns={ERA_ORDER} colors={ERA_COLORS} hollow={ERA_HOLLOW} titleOf={eraTitleFor(eraRows[lg], "mints")} linkOf={eraLinkOf(lg)} linkText={playsText} />
-          ))}
-        </>
-      )}
 
       {leaguesOf(tierRows).length > 0 && (
         <>
@@ -1454,6 +1415,15 @@ export function Home() {
               <TierMatrix key={lg} league={lg} rows={rows} columns={SERIAL_ORDER} colors={SERIAL_COLORS} unit="serials" titleOf={(t, r, v) => (v === undefined ? SERIAL_WHAT[t] : `${t}: ${fmt(v)} serials`)} totalTitle={serialTotalTitle} linkOf={accountMatrices ? linkOfFor(lg, (k) => ({ special: SERIAL_SPECIAL_KEYS[k] })) : undefined} />
             );
           })}
+        </>
+      )}
+
+      {leaguesOf(eraRows).length > 0 && (
+        <>
+          <h3 className="home-section-title">{accountMatrices ? "Owned in-season vs historical by series" : "In-season vs historical mints by series"}</h3>
+          {leaguesOf(eraRows).map((lg) => (
+            <SplitMatrix key={lg} league={lg} rows={eraRows[lg]} columns={ERA_ORDER} colors={ERA_COLORS} hollow={ERA_HOLLOW} titleOf={eraTitleFor(eraRows[lg], "mints")} linkOf={eraLinkOf(lg)} linkText={playsText} />
+          ))}
         </>
       )}
 
@@ -1494,10 +1464,61 @@ export function Home() {
             : splitDesc(franchiseStats.teams.nba, franchiseStats.teams.wnba)}
         />
         <MetricCard
+          to="/plays"
+          value={owned && loaded
+            ? <OwnedFraction owned={owned.index ? [...owned.index.byPlay.keys()].filter((id) => !isMismintPlay(id)).length : 0} total={realPlayCount} greenWhenFull />
+            : loaded ? fmt(realPlayCount) : (stats ? fmt(stats.nextPlayID - 1) : "...")}
+          label="Plays"
+          desc={peopleStats
+            ? (owned
+              ? ownedSplitDesc(peopleStats.ownedPlayCounts.NBA, peopleStats.playCounts.NBA, peopleStats.ownedPlayCounts.WNBA, peopleStats.playCounts.WNBA)
+              : splitDesc(peopleStats.playCounts.NBA, peopleStats.playCounts.WNBA))
+            : undefined}
+        />
+        <MetricCard
           to="/arenas"
-          value={fmt(franchiseStats.arenas.total)}
+          value={arenaStats.owned
+            ? <OwnedFraction owned={arenaStats.owned.total} total={arenaStats.all.total} greenWhenFull />
+            : fmt(arenaStats.all.total)}
           label="Arenas"
-          desc={splitDesc(franchiseStats.arenas.nba, franchiseStats.arenas.wnba)}
+          desc={arenaStats.owned
+            ? ownedSplitDesc(arenaStats.owned.nba, arenaStats.all.nba, arenaStats.owned.wnba, arenaStats.all.wnba)
+            : splitDesc(arenaStats.all.nba, arenaStats.all.wnba)}
+        />
+      </div>
+
+      <h3 className="home-section-title">The collection</h3>
+      <div className="stats-metric-grid">
+        {/* The local total leaves out burned sets, mismint editions and
+            (by default) burned moments; the on-chain totalSupply counts them
+            all, so it only fills in before the editions have synced */}
+        <MetricCard
+          value={owned && owned.index
+            ? <OwnedFraction owned={ownedRealTotal} total={mintTotals.NBA + mintTotals.WNBA} />
+            : mintTotals.NBA + mintTotals.WNBA > 0
+              ? <Supply shown={mintTotals.NBA + mintTotals.WNBA} other={mintTotals.otherNBA + mintTotals.otherWNBA} format={fmt} />
+              : (stats ? fmt(stats.totalSupply) : "...")}
+          label={<SupplyWord remaining="Moments Remaining" minted="Moments Minted" />}
+          desc={mintTotals.NBA > 0 ? `NBA ${fmtShort(mintTotals.NBA)} · WNBA ${fmtShort(mintTotals.WNBA)}` : undefined}
+          // Remaining is a snapshot: burns keep happening, so the figure
+          // carries the date the burn counts were read. The mint count is
+          // not a snapshot, so the line swaps out with it
+          note={mintTotals.NBA > 0 && burnsAsOf() ? <SupplyWord remaining={`as of ${formatDateISO(new Date(burnsAsOf()))}`} minted="" /> : undefined}
+        />
+        <MetricCard
+          to="/sets"
+          value={owned && loaded
+            ? <OwnedFraction owned={owned.index ? [...owned.index.bySet.keys()].filter((id) => !isMismintSet(id)).length : 0} total={visibleSets.length} greenWhenFull />
+            : loaded ? fmt(visibleSets.length) : (stats ? fmt(stats.nextSetID - 1) : "...")}
+          label="Sets"
+          desc={setSplit
+            ? `${seriesCount} series · ${splitDesc(setSplit.nba, setSplit.wnba)}`
+            : (seriesCount ? `across ${seriesCount} series` : undefined)}
+        />
+        <MetricCard
+          value={bridgeStats ? fmt(bridgeStats.current) : "..."}
+          label="Moments on Flow EVM"
+          desc={bridgeStats && bridgeStats.allTime ? `${fmt(bridgeStats.allTime)} bridged all-time` : undefined}
         />
         {/* The collectors themselves, from the census (data/census_stats.json):
             Dapper wallets that have held Top Shot, and how many have linked

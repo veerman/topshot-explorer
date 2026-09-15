@@ -16,7 +16,7 @@ import { OwnedFraction } from "../components/OwnedFraction";
 import { useOwnedPct } from "../hooks/useOwnedPct";
 import setsParallels from "../../data/sets_parallels.json";
 import { getSeriesInfo } from "../services/overrides.service";
-import { supplyOf, otherSupplyOf, burnedOf, isRemainingSupply } from "../services/supply.service";
+import { supplyOf, otherSupplyOf, remainingOf, isRemainingSupply } from "../services/supply.service";
 import { Supply } from "../components/Supply";
 import { computeIpfsCoverageForSets, formatCoveragePct, buildCoverageTooltip, isMismintPlay } from "../services/ipfs.analysis";
 import { getSetStatus, getSetTier, getEditionTier, isMismintSet, MIXED_TIER } from "../services/set.status";
@@ -105,9 +105,11 @@ export function Sets() {
     let subMintsSum = 0;
     const breakdown = subIDs.map((subID) => {
       const subInfo = subeditions[subID] || { name: `Subedition ${subID}`, mintCount: 0 };
-      // The parallel run is a fixed size per play; burns come off it per edition
-      const totalSubMintsForSet = subInfo.mintCount * numEditions
-        - (isRemainingSupply() ? setEditions.reduce((s, ed) => s + burnedOf(setID, ed.playID, subID), 0) : 0);
+      // The parallel run is a fixed size per play; burns come off it per
+      // edition (a burned set leaves nothing)
+      const totalSubMintsForSet = isRemainingSupply()
+        ? setEditions.reduce((s, ed) => s + remainingOf(subInfo.mintCount, setID, ed.playID, subID), 0)
+        : subInfo.mintCount * numEditions;
       subMintsSum += totalSubMintsForSet;
       return {
         id: subID,
@@ -136,7 +138,6 @@ export function Sets() {
   // 3. Define columns for Sets table
   const columns = useMemo(() => {
     return [
-      { key: "idCell", text: "ID" },
       // Filtering to one series makes the column a single repeated value
       ...(seriesFilter ? [] : [{ key: "seriesName", text: "Series" }]),
       { key: "name", text: "Set Name" },
@@ -271,12 +272,6 @@ export function Sets() {
         <span style={{ color: TIER_COLORS[tier] || "inherit", fontWeight: "600" }}>{tier}</span>
       );
 
-      const idCell = (
-        <Link to={`/sets/${set.id}`} className="font-mono set-id-badge" style={{ display: "inline-block" }}>
-          {set.id}
-        </Link>
-      );
-
       const seriesInfo = getSeriesInfo(set.series);
       const seriesName = seriesInfo ? seriesInfo.name : `Series ${set.series}`;
 
@@ -381,12 +376,14 @@ export function Sets() {
 
       return {
         ...set,
-        idCell,
+        // The whole row opens the set (links inside keep their own targets)
+        _clickable: true,
+        _rowTo: `/sets/${set.id}`,
         seriesName,
         name: nameCell,
         status: statusBadge,
         playsCount: owned
-          ? <OwnedFraction owned={ownedEditions} total={numPlays} greenWhenFull title={`${ownedEditions} of ${numPlays} editions owned`} />
+          ? <OwnedFraction owned={ownedEditions} total={numPlays} greenWhenFull to={`/sets/${set.id}?f_totalMinted=0`} title={`${ownedEditions} of ${numPlays} editions owned`} />
           : numPlays,
         playsCountSort: numPlays,
         ownedEditions,
@@ -482,23 +479,16 @@ export function Sets() {
           )}
           <DataTable
             columns={columns}
+            ownedFilter={owned ? "playsCount" : ""}
             records={tableRecords}
             defaultSortColumn="id"
             defaultSortOrder="asc"
+            onRowClick={(rec) => navigate(rec._rowTo)}
           />
         </div>
       )}
 
       <style>{`
-        .set-id-badge {
-          font-family: var(--font-mono);
-          background: rgba(139, 92, 246, 0.12);
-          color: var(--primary-hover);
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
         .dropdown-series-id {
           font-family: var(--font-mono);
           color: var(--primary-hover);

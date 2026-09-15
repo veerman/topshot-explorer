@@ -1519,8 +1519,15 @@ export function Navbar() {
             padding: 10px 14px;
             margin-bottom: 20px;
           }
+          /* One grid: the top row is the brand, then the search glass, the
+             account chip and the menu button, in that order at the right
+             edge; the Account/Sign in row, the open search box and the
+             open menu take full rows underneath */
           .nav-container {
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto auto;
+            grid-template-areas: "brand search account menu";
+            align-items: center;
             position: relative;
             gap: 10px;
           }
@@ -1557,20 +1564,26 @@ export function Navbar() {
           }
           .nav-menu-btn {
             display: inline-flex;
-            position: absolute;
-            top: 0;
-            right: 0;
+            grid-area: menu;
           }
           /* The top row is at least the menu button's height (36px plus
-             its border), so the Look up row below never runs into it */
+             its border); a long brand clips rather than pushing the
+             controls off the row */
           .nav-brand-group {
+            grid-area: brand;
             min-height: 38px;
+            min-width: 0;
+            overflow: hidden;
+          }
+          .nav-brand {
+            white-space: nowrap;
           }
           .nav-links {
             display: none;
-            /* After the brand and the account chip, so the open menu lists
-               under the top row instead of pushing the chip below it */
-            order: 2;
+            /* The open menu lists under the top row (and under the
+               Account row or the open search box when one is showing) */
+            grid-column: 1 / -1;
+            grid-row: 3;
           }
           .nav-links.open {
             display: flex;
@@ -1619,6 +1632,8 @@ export function Navbar() {
           .nav-tools,
           .nav-lookup-open {
             max-width: none;
+            grid-column: 1 / -1;
+            grid-row: 2;
           }
           .nav-tools .nav-lookup-btn {
             flex: 1;
@@ -1631,14 +1646,13 @@ export function Navbar() {
             width: auto;
             min-width: 0;
           }
-          /* The account chip takes the second row, right-aligned (the
-             top row is the brand, the search icon and the menu button);
-             the menu stays anchored beside the chip */
+          /* The account chip sits in the top row between the search glass
+             and the menu button; the menu stays anchored beside the chip */
           .nav-account-wrapper {
+            grid-area: account;
             width: auto;
             max-width: none;
-            margin-left: auto;
-            margin-right: 92px;
+            margin: 0;
           }
           .nav-account-addr {
             display: none;
@@ -1657,16 +1671,15 @@ export function Navbar() {
           .nav-links {
             margin-right: 0;
           }
-          /* The search icon is pinned to the top row beside the menu
-             button (40px plus a gap), whatever the second row holds;
+          /* The search glass sits in the top row before the account chip;
              open, the box is its own full-width row under the top row */
           .nav-search-wrap {
-            position: absolute;
-            top: 0;
-            right: 50px;
+            grid-area: search;
+            position: static;
           }
           .nav-search-wrap.open {
-            position: static;
+            grid-column: 1 / -1;
+            grid-row: 2;
             width: 100%;
             max-width: none;
           }

@@ -13,8 +13,11 @@ import { describeMedia, mediaCellLines } from "../services/ipfs.media";
  * activeUrl     the file lit as active (the edition page's playing video)
  * playerExtra   rides beside the Player line (the dynamic photo button)
  * extraLines    appended after the files (the edition page's commentary)
+ * grouped       headings over each group, as the set page's coverage
+ *               panel names them: IPFS Core, IPFS Extras, and offChainTitle
+ *               over the extraLines (files not registered on chain)
  */
-export function MediaStack({ cids, ipfsMedia, onOpen, activeUrl, playerExtra, extraLines }) {
+export function MediaStack({ cids, ipfsMedia, onOpen, activeUrl, playerExtra, extraLines, grouped = false, offChainTitle = "Off-chain media" }) {
   const isLive = (cid) => cid && !(ipfsMedia && ipfsMedia.media[cid] === 0);
   const line = (mediaType, cid) => {
     const label = getMediaTypeLabel(mediaType).replace(/^\S+\s/, "");
@@ -65,22 +68,44 @@ export function MediaStack({ cids, ipfsMedia, onOpen, activeUrl, playerExtra, ex
     .filter((t) => !isLive(all[t]))
     .map((t) => getMediaTypeLabel(t).replace(/^\S+\s/, ""))
     .join(", ");
+  const hasExtraLines = Boolean(extraLines && extraLines.length > 0);
+  const extrasBlock = (
+    <>
+      {liveExtras.map((t) => line(t, all[t]))}
+      {deadExtraNames && (
+        <span className="ipfs-line" title={`${deadExtraNames}: registered on chain, but the IPFS gateway serves no content`} style={{ cursor: "help" }}>
+          ⚠️ <span className="ipfs-line-label">{deadExtraNames}</span>
+        </span>
+      )}
+    </>
+  );
   return (
     <div className="ipfs-stack">
+      {grouped && <div className="ipfs-stack-head">IPFS Core</div>}
       {CORE_MEDIA_FIELDS.map((f) => (f === "PLAYER" && playerExtra ? (
         <span key={f} className="ipfs-line-row">
           {line(f, all[f])}
           {playerExtra}
         </span>
       ) : line(f, all[f])))}
-      {(extras.length > 0 || (extraLines && extraLines.length > 0)) && (
-        <div className="ipfs-stack ipfs-stack-extras">
-          {liveExtras.map((t) => line(t, all[t]))}
-          {deadExtraNames && (
-            <span className="ipfs-line" title={`${deadExtraNames}: registered on chain, but the IPFS gateway serves no content`} style={{ cursor: "help" }}>
-              ⚠️ <span className="ipfs-line-label">{deadExtraNames}</span>
-            </span>
+      {grouped ? (
+        <>
+          {extras.length > 0 && (
+            <>
+              <div className="ipfs-stack-head">IPFS Extras</div>
+              <div className="ipfs-stack ipfs-stack-extras" style={{ marginTop: 0 }}>{extrasBlock}</div>
+            </>
           )}
+          {hasExtraLines && (
+            <>
+              <div className="ipfs-stack-head">{offChainTitle}</div>
+              <div className="ipfs-stack ipfs-stack-extras" style={{ marginTop: 0 }}>{extraLines}</div>
+            </>
+          )}
+        </>
+      ) : (extras.length > 0 || hasExtraLines) && (
+        <div className="ipfs-stack ipfs-stack-extras">
+          {extrasBlock}
           {extraLines}
         </div>
       )}

@@ -26,23 +26,31 @@ export function OwnedStrip({ children }) {
   return <div className="stat-strip stat-strip-sm">{children}</div>;
 }
 
-/** Special serials owned, one chip each ("Jersey number ×3"), or null */
-export function OwnedSpecials({ specialCounts }) {
+/**
+ * Special serials owned, one chip each ("Jersey number ×3"), or null.
+ * With linkFor(kind), each chip opens the collection filtered to those
+ * moments (the page's own scope plus that special).
+ */
+export function OwnedSpecials({ specialCounts, linkFor }) {
   const specials = Object.keys(SPECIAL_LABELS).filter((k) => specialCounts[k]);
   if (specials.length === 0) return null;
   return (
     <div className="mt-12">
       <div className="stat-label">Specials</div>
       <div className="special-chips">
-        {specials.map((k) => (
-          <span key={k} className="special-chip">
-            {SPECIAL_LABELS[k]} <span className="special-chip-count">×{specialCounts[k].toLocaleString()}</span>
-          </span>
-        ))}
+        {specials.map((k) => {
+          const inner = <>{SPECIAL_LABELS[k]} <span className="special-chip-count">×{specialCounts[k].toLocaleString()}</span></>;
+          return linkFor
+            ? <Link key={k} to={linkFor(k)} className="special-chip" title="Open these moments in the collection">{inner}</Link>
+            : <span key={k} className="special-chip">{inner}</span>;
+        })}
       </div>
     </div>
   );
 }
+
+/** The collection link with one more facet added (special=<kind>) */
+const withSpecial = (link, kind) => `${link}${link.includes("?") ? "&" : "?"}special=${encodeURIComponent(kind)}`;
 
 /**
  * Green ownership banner for detail pages (player, team), fed by
@@ -78,7 +86,7 @@ export function OwnedSummaryBanner({ summary, link }) {
               <OwnedStat n={`#${summary.avgBestSerial.toLocaleString()}`} label="Avg serial" title="Average of your lowest serial per play" />
             )}
           </OwnedStrip>
-          <OwnedSpecials specialCounts={summary.specialCounts} />
+          <OwnedSpecials specialCounts={summary.specialCounts} linkFor={link ? (k) => withSpecial(link, k) : undefined} />
         </>
       ) : (
         <p className="text-muted mt-8" style={{ fontSize: "0.85rem" }}>None owned.</p>

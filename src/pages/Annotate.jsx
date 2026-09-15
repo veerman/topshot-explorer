@@ -632,7 +632,7 @@ export function Annotate() {
             {ctx.play && (
               <div className="annotate-context-col">
                 <Link to={`/plays/${ctx.sets[0].playID}`} className="annotate-context-player">
-                  {ctx.play.FullName || `Play #${ctx.sets[0].playID}`}
+                  {ctx.play.FullName || `Play ${ctx.sets[0].playID}`}
                 </Link>
                 {ctx.play.TeamAtMoment && <div>{String(ctx.play.TeamAtMoment).trim()}</div>}
                 <div className="text-muted">

@@ -96,7 +96,7 @@ function matchesColumnFilter(val, rawNeedle, colDef, rec, cellText) {
 // existing groups are skipped by reference, so a commit costs one chunk,
 // not the whole table so far; a keyed child diff over 9k rows per chunk
 // made the streaming quadratic.
-const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, mismints, mismintKey, keyColumn, onRowClick }) {
+const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, mismints, mismintKey, keyColumn, onRowClick, sortColumn, sortOrder, filters }) {
   return (
     <tbody>
       {recs.map((rec, rIdx) => (
@@ -107,20 +107,28 @@ const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, 
           columnAlign={columnAlign}
           isMismint={mismints.includes(String(rec[mismintKey]))}
           onRowClick={onRowClick}
+          sortColumn={sortColumn}
+          sortOrder={sortOrder}
+          filters={filters}
         />
       ))}
     </tbody>
   );
 });
 
-const TableRow = React.memo(function TableRow({ rec, columns, columnAlign, isMismint, onRowClick }) {
+// A cell renderer gets the table's sort state third, so a cell listing
+// several things (the editions of a play) can order them the same way.
+// A column with noRowClick keeps its whole cell (padding included) out of
+// the row's click; content can opt out on its own with data-no-row-click.
+const TableRow = React.memo(function TableRow({ rec, columns, columnAlign, isMismint, onRowClick, sortColumn, sortOrder, filters }) {
   const clickable = onRowClick && rec._clickable;
   return (
     <tr
       className={[isMismint ? "mismint-row" : "", rec._rowClass || "", clickable ? "clickable-row" : ""].filter(Boolean).join(" ")}
       onClick={clickable ? (e) => {
-        // Links inside the row keep their own behaviour
-        if (e.target.closest("a, button, input, select")) return;
+        // Links inside the row keep their own behaviour, as does a cell
+        // that opts out (data-no-row-click)
+        if (e.target.closest("a, button, input, select, [data-no-row-click]")) return;
         onRowClick(rec);
       } : undefined}
     >
@@ -128,9 +136,10 @@ const TableRow = React.memo(function TableRow({ rec, columns, columnAlign, isMis
         <td
           key={col.key}
           style={{ textAlign: columnAlign[col.key] }}
+          data-no-row-click={col.noRowClick ? "" : undefined}
         >
           {col.render
-            ? col.render(rec[col.key], rec)
+            ? col.render(rec[col.key], rec, { sortColumn, sortOrder, filters })
             : (rec[col.key] !== undefined && rec[col.key] !== null
               ? rec[col.key]
               : "")}
@@ -154,7 +163,12 @@ export function DataTable({
   onRowClick = null,
   // Prefix for the table's URL params when a page hosts several tables
   // (e.g. "nba" -> ?nba_q=...); a single table uses the bare names
-  urlPrefix = ""
+  urlPrefix = "",
+  // While browsing as an account: the key of the column whose filter
+  // value is the account's count for the row. Draws a Show switch (All,
+  // Owned, Missing) that sets that column's filter to ">0" or "0", so a
+  // link can open the table on the missing rows with ?f_<key>=0.
+  ownedFilter = ""
 }) {
   // Search, filters, sort and page live in the URL (house rule: a
   // filtered view is shareable and survives refresh). Read once on
@@ -179,8 +193,9 @@ export function DataTable({
   const [searchTerm, setSearchTerm] = useState(searchInput);
   const [columnFilterInputs, setColumnFilterInputs] = useState(filtersFromUrl);
   const [columnFilters, setColumnFilters] = useState(columnFilterInputs);
-  // Filters restored from a shared link start visible
-  const [showFilters, setShowFilters] = useState(() => Object.keys(columnFilterInputs).length > 0);
+  // Filters restored from a shared link start visible (the Show switch's
+  // own filter has its control in the toolbar, so it opens nothing)
+  const [showFilters, setShowFilters] = useState(() => Object.keys(columnFilterInputs).some((k) => k !== ownedFilter));
   const [sortColumn, setSortColumn] = useState(() => readParam("sort") || defaultSortKey);
   const [sortOrder, setSortOrder] = useState(() => {
     const d = readParam("dir");
@@ -543,10 +558,38 @@ export function DataTable({
     return <Pagination page={safeCurrentPage} totalPages={totalPages} onChange={setCurrentPage} />;
   };
 
+  // The Show switch: three states of the owned column's filter. Set at
+  // once, not through the typing debounce, so the rows answer the click.
+  const OWNED_VIEWS = [["", "All"], [">0", "Owned"], ["0", "Missing"]];
+  const ownedView = ownedFilter ? (columnFilterInputs[ownedFilter] || "") : "";
+  const setOwnedView = (value) => {
+    const next = { ...columnFilterInputs };
+    if (value) next[ownedFilter] = value; else delete next[ownedFilter];
+    setColumnFilterInputs(next);
+    setColumnFilters(next);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="datatable-container">
       {/* Table Top Controls */}
       <div className="table-controls" style={{ justifyContent: "flex-end", gap: "10px" }}>
+        {ownedFilter && (
+          <div className="owned-switch" role="group" aria-label="Show" title="Every row, only the rows the account owns, or only the rows it is missing">
+            <span className="text-muted" style={{ fontSize: "0.8rem" }}>Show</span>
+            {OWNED_VIEWS.map(([value, label]) => (
+              <button
+                key={label}
+                type="button"
+                className={`filter-toggle-btn${ownedView === value ? " active" : ""}`}
+                aria-pressed={ownedView === value}
+                onClick={() => setOwnedView(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         {activeColumnFilters.length > 0 && (
           <button
             className="filter-toggle-btn"
@@ -667,6 +710,9 @@ export function DataTable({
                 mismintKey={mismintKey}
                 keyColumn={keyColumn}
                 onRowClick={onRowClick}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                filters={columnFilters}
               />
             ))
           ) : (

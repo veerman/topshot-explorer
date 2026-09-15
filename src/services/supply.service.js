@@ -1,6 +1,7 @@
 import burns from "../../data/burns.json";
 import { runSizeFor } from "../utils/serials.utils";
 import { signedSubs } from "./autograph.service";
+import { isBurnedSet } from "./set.status";
 
 /**
  * Remaining supply: the moments of an edition that still exist.
@@ -10,7 +11,10 @@ import { signedSubs } from "./autograph.service";
  * data/burns.json carries the destroyed count per edition from Atlas
  * (`npm run atlas:burns`), and every surface that would show the mint
  * count shows minted minus burned instead: the number a collector can
- * actually chase. Settings switches back to the original mint counts
+ * actually chase. Atlas records collectors' own burns only: Top Shot's
+ * wipe of four early sets on 2023-01-11 is absent from it, so an edition
+ * in a set flagged burned (data/additions/sets.json) counts as wholly
+ * burned here. Settings switches back to the original mint counts
  * (localStorage `show_remaining_supply`, default on). Either way the
  * other number is one hover away: src/components/Supply.jsx.
  *
@@ -59,6 +63,7 @@ export function burnedOf(setID, playID, sub = null) {
 
 /** Minted minus burned, whatever the setting says */
 export function remainingOf(minted, setID, playID, sub = null) {
+  if (isBurnedSet(setID)) return 0;
   return Math.max(0, (Number(minted) || 0) - burnedOf(setID, playID, sub));
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Loader } from "../components/Loader";
 import { writeFilters, useFacetFilters, useSortState, readSort, cascadeOf } from "../hooks/useFacetFilters";
 import { SortableTh } from "../components/SortableTh";
@@ -813,9 +813,10 @@ export function Offers() {
                             ? <span className="text-muted" title="An edition-level offer accepts any subedition of the play">Any</span>
                             : <Link to={`/editions/${f.setID}_${f.playID}_${e.sub}`}>{subLabel(e.sub)}</Link>);
                         const top = f.entries[0];
-                        return (
-                          <React.Fragment key={f.rowKey}>
-                          <tr>
+                        // Flat keyed rows, never a keyed Fragment with
+                        // conditional rows inside (Preact misorders those)
+                        return [
+                          <tr key={f.rowKey}>
                             {showAll && <td>{f.coll}</td>}
                             <td>{f.kind === "serial" ? "Serial" : f.kind === "other" ? ([...f.types].map((t) => TYPE_LABELS[t] || t).join(", ")) : "Edition"}</td>
                             {f.kind === "serial" ? (
@@ -862,8 +863,8 @@ export function Offers() {
                               ) : f.count}
                             </td>
                             <td className="font-mono">{buyerLink(f.buyer)}</td>
-                          </tr>
-                          {isOpen && f.entries.slice(1).map((e, i) => (
+                          </tr>,
+                          isOpen && f.entries.slice(1).map((e, i) => (
                             <tr key={`${f.rowKey}:${i}`} className="offer-child-row">
                               {showAll && <td />}
                               <td />
@@ -882,9 +883,8 @@ export function Offers() {
                               <td />
                               <td className="font-mono">{buyerLink(e.buyer)}</td>
                             </tr>
-                          ))}
-                          </React.Fragment>
-                        );
+                          ))
+                        ];
                       })}
                     </tbody>
                   </table>

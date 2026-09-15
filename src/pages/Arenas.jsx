@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllTeamsDB } from "../services/db.service";
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
@@ -166,13 +166,14 @@ export function Arenas() {
     ];
   }, [accountMode]);
 
+  const navigate = useNavigate();
   // Format table rows
   const tableRecords = useMemo(() => {
     return filteredArenas.map((venue) => {
       const locationCell = `${venue.city}, ${venue.state}`;
 
       const playCountCell = owned ? (
-        <OwnedFraction owned={venue.ownedPlayCount} total={venue.playCount} greenWhenFull />
+        <OwnedFraction owned={venue.ownedPlayCount} total={venue.playCount} greenWhenFull to={`/arenas/${encodeURIComponent(venue.arena.replace(/\s+/g, "_"))}?f_Owned=0`} />
       ) : (
         <span style={{ color: "#fff", fontWeight: "600" }}>
           {venue.playCount}
@@ -208,6 +209,9 @@ export function Arenas() {
 
       return {
         id: venue.arena.toLowerCase().trim(),
+        // The whole row opens the arena
+        _clickable: true,
+        _rowTo: `/arenas/${arenaUrlName}`,
         arenaCell,
         locationCell,
         playCount: venue.playCount,
@@ -246,9 +250,11 @@ export function Arenas() {
       <div className="glass-panel mt-20 table-panel">
         <DataTable
           columns={columns}
+          ownedFilter={owned ? "playCount" : ""}
           records={tableRecords}
           defaultSortColumn="playCount"
           defaultSortOrder="desc"
+          onRowClick={(rec) => navigate(rec._rowTo)}
         />
       </div>
 

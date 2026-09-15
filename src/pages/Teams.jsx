@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.service";
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
 import { Loader } from "../components/Loader";
-import { getTeamDetailsById, isMismintPlay } from "../services/overrides.service";
+import { getTeamDetailsById, isMismintPlay, teamKeyForPlay, isNameKeyedTeam } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply } from "../components/Supply";
 import { getLeagueName, renderEmojiName, ownedMintsColumn, ownedCountColumn, ALL_LEAGUE_OPTIONS } from "../utils/display.utils";
@@ -65,7 +65,7 @@ export function Teams() {
     plays.forEach((play) => {
       // Mismint plays (plays_exclude.json) never count toward stats
       if (isMismintPlay(play.playID)) return;
-      const nbaID = play.TeamAtMomentNBAID;
+      const nbaID = teamKeyForPlay(play);
       if (!nbaID) return;
       const cleanID = String(nbaID);
 
@@ -146,9 +146,13 @@ export function Teams() {
     ];
   }, [accountMode, pctMode]);
 
+  const navigate = useNavigate();
   const mapTeamsToRecords = (teams) => {
     return teams.map((team) => {
-      const idCell = (
+      // A squad Dapper Labs gave no id shows none: it is grouped by name
+      const idCell = isNameKeyedTeam(team.id) ? (
+        <span className="text-muted" style={{ fontSize: "0.8rem" }} title="No team id on chain: Dapper Labs wrote this squad's plays under the players' franchises. Grouped by name.">no id</span>
+      ) : (
         <Link to={`/teams/${team.id}`} className="font-mono team-id-badge" style={{ display: "inline-block" }}>
           {team.id}
         </Link>
@@ -168,13 +172,16 @@ export function Teams() {
 
       return {
         ...team,
+        // The whole row opens the team
+        _clickable: true,
+        _rowTo: `/teams/${team.id}`,
         idCell,
         name: nameCell,
         playCountCell: owned
           ? <OwnedFraction owned={team.ownedPlayCount} total={team.playCount} greenWhenFull title={`${team.ownedPlayCount} of ${team.playCount} plays owned`} />
           : team.playCount,
         playerCountCell: owned
-          ? <OwnedFraction owned={team.ownedPlayerCount} total={team.playerCount} greenWhenFull title={`${team.ownedPlayerCount} of ${team.playerCount} players represented`} />
+          ? <OwnedFraction owned={team.ownedPlayerCount} total={team.playerCount} greenWhenFull to={`/teams/${team.id}?f_PlayCountCell=0`} title={`${team.ownedPlayerCount} of ${team.playerCount} players represented`} />
           : team.playerCount,
         totalMintsFormatted: owned
           ? <OwnedFraction owned={team.ownedMints} total={team.totalMints} pct={pctMode} title={`${team.ownedMints.toLocaleString()} of ${team.totalMints.toLocaleString()} moments owned`} />
@@ -229,10 +236,12 @@ export function Teams() {
               <div className="mt-20">
                 <DataTable
                   columns={columns}
+                  ownedFilter={owned ? "playCount" : ""}
                   records={nbaRecords}
                   defaultSortColumn="playCount"
                   defaultSortOrder="desc"
                   urlPrefix="nba"
+                  onRowClick={(rec) => navigate(rec._rowTo)}
                 />
               </div>
             </div>
@@ -245,10 +254,12 @@ export function Teams() {
               <div className="mt-20">
                 <DataTable
                   columns={columns}
+                  ownedFilter={owned ? "playCount" : ""}
                   records={wnbaRecords}
                   defaultSortColumn="playCount"
                   defaultSortOrder="desc"
                   urlPrefix="wnba"
+                  onRowClick={(rec) => navigate(rec._rowTo)}
                 />
               </div>
             </div>

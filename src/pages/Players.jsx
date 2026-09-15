@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useCallback, useMemo } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.service";
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
@@ -165,9 +165,11 @@ export function Players() {
       // OWNED numerator, not the total; Mints sorts by percentage in % view
       ownedCountColumn({ key: "PlayCount", text: "Plays", totalField: "PlayCountSort", ownedField: "PlayCountOwned", accountMode }),
       ownedMintsColumn({ key: "TotalMints", text: "Mints", totalField: "TotalMintsSort", ownedField: "TotalMintsOwned", accountMode, pctMode }),
-      { key: "Teams", text: "Teams" }
+      // The team links keep their own targets; the row opens the player
+      { key: "Teams", text: "Teams", noRowClick: true }
     ];
   }, [accountMode, pctMode]);
+  const navigate = useNavigate();
 
   // Filter players on the league selector and the honor toggles (honors
   // stack: every selected one must apply)
@@ -225,18 +227,17 @@ export function Players() {
                     {allStar && <span className="text-muted" style={{ fontWeight: 400 }}> (All-Star)</span>}
                   </>
                 );
-                return (
-                  <React.Fragment key={teamName}>
-                    {idx > 0 && <span style={{ color: "var(--text-muted)", marginRight: "4px" }}>,</span>}
-                    {teamId ? (
-                      <Link to={`/teams/${teamId}`} className="font-hover-glow" style={{ color: "#fff", fontWeight: "500", textDecoration: "none", whiteSpace: "nowrap" }}>
-                        {label}
-                      </Link>
-                    ) : (
-                      <span style={{ whiteSpace: "nowrap" }}>{label}</span>
-                    )}
-                  </React.Fragment>
-                );
+                // Flat keyed siblings: the separator is its own keyed element
+                return [
+                  idx > 0 ? <span key={`sep-${teamName}`} style={{ color: "var(--text-muted)", marginRight: "4px" }}>,</span> : null,
+                  teamId ? (
+                    <Link key={teamName} to={`/teams/${teamId}`} className="font-hover-glow" style={{ color: "#fff", fontWeight: "500", textDecoration: "none", whiteSpace: "nowrap" }}>
+                      {label}
+                    </Link>
+                  ) : (
+                    <span key={teamName} style={{ whiteSpace: "nowrap" }}>{label}</span>
+                  )
+                ];
               })}
             </div>
           ))}
@@ -257,12 +258,14 @@ export function Players() {
           if (n > 0) ownedPlaysNum++;
           ownedMintsNum += n;
         });
-        playCountCell = <OwnedFraction owned={ownedPlaysNum} total={player.playCount} greenWhenFull title={`${ownedPlaysNum} of ${player.playCount} plays owned`} />;
+        playCountCell = <OwnedFraction owned={ownedPlaysNum} total={player.playCount} greenWhenFull to={`${playerPath(player.name)}?f_MintSize=0`} title={`${ownedPlaysNum} of ${player.playCount} plays owned`} />;
         mintsCell = <OwnedFraction owned={ownedMintsNum} total={player.totalMints} pct={pctMode} title={`${ownedMintsNum.toLocaleString()} of ${player.totalMints.toLocaleString()} moments owned`} />;
       }
 
       return {
         name: player.name, // retained for key identification
+        _clickable: true,
+        _rowTo: playerPath(player.name),
         FullName: playerLink,
         League: leagueBadge,
         PlayCount: playCountCell,
@@ -332,10 +335,12 @@ export function Players() {
 
         <DataTable
           columns={columns}
+          ownedFilter={owned ? "PlayCount" : ""}
           records={tableRecords}
           keyColumn="name"
           defaultSortColumn="PlayCount"
           defaultSortOrder="desc"
+          onRowClick={(rec) => navigate(rec._rowTo)}
         />
       </div>
     </div>

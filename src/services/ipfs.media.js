@@ -1,7 +1,9 @@
 // Per-CID media metadata from data/ipfs_media.json (distilled from the
-// IPFS probe run, scripts/probe-missing.mjs). The file is
-// ~5MB, so it is dynamic-imported on first use and never rides in the
-// main bundle. CIDs are content-addressed: entries never go stale.
+// IPFS probe run, scripts/probe-missing.mjs). The file is ~5MB, so it is
+// fetched on first use as a plain JSON asset (Vite's ?url import hashes
+// and serves it as a file): JSON.parse beats evaluating a 5MB JS module,
+// and the CDN caches the file on its own. CIDs are content-addressed:
+// entries never go stale.
 //
 // Entry shapes (type first):
 //   image: ["jpg"|"png"|"mpo", width, height, bytes|null, author?, camera?, photoDate?, silhouette?, fullBleed?]
@@ -16,13 +18,17 @@
 // cube render in it, so nothing can be extracted from it; written by
 // scripts/mark-image-flags.mjs from the border census.
 
+import ipfsMediaUrl from "../../data/ipfs_media.json?url";
+
 let loadPromise = null;
 let state = null; // { media: object, probedAt: string }
 
 export function loadIpfsMedia() {
   if (!loadPromise) {
-    loadPromise = import("../../data/ipfs_media.json").then((mod) => {
-      const data = mod.default || mod;
+    loadPromise = fetch(ipfsMediaUrl).then((res) => {
+      if (!res.ok) throw new Error(`ipfs_media.json: HTTP ${res.status}`);
+      return res.json();
+    }).then((data) => {
       const probedAt = (String(data._meta?.source || "").match(/\d{4}-\d{2}-\d{2}/) || [])[0] || null;
       state = { media: data.media || {}, probedAt };
       return state;

@@ -124,7 +124,7 @@ export function AccountOffers() {
         otype,
         play,
         series: sRec?.series != null ? Number(sRec.series) : null,
-        setName: sRec?.setName || `Set #${o.setID}`,
+        setName: sRec?.setName || `Set ${o.setID}`,
         tier: getEditionTier(o.setID, o.playID) || "",
         ptype: (play?.PlayCategory || play?.PlayType || "").trim(),
         year: play?.DateOfMoment ? String(play.DateOfMoment).slice(0, 4) : "",

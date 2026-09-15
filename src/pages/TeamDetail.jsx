@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllEditionsDB } from "../services/db.service";
 import { DataTable } from "../components/DataTable";
-import { getTeamDetailsById, getTeamNameWithEmoji, getTeamEmoji, isMismintPlay } from "../services/overrides.service";
+import { getTeamDetailsById, getTeamNameWithEmoji, getTeamEmoji, isMismintPlay, teamKeyForPlay } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply, SupplyWord } from "../components/Supply";
-import { isWnbaTeam, renderEmojiName, playerPath, ownedMintsColumn, ownedCountColumn } from "../utils/display.utils";
+import { isWnbaTeam, renderEmojiName, playerPath, ownedMintsColumn, ownedCountColumn, buildPlayToSets } from "../utils/display.utils";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { OwnedFraction } from "../components/OwnedFraction";
 import { useOwnedPct } from "../hooks/useOwnedPct";
@@ -60,7 +60,7 @@ export function TeamDetail() {
     if (plays.length === 0) return null;
 
     const filteredPlays = plays.filter(
-      (play) => String(play.TeamAtMomentNBAID) === String(teamID)
+      (play) => teamKeyForPlay(play) === String(teamID)
     );
 
     if (filteredPlays.length === 0) return null;
@@ -176,9 +176,41 @@ export function TeamDetail() {
       { key: "FullName", text: "Player Name" },
       ownedCountColumn({ key: "PlayCountCell", text: "Plays", totalField: "PlayCount", ownedField: "OwnedPlays", accountMode }),
       ownedMintsColumn({ key: "TotalMintsFormatted", text: "Mints", totalField: "TotalMints", ownedField: "OwnedMints", accountMode, pctMode }),
-      { key: "HighlightPlayIDs", text: "Play IDs", align: "left" }
+      { key: "HighlightPlayIDs", text: "Edition IDs", align: "left" }
     ];
   }, [accountMode, pctMode]);
+
+  // The sets each play sits in, for the Edition IDs chips: a play in one
+  // set is one edition, so its chip is that edition id and opens the
+  // edition; in more (or none) the chip is the bare play id and opens the
+  // play, where its editions are listed
+  const setsByPlay = useMemo(() => buildPlayToSets(sets), [sets]);
+  // While browsing as an account, a chip the account holds none of goes
+  // dim with a dashed border (not colour alone), and its hover says so
+  const editionChip = useCallback((pID) => {
+    const ownedNote = (n) => (owned ? (n > 0 ? `; owned: ${n.toLocaleString()}` : "; not owned") : "");
+    const chipClass = (n) => `set-link${owned && n === 0 ? " set-link-unowned" : ""}`;
+    const inSets = setsByPlay[Number(pID)] || [];
+    const mismint = isMismintPlay(pID) ? "; mismint" : "";
+    const mark = mismint ? <span className="mini-badge-mismint" title="This play is a mismint!">⚠️</span> : null;
+    if (inSets.length === 1) {
+      const s = inSets[0];
+      const editionID = `${s.id}_${pID}`;
+      const n = owned ? (owned.index?.byEdition.get(`${Number(s.id)}_${Number(pID)}`) || 0) : 0;
+      return (
+        <Link key={pID} to={`/editions/${editionID}`} className={chipClass(n)} title={`Edition ${editionID}: ${s.name} (Series ${s.series})${mismint}${ownedNote(n)}`}>
+          {editionID}{mark}
+        </Link>
+      );
+    }
+    const why = inSets.length === 0 ? "is not in any set yet" : `has ${inSets.length} editions`;
+    const n = owned ? (owned.index?.byPlay.get(Number(pID)) || 0) : 0;
+    return (
+      <Link key={pID} to={`/plays/${pID}`} className={chipClass(n)} title={`Play ${pID} ${why}; opens the play${mismint}${ownedNote(n)}`}>
+        {pID}{mark}
+      </Link>
+    );
+  }, [setsByPlay, owned]);
 
   // Format table rows using grouped roster logic
   const tableRecords = useMemo(() => {
@@ -186,21 +218,12 @@ export function TeamDetail() {
 
     const records = [];
 
-    // Grouped players
-    Object.values(teamContext.playerGroups).forEach((group) => {
-      const playerLink = (
-        <Link to={`${playerPath(group.name)}?teamnbaid=${teamID}`} className="player-detail-link">
-          {group.name}
-        </Link>
-      );
-
+    // One roster row per group of plays: a player's plays, or the team's
+    // own plays merged the same way under "Team Play"
+    const pushGroup = (name, nameCell, playIDs, totalMints, totalOther) => {
       const playIDsLinks = (
-        <div className="set-links-cell id-grid">
-          {group.playIDs.map((pID) => (
-            <Link key={pID} to={`/plays/${pID}`} className="set-link">
-              #{pID}
-            </Link>
-          ))}
+        <div className="set-links-cell id-grid id-grid-right" style={{ "--id-w": "7.2em" }}>
+          {playIDs.map(editionChip)}
         </div>
       );
 
@@ -208,7 +231,7 @@ export function TeamDetail() {
       let ownedPlays = 0, ownedMints = 0;
       if (owned) {
         const byPlay = owned.index?.byPlay;
-        group.playIDs.forEach((pID) => {
+        playIDs.forEach((pID) => {
           const n = byPlay ? (byPlay.get(Number(pID)) || 0) : 0;
           if (n > 0) ownedPlays++;
           ownedMints += n;
@@ -216,61 +239,43 @@ export function TeamDetail() {
       }
 
       records.push({
-        name: group.name,
-        FullName: playerLink,
-        PlayCount: group.plays.length,
+        name,
+        FullName: nameCell,
+        PlayCount: playIDs.length,
         OwnedPlays: ownedPlays,
         PlayCountCell: owned
-          ? <OwnedFraction owned={ownedPlays} total={group.plays.length} greenWhenFull />
-          : group.plays.length,
-        TotalMints: group.totalMints,
+          ? <OwnedFraction owned={ownedPlays} total={playIDs.length} greenWhenFull />
+          : playIDs.length,
+        TotalMints: totalMints,
         OwnedMints: ownedMints,
         TotalMintsFormatted: owned
-          ? <OwnedFraction owned={ownedMints} total={group.totalMints} pct={pctMode} />
-          : <Supply shown={group.totalMints} other={group.totalOther} />,
-        HighlightPlayIDs: playIDsLinks
-      });
-    });
-
-    // Team plays listed individually as separate plain-text rows
-    teamContext.teamPlays.forEach((play) => {
-      const playID = play.playID;
-      const isMismint = isMismintPlay(playID);
-      const totalMints = teamContext.playToMintsMap[playID] || 0;
-      const totalOther = teamContext.playToOtherMap[playID] || 0;
-
-      const playerLink = (
-        <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
-          Team Play
-          {isMismint && <span className="mini-badge-mismint" title="This play is a mismint!" style={{ marginLeft: "6px" }}>Mismint ⚠️</span>}
-        </span>
-      );
-
-      const playIDsLinks = (
-        <div className="set-links-cell">
-          <Link to={`/plays/${playID}`} className="set-link">
-            #{playID}
-          </Link>
-        </div>
-      );
-
-      const ownedOfPlay = owned ? (owned.index?.byPlay.get(Number(playID)) || 0) : 0;
-      records.push({
-        name: `team-play-${playID}`,
-        FullName: playerLink,
-        PlayCount: 1,
-        OwnedPlays: ownedOfPlay > 0 ? 1 : 0,
-        PlayCountCell: owned
-          ? <OwnedFraction owned={ownedOfPlay > 0 ? 1 : 0} total={1} greenWhenFull />
-          : 1,
-        TotalMints: totalMints,
-        OwnedMints: ownedOfPlay,
-        TotalMintsFormatted: owned
-          ? <OwnedFraction owned={ownedOfPlay} total={totalMints} pct={pctMode} />
+          ? <OwnedFraction owned={ownedMints} total={totalMints} pct={pctMode} />
           : <Supply shown={totalMints} other={totalOther} />,
         HighlightPlayIDs: playIDsLinks
       });
+    };
+
+    Object.values(teamContext.playerGroups).forEach((group) => {
+      pushGroup(
+        group.name,
+        <Link to={`${playerPath(group.name)}?teamnbaid=${teamID}`} className="player-detail-link">{group.name}</Link>,
+        group.playIDs,
+        group.totalMints,
+        group.totalOther
+      );
     });
+
+    if (teamContext.teamPlays.length > 0) {
+      const ids = teamContext.teamPlays.map((play) => Number(play.playID));
+      const sum = (map) => ids.reduce((acc, id) => acc + (map[id] || 0), 0);
+      pushGroup(
+        "team-plays",
+        <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>Team Play</span>,
+        ids,
+        sum(teamContext.playToMintsMap),
+        sum(teamContext.playToOtherMap)
+      );
+    }
 
     // Sort: most plays to least (PlayCount desc), and if equal, by mints highest to lowest (TotalMints desc)
     records.sort((a, b) => {
@@ -281,7 +286,7 @@ export function TeamDetail() {
     });
 
     return records;
-  }, [teamContext, teamID, owned, pctMode]);
+  }, [teamContext, teamID, owned, pctMode, editionChip]);
 
   if (loadError && !loading) {
     return <LoadError message={loadError} onRetry={retry} />;
@@ -418,6 +423,7 @@ export function TeamDetail() {
         <div className="mt-20">
           <DataTable
             columns={columns}
+            ownedFilter={owned ? "PlayCountCell" : ""}
             records={tableRecords}
             keyColumn="name"
             defaultSortColumn="PlayCount"

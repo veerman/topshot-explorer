@@ -13,6 +13,17 @@
 // assigned in Dapper's database and never published beside a Flow id, so
 // those links are recognised and explained, never resolved.
 import setsParallels from "../../data/sets_parallels.json";
+// The Dapper id tables (~1.6MB together) load as plain JSON assets on
+// first use, not as JS modules: JSON.parse is the faster path for data
+// this size, and the files cache on the CDN by their own hash
+import dapperPlaysUrl from "../../data/dapper/plays.json?url";
+import dapperSetsUrl from "../../data/dapper/sets.json?url";
+import dapperEditionsUrl from "../../data/dapper/editions.json?url";
+
+const fetchJson = (url) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return res.json();
+});
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
 
@@ -21,14 +32,14 @@ let mapsPromise = null;
 export function loadDapperIds() {
   if (!mapsPromise) {
     mapsPromise = Promise.all([
-      import("../../data/dapper/plays.json"),
-      import("../../data/dapper/sets.json"),
-      import("../../data/dapper/editions.json")
+      fetchJson(dapperPlaysUrl),
+      fetchJson(dapperSetsUrl),
+      fetchJson(dapperEditionsUrl)
     ]).then(([p, s, e]) => {
       const playByUUID = new Map(), setByUUID = new Map(), editionByUUID = new Map(), editionByAtlasID = new Map();
-      Object.entries(p.default).forEach(([id, v]) => { if (v && v.playUUID) playByUUID.set(v.playUUID.toLowerCase(), Number(id)); });
-      Object.entries(s.default).forEach(([id, v]) => { if (v && v.legacySetUUID) setByUUID.set(v.legacySetUUID.toLowerCase(), Number(id)); });
-      Object.entries(e.default).forEach(([key, v]) => {
+      Object.entries(p).forEach(([id, v]) => { if (v && v.playUUID) playByUUID.set(v.playUUID.toLowerCase(), Number(id)); });
+      Object.entries(s).forEach(([id, v]) => { if (v && v.legacySetUUID) setByUUID.set(v.legacySetUUID.toLowerCase(), Number(id)); });
+      Object.entries(e).forEach(([key, v]) => {
         if (!v || key.startsWith("_")) return;
         if (v.legacyEditionUUID) editionByUUID.set(v.legacyEditionUUID.toLowerCase(), key);
         if (Number.isInteger(v.atlasEditionID)) editionByAtlasID.set(v.atlasEditionID, key);

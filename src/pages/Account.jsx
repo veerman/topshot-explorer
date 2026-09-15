@@ -3,7 +3,7 @@ import { useUsernames, introOf } from "../services/usernames.service";
 import { approxCreatedAt, formatMonth, accountClockAsOf } from "../services/flow.address";
 import { sizePercentile, holdersCounted, collectionSizesAsOf } from "../services/census.stats";
 import { foldedEntryOf } from "../services/wall.service";
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getAccountDetails, getAccountMoments, getSaleData, subeditionLabel, getAccountGraph, getEvmCollectionIDsAll } from "../services/fcl.service";
 import { Pagination } from "../components/Pagination";
@@ -89,8 +89,10 @@ async function buildCollectionIndex(address, summary, onProgress, evmList = []) 
 // Facet filters live in the URL query string so a filtered view is
 // shareable and survives refresh; multi facets are comma-joined values.
 // The read/write/cascade machinery is shared (hooks/useFacetFilters).
-const EMPTY_FILTERS = { league: [], series: [], set: [], sub: [], tier: [], type: [], year: [], player: [], team: [], badge: [], special: [], listed: "", locking: "", held: "", owned: "", serial: "" };
-const MULTI_FILTER_KEYS = ["league", "series", "set", "sub", "tier", "type", "year", "player", "team", "badge", "special"];
+// "play" (play ids) is a deep-link facet from the catalogue pages (the
+// Plays page's Owned column); its chip appears only while it is set.
+const EMPTY_FILTERS = { league: [], series: [], set: [], play: [], sub: [], tier: [], type: [], year: [], player: [], team: [], badge: [], special: [], listed: "", locking: "", held: "", owned: "", serial: "" };
+const MULTI_FILTER_KEYS = ["league", "series", "set", "play", "sub", "tier", "type", "year", "player", "team", "badge", "special"];
 const SINGLE_FILTER_KEYS = ["listed", "locking", "held", "owned", "serial"];
 
 // Column sort. Each key's first click uses its natural direction, a
@@ -478,6 +480,7 @@ export function Account() {
     team: (v) => filters.team.length === 0 || (Boolean(v) && filters.team.includes(v)),
     series: (v) => filters.series.length === 0 || (v != null && filters.series.includes(String(v))),
     set: (v) => filters.set.length === 0 || filters.set.includes(String(v)),
+    play: (v) => filters.play.length === 0 || filters.play.includes(String(v)),
     sub: (v) => filters.sub.length === 0 || filters.sub.includes(String(v)),
     tier: (v) => filters.tier.length === 0 || (Boolean(v) && filters.tier.includes(v)),
     type: (v) => filters.type.length === 0 || (Boolean(v) && filters.type.includes(v)),
@@ -515,7 +518,7 @@ export function Account() {
         momentID: Number(momentID),
         setID: Number(setID),
         playID: Number(playID),
-        setName: sRec?.setName || `Set #${setID}`,
+        setName: sRec?.setName || `Set ${setID}`,
         series,
         sub: Number(sub),
         evm: evm === 1,
@@ -548,6 +551,7 @@ export function Account() {
         league: passFns.league(f.league),
         series: passFns.series(f.series),
         set: passFns.set(f.setID),
+        play: passFns.play(f.playID),
         sub: passFns.sub(f.sub),
         tier: passFns.tier(f.tier),
         type: passFns.type(f.type),
@@ -655,7 +659,7 @@ export function Account() {
       const playRec = localMeta.plays.get(g.playID);
       out.set(g.key, {
         setRec,
-        setName: setRec?.setName || `Set #${g.setID}`,
+        setName: setRec?.setName || `Set ${g.setID}`,
         series: setRec?.series != null ? Number(setRec.series) : null,
         pf: playFacts.get(g.playID) || {},
         tags: momentTags(playFacts.get(g.playID), g.setID, g.playID, g.sub),
@@ -685,6 +689,7 @@ export function Account() {
         && passFns.team(pf.team || "")
         && passFns.series(gf.series)
         && passFns.set(g.setID)
+        && passFns.play(g.playID)
         && passFns.sub(g.sub)
         && passFns.tier(gf.tier)
         && passFns.type(pf.category || "")
@@ -704,7 +709,7 @@ export function Account() {
     const val = (g) => {
       const gf = groupFacts.get(g.key) || { pf: {} };
       switch (sort.key) {
-        case "set": return gf.setName || `Set #${g.setID}`;
+        case "set": return gf.setName || `Set ${g.setID}`;
         case "play": return gf.pf.date || "";
         case "sub": return subeditionLabel(g.sub);
         case "player": return gf.pf.player || "";
@@ -804,6 +809,10 @@ export function Account() {
       {msFacet("League", "league", [...facetData.opts.league].sort().map((l) => [l, l]))}
       {msFacet("Series", "series", [...facetData.opts.series].sort((a, b) => a - b).map((s) => [String(s), `Series ${s}`]))}
       {msFacet("Set", "set", [...facetData.opts.set.entries()].sort((a, b) => a[1].localeCompare(b[1])).map(([id, name]) => [String(id), name]))}
+      {msFacet("Play", "play", filters.play.map((id) => {
+        const pf = playFacts?.get(Number(id));
+        return [id, `Play ${id}${pf && (pf.player || pf.team) ? `: ${pf.player || pf.team}` : ""}`];
+      }))}
       {msFacet("Subedition", "sub", [...facetData.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subLabel(s)]))}
       {msFacet("Tier", "tier", [...facetData.opts.tier].sort((a, b) => tierRank(a) - tierRank(b)).map((t) => [t, t]))}
       {msFacet("Type", "type", [...facetData.opts.type].sort().map((t) => [t, t]))}
@@ -1096,12 +1105,13 @@ export function Account() {
                         : g.serials;
                       const serialsOpen = expandedSerials.has(g.key);
                       const matchedSet = serialsOpen && serialFiltersActive ? new Set(rowSerials) : null;
-                      return (
-                        <React.Fragment key={g.key}>
-                        <tr className={isMismint ? "mismint-row" : ""}>
-                          {cubeCell(g.setID, g.playID, play, rowSeries, `${play?.FullName || playSummary(play, g.playID)} · ${setRec?.setName || `Set #${g.setID}`}`)}
+                      // Flat keyed rows, never a keyed Fragment with a
+                      // conditional row inside (Preact misorders those)
+                      return [
+                        <tr key={g.key} className={isMismint ? "mismint-row" : ""}>
+                          {cubeCell(g.setID, g.playID, play, rowSeries, `${play?.FullName || playSummary(play, g.playID)} · ${setRec?.setName || `Set ${g.setID}`}`)}
                           <td className="font-mono"><Link to={`/editions/${g.key}`}>{g.key}</Link></td>
-                          <td><Link to={`/sets/${g.setID}`}>{setRec?.setName || `Set #${g.setID}`}</Link></td>
+                          <td><Link to={`/sets/${g.setID}`}>{setRec?.setName || `Set ${g.setID}`}</Link></td>
                           <td><Link to={`/plays/${g.playID}`}>{playSummary(play, g.playID)}</Link></td>
                           <td>{subName}</td>
                           <td>
@@ -1111,7 +1121,7 @@ export function Account() {
                               </Link>
                             ) : (
                               <Link to={`/plays/${g.playID}`} style={{ fontWeight: "600" }}>
-                                {(play?.TeamAtMoment || "").trim() || `Play #${g.playID}`}
+                                {(play?.TeamAtMoment || "").trim() || `Play ${g.playID}`}
                               </Link>
                             )}
                             {isMismint && <span className="mini-badge-mismint" style={{ marginLeft: "8px" }}>Mismint ⚠️</span>}
@@ -1129,9 +1139,9 @@ export function Account() {
                               {serialFiltersActive ? `${rowSerials.length}/${g.serials.length}` : g.serials.length} {serialsOpen ? "▴" : "▾"}
                             </button>
                           </td>
-                        </tr>
-                        {serialsOpen && (
-                          <tr>
+                        </tr>,
+                        serialsOpen && (
+                          <tr key={`${g.key}-serials`}>
                             <td colSpan={7} style={{ background: "rgba(139, 92, 246, 0.04)", padding: "10px 16px" }}>
                               {serialFiltersActive && (
                                 <div className="text-muted" style={{ fontSize: "0.78rem", marginBottom: "6px" }}>
@@ -1166,9 +1176,8 @@ export function Account() {
                               </div>
                             </td>
                           </tr>
-                        )}
-                        </React.Fragment>
-                      );
+                        )
+                      ];
                     })}
                   </tbody>
                 </table>
@@ -1203,10 +1212,10 @@ export function Account() {
 
                     return (
                       <tr key={moment.momentID} className={isMismint ? "mismint-row" : ""}>
-                        {cubeCell(moment.setID, moment.playID, moment.playMetadata, localMeta?.sets.get(Number(moment.setID))?.series, `${moment.playMetadata?.FullName || playSummary(moment.playMetadata, moment.playID)} · ${moment.setName || `Set #${moment.setID}`}`)}
+                        {cubeCell(moment.setID, moment.playID, moment.playMetadata, localMeta?.sets.get(Number(moment.setID))?.series, `${moment.playMetadata?.FullName || playSummary(moment.playMetadata, moment.playID)} · ${moment.setName || `Set ${moment.setID}`}`)}
                         <td className="font-mono"><Link to={`/editions/${editionID}`}>{editionID}</Link></td>
                         <td>
-                          <Link to={`/sets/${moment.setID}`}>{moment.setName || `Set #${moment.setID}`}</Link>
+                          <Link to={`/sets/${moment.setID}`}>{moment.setName || `Set ${moment.setID}`}</Link>
                         </td>
                         <td>
                           <Link to={`/plays/${moment.playID}`}>{playSummary(moment.playMetadata, moment.playID)}</Link>
@@ -1222,7 +1231,7 @@ export function Account() {
                             </Link>
                           ) : (
                             <Link to={`/plays/${moment.playID}`} style={{ fontWeight: "600" }}>
-                              {(moment.playMetadata.TeamAtMoment || "").trim() || `Play #${moment.playID}`}
+                              {(moment.playMetadata.TeamAtMoment || "").trim() || `Play ${moment.playID}`}
                             </Link>
                           )}
                           {isMismint && <span className="mini-badge-mismint" style={{ marginLeft: "8px" }}>Mismint ⚠️</span>}

@@ -1,18 +1,21 @@
 import { useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getAllPlaysDB, getAllTeamsDB } from "../services/db.service";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { getAllPlaysDB, getAllTeamsDB, getAllSetsDB } from "../services/db.service";
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
 import { Loader } from "../components/Loader";
-import { resolveVenue, getTeamDetailsById, normalizeTeamName, parseMomentDate } from "../services/overrides.service";
-import { buildTeamNameMap, renderMatchupCell, formatDateISO } from "../utils/display.utils";
+import { resolveVenue, normalizeTeamName, buildTsdIndex, buildMintClock } from "../services/overrides.service";
+import { buildTeamNameMap, buildSeriesSeasonMap } from "../utils/display.utils";
 import { DataTable } from "../components/DataTable";
+import { playTableColumns, buildPlayRecord, buildPlayToSets } from "../components/PlayTable";
+import { useAccountCollection } from "../hooks/useAccountCollection";
+import playsExclude from "../../data/plays_exclude.json";
 
 const NO_ROWS = [];
 
 async function loadArenaData() {
-  const [dbPlays, dbTeams] = await Promise.all([getAllPlaysDB(), getAllTeamsDB()]);
-  return { plays: dbPlays, teams: dbTeams };
+  const [dbPlays, dbTeams, dbSets] = await Promise.all([getAllPlaysDB(), getAllTeamsDB(), getAllSetsDB()]);
+  return { plays: dbPlays, teams: dbTeams, sets: dbSets };
 }
 
 export function ArenaDetail() {
@@ -22,6 +25,9 @@ export function ArenaDetail() {
   const { data, loading, loadError, retry } = useDbData(loadArenaData, "Could not read this arena's data from the local database.");
   const plays = data ? data.plays : NO_ROWS;
   const teams = data ? data.teams : NO_ROWS;
+  const sets = data ? data.sets : NO_ROWS;
+  const owned = useAccountCollection();
+  const navigate = useNavigate();
 
   // 3. Resolve Home Team Name Map
   const nameMap = useMemo(() => buildTeamNameMap(teams), [teams]);
@@ -89,75 +95,18 @@ export function ArenaDetail() {
     };
   }, [filteredPlays]);
 
-  // 6. Define columns for DataTable
-  const columns = useMemo(() => {
-    return [
-      { key: "playIDCell", text: "Play ID" },
-      { key: "dateCell", text: "Date" },
-      { key: "matchupCell", text: "Matchup", align: "center" }
-    ];
-  }, []);
-
-  // 7. Format records
-  const tableRecords = useMemo(() => {
-    return filteredPlays.map((play) => {
-      const playIDCell = (
-        <Link to={`/plays/${play.playID}`} className="font-mono team-id-badge font-hover-glow" style={{ display: "inline-block" }}>
-          {play.playID}
-        </Link>
-      );
-
-      let dateCell = "-";
-      const dObj = play.DateOfMoment ? parseMomentDate(play.DateOfMoment) : null;
-      const dateMatch = play.DateOfMoment ? String(play.DateOfMoment).match(/^(\d{4})-(\d{2})-(\d{2})/) : null;
-      if (play.DateOfMoment && (!dObj || !dateMatch)) {
-        dateCell = play.DateOfMoment;
-      }
-      if (dObj && dateMatch) {
-        const dateKey = `${dateMatch[2]}-${dateMatch[3]}`;
-
-        const timePart = dObj.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-        const dateStringLocal = `${formatDateISO(dObj)}, ${timePart}`;
-
-        dateCell = (
-          <Link to={`/calendar/${dateKey}`} className="date-calendar-link font-hover-glow" style={{ textDecoration: "none" }}>
-            {/* Hidden ISO date prefix for accurate sorting */}
-            <span style={{ display: "none" }}>{play.DateOfMoment}</span>
-            {dateStringLocal}
-          </Link>
-        );
-      }
-
-      // Stacked matchup cell (same convention as the Plays page); the arena
-      // page keeps its venue-resolved emojis with a 🏀 fallback
-      const homeTeamDetails = getTeamDetailsById(play.homeTeamId);
-      const awayTeamId = nameMap[play.AwayTeamName?.trim().toLowerCase()];
-      const awayTeamDetails = awayTeamId ? getTeamDetailsById(awayTeamId) : null;
-
-      const matchupCell = renderMatchupCell({
-        away: play.AwayTeamName ? {
-          name: play.AwayTeamName,
-          score: play.AwayTeamScore,
-          teamId: awayTeamId,
-          emoji: awayTeamDetails?.emoji || "🏀"
-        } : null,
-        home: play.HomeTeamName ? {
-          name: play.HomeTeamName,
-          score: play.HomeTeamScore,
-          teamId: play.homeTeamId,
-          emoji: homeTeamDetails?.emoji || "🏀"
-        } : null,
-        teamAtMoment: play.TeamAtMoment
-      });
-
-      return {
-        id: play.playID,
-        playIDCell,
-        dateCell,
-        matchupCell
-      };
-    });
-  }, [filteredPlays, nameMap]);
+  // 6. The shared one-row-per-play table (PlayTable), as on the Plays page.
+  // Debut index and mint clock run over ALL plays so badges never depend
+  // on the venue filter.
+  const columns = useMemo(() => playTableColumns({ teamNameMap: nameMap, owned }), [nameMap, owned]);
+  const playToSets = useMemo(() => buildPlayToSets(sets), [sets]);
+  const tsdIndex = useMemo(() => buildTsdIndex(plays), [plays]);
+  const mintClock = useMemo(() => buildMintClock(plays), [plays]);
+  const seriesSeasonMap = useMemo(() => buildSeriesSeasonMap(plays, playToSets), [plays, playToSets]);
+  const tableRecords = useMemo(
+    () => filteredPlays.map((play) => buildPlayRecord(play, { playToSets, seriesSeasonMap, tsdIndex, mintClock, owned })),
+    [filteredPlays, playToSets, seriesSeasonMap, tsdIndex, mintClock, owned]
+  );
 
   if (loadError && !loading) {
     return <LoadError message={loadError} onRetry={retry} />;
@@ -225,9 +174,13 @@ export function ArenaDetail() {
         ) : (
           <DataTable
             columns={columns}
+            ownedFilter={owned ? "Owned" : ""}
             records={tableRecords}
-            defaultSortColumn="dateCell"
+            keyColumn="playID_raw"
+            defaultSortColumn="DateOfMomentLocal"
             defaultSortOrder="desc"
+            mismints={playsExclude}
+            onRowClick={(rec) => navigate(rec._rowTo)}
           />
         )}
       </div>

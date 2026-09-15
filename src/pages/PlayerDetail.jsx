@@ -1,12 +1,12 @@
-import React, { useMemo } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useMemo } from "react";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.service";
 import { harmonizePlayerProfiles } from "../services/relationship.service";
 import { DataTable } from "../components/DataTable";
-import { getTeamNameWithEmoji, getTeamEmoji, getTeamDetailsById, isMismintPlay } from "../services/overrides.service";
+import { getTeamNameWithEmoji, getTeamEmoji, getTeamDetailsById, isMismintPlay, teamKeyForPlay } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply, SupplyWord } from "../components/Supply";
-import { buildTeamNameMap, isWnbaTeam, renderTeamLink, renderEmojiName, formatHeight, playerNameFromParam, calendarDateCell } from "../utils/display.utils";
+import { buildTeamNameMap, isWnbaTeam, renderTeamLink, renderEmojiName, formatHeight, playerNameFromParam, calendarDateCell, buildPlayToSets } from "../utils/display.utils";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { OwnedFraction, OwnedPctToggle } from "../components/OwnedFraction";
 import { useOwnedPct } from "../hooks/useOwnedPct";
@@ -15,6 +15,8 @@ import { OwnedSummaryBanner } from "../components/OwnedSummaryBanner";
 import { LoadError } from "../components/LoadError";
 import { Loader } from "../components/Loader";
 import { useDbData } from "../hooks/useDbData";
+import { editionsColumn, editionRowFacts, setsByIdDesc } from "../components/EditionsColumn";
+import playsExclude from "../../data/plays_exclude.json";
 
 const NO_ROWS = [];
 const NO_MAP = {};
@@ -83,21 +85,7 @@ export function PlayerDetail() {
     const jerseys = new Set();
     let league = "NBA";
 
-    // Build sets play-ID mapping
-    const playToSetsMap = {};
-    sets.forEach((set) => {
-      if (set.playIDs) {
-        set.playIDs.forEach((pID) => {
-          if (!playToSetsMap[pID]) playToSetsMap[pID] = [];
-          playToSetsMap[pID].push({
-            id: set.id,
-            name: set.setName,
-            series: set.series,
-            locked: set.locked
-          });
-        });
-      }
-    });
+    const playToSetsMap = buildPlayToSets(sets);
 
     // Sum mints and check retired status per play
     const playToMintsMap = {};
@@ -215,17 +203,19 @@ export function PlayerDetail() {
   // Table columns definition
   const columns = useMemo(() => {
     return [
-      { key: "playID", text: "Play ID", sortValue: (_val, rec) => rec.playID_raw },
+      // The play's editions, as on the Plays page (the row opens the
+      // edition when the play has one); a mismint says so in the cell
+      editionsColumn({ mismintBadge: true }),
       { key: "TeamAtMoment", text: "Team" },
       { key: "PlayCategory", text: "Category" },
       { key: "NbaSeason", text: "Season" },
       // In account mode, sorting and column filters (e.g. ">0") use the
       // OWNED numerator, not the total; Mint Size sorts by percentage in % view
       { key: "MintSize", text: "Mint Size", align: "right", sortValue: (_val, rec) => (accountMode ? (pctMode ? (rec.MintSizeSort > 0 ? rec.MintSizeOwned / rec.MintSizeSort : 0) : rec.MintSizeOwned) : rec.MintSizeSort), filterValue: (_val, rec) => (accountMode ? rec.MintSizeOwned : rec.MintSizeSort), headerControl: accountMode ? <OwnedPctToggle /> : undefined },
-      { key: "Status", text: "Status" },
-      { key: "SetIDs", text: "Set IDs" }
+      { key: "Status", text: "Status" }
     ];
   }, [accountMode, pctMode]);
+  const navigate = useNavigate();
 
   // Format table rows
   const tableRecords = useMemo(() => {
@@ -234,7 +224,7 @@ export function PlayerDetail() {
     let playsToRender = playerContext.plays;
     if (teamNbaIdParam) {
       playsToRender = playsToRender.filter(
-        (play) => String(play.TeamAtMomentNBAID) === String(teamNbaIdParam)
+        (play) => teamKeyForPlay(play) === String(teamNbaIdParam)
       );
     }
 
@@ -245,34 +235,10 @@ export function PlayerDetail() {
       const totalOther = playerContext.playToOtherMap[playID] || 0;
       const isRetired = playerContext.playToRetiredMap[playID] || false;
 
-      // 1. Play details link
-      const playIDLink = (
-        <Link to={`/plays/${playID}`} className="player-detail-link" style={{ fontFamily: "var(--font-mono)", fontWeight: "600" }}>
-          #{playID}
-          {isMismint && <span className="mini-badge-mismint" title="This play is a mismint!">⚠️</span>}
-        </Link>
-      );
+      // 1. The play's editions (shared Editions column), highest set first
+      const matchingSets = setsByIdDesc(playerContext.playToSetsMap[playID]);
 
-      // 2. Set ids, each opening THIS play's edition in that set: the play
-      // is already in front of the reader, so the click goes forward to the
-      // edition, not back to the set (same rule as Plays and Calendar)
-      const matchingSets = playerContext.playToSetsMap[playID] || [];
-      const setLinks = matchingSets.length > 0 ? (
-        <div className="set-links-cell">
-          {matchingSets.map((s, idx) => (
-            <React.Fragment key={s.id}>
-              {idx > 0 && ", "}
-              <Link to={`/editions/${Number(s.id)}_${Number(playID)}`} className="set-link" title={`${s.name} (Series ${s.series}); opens edition ${Number(s.id)}_${Number(playID)}`}>
-                {Number(s.id)}
-              </Link>
-            </React.Fragment>
-          ))}
-        </div>
-      ) : (
-        <span className="text-muted">-</span>
-      );
-
-      // 3. Status badges
+      // 2. Status badges
       const statusBadge = isRetired ? (
         <span className="badge badge-retired">Retired</span>
       ) : (
@@ -283,8 +249,10 @@ export function PlayerDetail() {
 
       return {
         ...play,
-        playID: playIDLink,
+        playID: String(playID),
         playID_raw: Number(playID),
+        isMismint,
+        ...editionRowFacts(matchingSets, playID),
         TeamAtMoment: play.TeamAtMoment
           ? renderEmojiName(getTeamEmoji(play.TeamAtMoment, play.TeamAtMomentNBAID), play.TeamAtMoment)
           : <span className="text-muted">-</span>,
@@ -293,8 +261,7 @@ export function PlayerDetail() {
           : <Supply shown={totalMints} other={totalOther} />,
         MintSizeSort: totalMints,
         MintSizeOwned: ownedOfPlay,
-        Status: statusBadge,
-        SetIDs: setLinks
+        Status: statusBadge
       };
     });
   }, [playerContext, teamNbaIdParam, owned, pctMode]);
@@ -358,12 +325,11 @@ export function PlayerDetail() {
             <h1 className="player-title mt-8">{playerContext.name}</h1>
             <p className="text-muted mt-4" style={{ display: "inline-flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
               {playerContext.teams.length > 0 ? (
-                playerContext.teams.map((t, idx) => (
-                  <React.Fragment key={t}>
-                    {idx > 0 && <span style={{ color: "var(--text-muted)", margin: "0 4px" }}>•</span>}
-                    {renderTeamLink(t, teamNameMap, { style: { color: "var(--text-muted)" } })}
-                  </React.Fragment>
-                ))
+                // Flat keyed siblings: the separator is its own keyed element
+                playerContext.teams.flatMap((t, idx) => [
+                  idx > 0 ? <span key={`sep-${t}`} style={{ color: "var(--text-muted)", margin: "0 4px" }}>•</span> : null,
+                  <span key={t}>{renderTeamLink(t, teamNameMap, { style: { color: "var(--text-muted)" } })}</span>
+                ])
               ) : (
                 <span>-</span>
               )}
@@ -509,10 +475,13 @@ export function PlayerDetail() {
         <div className="mt-20">
           <DataTable
             columns={columns}
+            ownedFilter={owned ? "MintSize" : ""}
             records={tableRecords}
             keyColumn="playID_raw"
-            defaultSortColumn="playID"
+            defaultSortColumn="EditionIDs"
             defaultSortOrder="desc"
+            mismints={playsExclude}
+            onRowClick={(rec) => navigate(rec._rowTo)}
           />
         </div>
       </div>

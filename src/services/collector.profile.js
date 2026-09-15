@@ -56,7 +56,7 @@ export function buildCollectorProfile({ index, editions, playByID, setByID, play
       tier: getEditionTier(setID, playID) || null,
       parallel: parallelName(sub),
       series: set.series !== undefined && set.series !== null ? seriesName(set.series) : null,
-      set: set.setName || set.name || `Set #${setID}`,
+      set: set.setName || set.name || `Set ${setID}`,
       badge: tags,
       league: (playLeague && playLeague.get(String(playID))) || "NBA"
     };

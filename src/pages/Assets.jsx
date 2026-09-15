@@ -77,7 +77,7 @@ export function Assets() {
           setID,
           playID: Number(m[2]),
           slug: m[4],
-          setName: setRec?.setName || `Set #${setID}`,
+          setName: setRec?.setName || `Set ${setID}`,
           series: setRec?.series
         };
       })
