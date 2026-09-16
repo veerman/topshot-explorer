@@ -1705,6 +1705,11 @@ span.ipfs-line {
   aspect-ratio: 1 / 1;
   margin-inline: auto;
   touch-action: none;
+  /* The scene inside is a stack of 3D-transformed layers and a playing
+     video; fenced here so the compositor does not promote the panels
+     below the card with them (the scene already clips to its box) */
+  contain: paint;
+  isolation: isolate;
 }
 .cube-inline-note {
   text-align: center;

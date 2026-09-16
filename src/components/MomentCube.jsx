@@ -40,13 +40,25 @@ export function CubeTrigger({ thumb, onOpen, title }) {
  * the width of its column hosting the MediaCube library, which idles
  * spinning and plays the front video as it passes. A "reconstruct" face
  * (player photo rebuilt from the hero) resolves before the mount. The
- * instance is destroyed on unmount or when the face changes, so callers
- * must pass a stable face object (memoised), not one built per render.
+ * instance is destroyed on unmount or when the face or play changes by
+ * content: the edition page rebuilds its objects on every load, and the
+ * parallels of one play share the same media, so switching parallels
+ * keeps the cube (a stack of 3D layers plus a playing video) and its
+ * spin. Rebuilding it in the same frames as the route's scroll made
+ * Chrome on Android paint the card at a stale scroll offset.
  */
 export function MomentCubeView({ face, play, tier, title }) {
   const boxRef = useRef(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error
+  const faceKey = face ? JSON.stringify(face) : "";
+  const playKey = play ? String(play.PlayID) : "";
+  // The latest objects, for the keyed effect below (runs after this one)
+  const latest = useRef({ face, play });
   useEffect(() => {
+    latest.current = { face, play };
+  });
+  useEffect(() => {
+    const { face, play } = latest.current;
     if (!face || !play || !boxRef.current) return undefined;
     let instance = null;
     let cancelled = false;
@@ -66,7 +78,7 @@ export function MomentCubeView({ face, play, tier, title }) {
       cancelled = true;
       if (instance) instance.destroy();
     };
-  }, [face, play, tier]);
+  }, [faceKey, playKey, tier]);
   return (
     <div className="cube-inline">
       <div ref={boxRef} className="cube-inline-box" title={title || "Drag to spin"} />

@@ -88,13 +88,21 @@ initFCL();
  * history entry: the browser's own restoration fires before a page's data
  * has rendered, when the page is still short, so the position is kept
  * per history key here and restored once the page is tall enough.
+ * One exception: the parallel pills on an edition page are links to the
+ * same set and play with another subedition suffix, in-page state rather
+ * than a new page, so the reader stays where the pills are.
  */
 const scrollPositions = new Map();
+const editionPage = (pathname) => {
+  const m = /^\/editions\/(\d+_\d+)(?:_\d+)?\/?$/.exec(pathname);
+  return m ? m[1] : null;
+};
 function ScrollToTop() {
   const location = useLocation();
   const type = useNavigationType();
   const lastY = useRef(0);
   const prevKey = useRef(location.key);
+  const prevPath = useRef(location.pathname);
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     const onScroll = () => { lastY.current = window.scrollY; };
@@ -105,6 +113,8 @@ function ScrollToTop() {
     // The entry just left keeps the position it was scrolled to
     if (prevKey.current !== location.key) scrollPositions.set(prevKey.current, lastY.current);
     prevKey.current = location.key;
+    const from = prevPath.current;
+    prevPath.current = location.pathname;
     if (type === "POP") {
       const target = scrollPositions.get(location.key) || 0;
       if (target > 0) {
@@ -121,8 +131,10 @@ function ScrollToTop() {
         return;
       }
     }
+    const edition = editionPage(location.pathname);
+    if (edition && edition === editionPage(from)) return;
     window.scrollTo(0, 0);
-  }, [location.key, type]);
+  }, [location.key, type, location.pathname]);
   return null;
 }
 
