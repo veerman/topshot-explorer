@@ -73,14 +73,18 @@ Before changing any factual value, or aligning a player's plays for consistency:
    drop to reintroduce class 1, 2, and 7.
 8. **A new mint format (play 9088 on, the 2026 WNBA plays of September 2026)**:
    173 of the first 217 carry at least one error, against a structural error
-   rate near zero before. Dates as "8/1/2026"; heights as "6-0"; the team at
+   rate near zero before. Dates as "8/1/2026"; heights as "6-0"; weights as "203lb"; the team at
    the moment as a nickname or code ("Dream", "LVA") with a blank or wrong id;
    a video file name as the tagline; a play-by-play line as PlayType, so a block
    reads "Driving Layup Shot: Missed"; team reels with the team as FullName;
    birthdates and draft facts left blank. Every shape here is new, so each has
    a normaliser (FOUNDATION 3.2, step 6) that no earlier play triggers.
-   What no rule can supply: the facts of a player with no earlier play, the
-   real tagline text, and one play naming two players (9269).
+   What no rule can supply: the facts of a player with no earlier play and the
+   real tagline text. 35 plays are exact earlier copies of later ones in the
+   same set, absent from Atlas (9269, naming two players, among them); they
+   are mismints. Several players arrived under a new spelling ("Alexa Held"
+   as Lexi Held, "Anastasiia Olairi Kosu"), which splits their debut badge
+   until one name override merges them.
 
 ## The rulebook, field by field
 

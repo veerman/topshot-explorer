@@ -26,11 +26,6 @@
       "league": "WNBA",
       "draft": null
     },
-    "Alexa Held": {
-      "season": "2025",
-      "league": "WNBA",
-      "draft": "2022"
-    },
     "Alicia Flórez": {
       "season": "2026",
       "league": "WNBA",
@@ -281,7 +276,7 @@
       "league": "WNBA",
       "draft": null
     },
-    "Leila Lacan": {
+    "Leïla Lacan": {
       "season": "2025",
       "league": "WNBA",
       "draft": "2024"
@@ -290,6 +285,11 @@
       "season": "2024",
       "league": "WNBA",
       "draft": "2020"
+    },
+    "Lexi Held": {
+      "season": "2025",
+      "league": "WNBA",
+      "draft": "2022"
     },
     "Li Meng": {
       "season": "2023",

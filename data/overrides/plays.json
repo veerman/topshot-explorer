@@ -522,11 +522,15 @@
     "Birthplace": "Havre de Grace, MD, USA",
     "NbaSeason": "2021 Summer League"
   },
+  "1488": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
   "1498": {
     "DraftTeam": "San Antonio Stars"
   },
   "1514": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "1526": {
     "Birthplace": "St. Louis, MO, USA"
@@ -540,6 +544,9 @@
   },
   "1562": {
     "DraftYear": 2013
+  },
+  "1571": {
+    "Birthdate": "1995-05-30"
   },
   "1600": {
     "DraftTeam": "New Orleans Hornets"
@@ -563,7 +570,8 @@
     "fullName": "Betnijah Laney-Hamilton"
   },
   "1679": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "1685": {
     "Birthplace": "Würzburg, DEU"
@@ -740,14 +748,19 @@
   "2762": {
     "DraftTeam": "San Antonio Stars"
   },
+  "2774": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
   "2779": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "2811": {
     "DraftTeam": "San Antonio Stars"
   },
   "2817": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "2883": {
     "Birthplace": "Elmhurst, IL, USA"
@@ -1019,6 +1032,9 @@
     "Height": "81",
     "Weight": "220"
   },
+  "5328": {
+    "Birthdate": "1995-05-30"
+  },
   "5329": {
     "fullName": "Temi Fágbénlé"
   },
@@ -1028,8 +1044,12 @@
   "5354": {
     "DraftTeam": "San Antonio Stars"
   },
+  "5355": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
   "5363": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "5372": {
     "Birthplace": "Irvine, CA, USA"
@@ -1071,11 +1091,15 @@
   "5548": {
     "DraftTeam": "San Antonio Stars"
   },
+  "5561": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
   "5562": {
     "Birthplace": "Wangaratta, AUS"
   },
   "5563": {
-    "fullName": "Skylar Diggins"
+    "fullName": "Skylar Diggins",
+    "DraftTeam": "Tulsa Shock"
   },
   "5564": {
     "TotalYearsExperience": "0"
@@ -1097,6 +1121,9 @@
   },
   "5663": {
     "DraftTeam": "San Antonio Stars"
+  },
+  "5678": {
+    "Birthdate": "1995-05-30"
   },
   "5703": {
     "Birthplace": "Prijepolje, SRB"
@@ -1325,11 +1352,20 @@
   "6768": {
     "fullName": "Steph Curry"
   },
+  "6782": {
+    "fullName": "Lexi Held"
+  },
   "6784": {
     "Birthplace": "Edéa, CMR"
   },
+  "6840": {
+    "Birthplace": "Yaoundé, CMR"
+  },
   "6859": {
     "Birthplace": "New York, NY, USA"
+  },
+  "6866": {
+    "Birthplace": "Yaoundé, CMR"
   },
   "6927": {
     "DraftTeam": "San Antonio Stars"
@@ -1407,8 +1443,17 @@
   "7056": {
     "DraftTeam": "San Antonio Stars"
   },
+  "7059": {
+    "DraftTeam": "Tulsa Shock"
+  },
   "7087": {
     "DraftTeam": "San Antonio Stars"
+  },
+  "7101": {
+    "Birthplace": "Yaoundé, CMR"
+  },
+  "7118": {
+    "Birthplace": "Yaoundé, CMR"
   },
   "7126": {
     "Birthplace": "Chicago, IL, USA"
@@ -1440,11 +1485,24 @@
   "7157": {
     "NbaSeason": "2000-01"
   },
+  "7172": {
+    "Birthplace": "Havre de Grace, MD, USA"
+  },
+  "7179": {
+    "DraftTeam": "Tulsa Shock"
+  },
   "7182": {
-    "DateOfMoment": "2025-05-18 02:00:00 +0000 UTC"
+    "DateOfMoment": "2025-05-18 02:00:00 +0000 UTC",
+    "Birthplace": "Yaoundé, CMR"
   },
   "7200": {
     "Birthplace": "Edéa, CMR"
+  },
+  "7201": {
+    "Birthplace": "Yaoundé, CMR"
+  },
+  "7204": {
+    "fullName": "Leïla Lacan"
   },
   "7209": {
     "DraftYear": 2024
@@ -1464,17 +1522,26 @@
   "7218": {
     "fullName": "Marine Johannès"
   },
+  "7227": {
+    "Birthplace": "Yaoundé, CMR"
+  },
   "7236": {
     "DraftTeam": "San Antonio Stars"
   },
   "7250": {
     "DraftTeam": "San Antonio Stars"
   },
+  "7253": {
+    "DraftTeam": "Tulsa Shock"
+  },
   "7264": {
     "Birthplace": "New York, NY, USA"
   },
   "7306": {
     "Birthplace": "New York, NY, USA"
+  },
+  "7309": {
+    "DraftTeam": "Tulsa Shock"
   },
   "7329": {
     "DraftTeam": "San Antonio Stars"
@@ -1719,14 +1786,26 @@
   "8817": {
     "Birthplace": "Lexington, KY, USA"
   },
+  "8835": {
+    "fullName": "Anastasiia Kosu"
+  },
   "8850": {
     "DraftTeam": "San Antonio Stars"
+  },
+  "8855": {
+    "Birthplace": "Yaoundé, CMR"
+  },
+  "8889": {
+    "DraftTeam": "Tulsa Shock"
   },
   "8901": {
     "DraftTeam": "San Antonio Stars"
   },
   "8904": {
     "DraftTeam": "San Antonio Stars"
+  },
+  "8911": {
+    "Birthplace": "Yaoundé, CMR"
   },
   "8918": {
     "TotalYearsExperience": "0"
@@ -1756,7 +1835,8 @@
   "8951": {
     "TeamAtMoment": "Team Coop",
     "TeamAtMomentNBAID": "1611665415",
-    "HomeTeamName": "Team Coop"
+    "HomeTeamName": "Team Coop",
+    "Birthplace": "Yaoundé, CMR"
   },
   "8964": {
     "TotalYearsExperience": "0"
@@ -1796,11 +1876,17 @@
   "9106": {
     "Height": "79"
   },
+  "9121": {
+    "Birthplace": "Yaoundé, CMR"
+  },
   "9132": {
     "Birthplace": "Chatham, ON, CAN"
   },
   "9174": {
     "DraftTeam": "Connecticut Sun"
+  },
+  "9202": {
+    "fullName": "DiJonai Carrington"
   },
   "9283": {
     "DraftTeam": "Minnesota Lynx"

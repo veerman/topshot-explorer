@@ -93,7 +93,7 @@ export function cyrb128(str) {
 
 // Bump when normalization logic changes (e.g. date formatting) so cached
 // databases recompile their plays/sets from the stored _raw backups once.
-const NORMALIZATION_VERSION = "6"; // 6: the play 9088+ mint format (team names and ids, play types, bare dates, heights, file-name taglines, team reels, bio fill); 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
+const NORMALIZATION_VERSION = "7"; // 7: weights as bare pounds; 6: the play 9088+ mint format (team names and ids, play types, bare dates, heights, file-name taglines, team reels, bio fill); 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
 
 // The inputs are static imports, so the hash cannot change within a session;
 // computing it once avoids re-serializing over a megabyte of JSON per call.

@@ -296,7 +296,7 @@ then applies, in order:
    `YYYY-MM-DD`, moment date to Eastern time, birthplace to house format,
    the one team-name rewrite (Los Angeles Clippers to LA Clippers);
 6. the repairs for the mint format that arrived with play 9088, each a
-   shape no earlier play has: height in inches; a video file name as
+   shape no earlier play has: height in inches, weight in bare pounds; a video file name as
    the tagline reads as none; the team at the moment resolved to the
    side of its game its nickname or code names ("Dream", "LVA"); the
    team id following that name (a blank id filled, an id naming a

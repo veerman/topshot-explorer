@@ -158,6 +158,12 @@ export function normalizeHeight(height) {
   return m ? String(Number(m[1]) * 12 + Number(m[2])) : height;
 }
 
+/** Weight in pounds as a bare number, the chain's form; mints from play 9088 write "203lb" */
+export function normalizeWeight(weight) {
+  const m = String(weight ?? "").trim().match(/^(\d{2,3})\s*lbs?\.?$/i);
+  return m ? m[1] : weight;
+}
+
 /*
  * A video file name where the story belongs ("bonner d 3 nylvphx verdap aug
  * 1 2026", "olsen_l_3_pointer_gsvvwas_verdap_jul_6_2026"): lowercase words
@@ -618,6 +624,9 @@ export function applyPlayOverrides(play) {
   });
   if (result.Height) {
     result.Height = normalizeHeight(result.Height);
+  }
+  if (result.Weight) {
+    result.Weight = normalizeWeight(result.Weight);
   }
   if (isFileNameTagline(result.description)) {
     result.description = "";
