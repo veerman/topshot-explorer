@@ -1410,9 +1410,6 @@
   "7087": {
     "DraftTeam": "San Antonio Stars"
   },
-  "7123": {
-    "TeamAtMomentNBAID": "1610612766"
-  },
   "7126": {
     "Birthplace": "Chicago, IL, USA"
   },
@@ -1711,7 +1708,6 @@
     "TotalYearsExperience": "0"
   },
   "8620": {
-    "TeamAtMomentNBAID": "1611661319",
     "TotalYearsExperience": "0"
   },
   "8653": {
@@ -1739,7 +1735,6 @@
     "TotalYearsExperience": "0"
   },
   "8920": {
-    "TeamAtMomentNBAID": "1611661319",
     "DraftTeam": "San Antonio Stars"
   },
   "8921": {
@@ -1797,5 +1792,20 @@
   },
   "9087": {
     "DraftTeam": "Seattle SuperSonics"
+  },
+  "9106": {
+    "Height": "79"
+  },
+  "9132": {
+    "Birthplace": "Chatham, ON, CAN"
+  },
+  "9174": {
+    "DraftTeam": "Connecticut Sun"
+  },
+  "9283": {
+    "DraftTeam": "Minnesota Lynx"
+  },
+  "9304": {
+    "DraftTeam": "Connecticut Sun"
   }
 }

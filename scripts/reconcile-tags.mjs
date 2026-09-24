@@ -28,7 +28,7 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { loadRawPlays, loadSeedPlaysRaw } from "./lib/raw-plays.mjs";
-import { seedEditions } from "./lib/seed-facts.mjs";
+import { seedEditions, seedSets } from "./lib/seed-facts.mjs";
 import { flag, opt } from "./lib/args.mjs";
 import { readJsonPreservingEol, writeJsonAtomic } from "./lib/json-file.mjs";
 import {
@@ -59,7 +59,7 @@ function reconcile(raw, additions) {
   buildNameAliases(raw);
   const plays = attachMintTotals(Object.entries(raw)
     .map(([id, metadata]) => compilePlayMetadata(id, metadata))
-    .filter(Boolean), seedEditions());
+    .filter(Boolean), seedEditions(), seedSets());
   const byID = new Map(plays.map((p) => [String(p.playID), p]));
   const tsdIndex = buildTsdIndex(plays);
   const mintClock = buildMintClock(plays);

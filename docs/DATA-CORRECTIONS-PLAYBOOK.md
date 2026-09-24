@@ -71,6 +71,16 @@ Before changing any factual value, or aligning a player's plays for consistency:
 7. **Format drift between mint batches**: newer mints (play IDs ~8700+) spell out
    states ("Akron, Ohio") where older mints used "Akron, OH, USA". Expect every new
    drop to reintroduce class 1, 2, and 7.
+8. **A new mint format (play 9088 on, the 2026 WNBA plays of September 2026)**:
+   173 of the first 217 carry at least one error, against a structural error
+   rate near zero before. Dates as "8/1/2026"; heights as "6-0"; the team at
+   the moment as a nickname or code ("Dream", "LVA") with a blank or wrong id;
+   a video file name as the tagline; a play-by-play line as PlayType, so a block
+   reads "Driving Layup Shot: Missed"; team reels with the team as FullName;
+   birthdates and draft facts left blank. Every shape here is new, so each has
+   a normaliser (FOUNDATION 3.2, step 6) that no earlier play triggers.
+   What no rule can supply: the facts of a player with no earlier play, the
+   real tagline text, and one play naming two players (9269).
 
 ## The rulebook, field by field
 
@@ -120,6 +130,13 @@ FACTUAL require a lookup against a basketball reference.
 ### Birthdate (19 overrides)
 - FACTUAL lookup. Watch for the wrong-person class (see error class 3) and
   off-by-one-day timezone artifacts. Format `YYYY-MM-DD`.
+- A BLANK birthdate, birthplace or draft field is DETERMINISTIC when the player
+  has other plays (since 2026-09-23): it takes the value all of them agree on
+  (the player bio index in overrides.service.js). No player with several plays
+  has ever had two birthdates or birthplaces. Only a player with no earlier play
+  needs an override, and an override on one play then fills the rest. A blank
+  height fills the same way, only when every other play agrees (heights change
+  with re-measurement); on the September 2026 mints it matched Atlas 46 of 46.
 
 ### Draft fields (254 DraftTeam + 21 DraftYear + round/selection)
 - **DraftTeam = the franchise that made the selection, under its name at the time.**
@@ -156,6 +173,23 @@ FACTUAL require a lookup against a basketball reference.
   All-Star / special-event sides get their own IDs (e.g. 1610616852, 1610616860)
   matching the special entries in `data/additions/teams.json`. Watch for upstream
   ID mixups (plays 8620/8920: San Antonio Stars plays stamped with the Fever's ID).
+- DETERMINISTIC since 2026-09-23 (`resolveTeamId`): the id follows the team name.
+  A blank id takes the named franchise's id; an id naming a franchise outside the
+  game, or one teams.json does not know (Swoopes, 9138), yields to a name that is a
+  side of it. Every earlier id override went that way, and the overrides on 7123,
+  8620 and 8920 were removed once the rule reproduced them. 7957's wrong id names
+  the opponent, a side of the game, so the rule leaves that one to its override.
+  Squad ids are never second-guessed.
+- The team name itself resolves first (`resolveTeamAtMoment`): a nickname or code
+  that names exactly one side of the game becomes that side's full name.
+
+### PlayType (0 overrides)
+- DETERMINISTIC: PlayCategory is the fine category, PlayType the coarse type
+  derived from it. Every play before 9088 follows one table: Dunk and Layup are
+  Rim; Jump Shot, Floater and Hook Shot are Mid-Range; everything else is its own
+  type. A PlayType outside that vocabulary is derived from the category
+  (`normalizePlayType`), never kept: the play-by-play line describes the
+  opponent on blocks and steals.
 
 ### Game facts (1 play)
 - Special-event plays may need HomeTeamName/score fixes (play 6364: OGs vs Rising

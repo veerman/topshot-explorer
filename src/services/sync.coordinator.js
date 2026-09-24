@@ -6,7 +6,7 @@
   getSetCIDs,
   fetchPlayBatch
 } from "./fcl.service";
-import { compilePlayMetadata, compileSetMetadata, buildNameAliases, standardizePlayKeys, teamKeyForPlay } from "./overrides.service";
+import { compilePlayMetadata, compileSetMetadata, buildNameAliases, hasBlankBioField, standardizePlayKeys, teamKeyForPlay } from "./overrides.service";
 import {
   saveSyncStatsDB,
   getSyncStatsDB,
@@ -93,7 +93,7 @@ export function cyrb128(str) {
 
 // Bump when normalization logic changes (e.g. date formatting) so cached
 // databases recompile their plays/sets from the stored _raw backups once.
-const NORMALIZATION_VERSION = "5"; // 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
+const NORMALIZATION_VERSION = "6"; // 6: the play 9088+ mint format (team names and ids, play types, bare dates, heights, file-name taglines, team reels, bio fill); 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
 
 // The inputs are static imports, so the hash cannot change within a session;
 // computing it once avoids re-serializing over a megabyte of JSON per call.
@@ -179,17 +179,18 @@ export function isSyncCompleteStage(stage) {
   return stage === "Up to date!" || (typeof stage === "string" && stage.startsWith("IPFS cache refreshed!"));
 }
 
-// Canonical-name aliases need every play's raw spelling, which a batch sync
-// only has once it finishes: prime the aliases from the raw store, then
-// recompile just the plays whose raw name IS an alias (a handful), so a
-// late-arriving variant spelling lands as the canonical name.
+// Canonical-name aliases and the player bio fill need every play, which a
+// batch sync only has once it finishes: prime both from the raw store, then
+// recompile just the plays whose raw name IS an alias or that have a blank
+// bio field (a few hundred), so a late-arriving variant spelling lands as
+// the canonical name and a new mint's blanks take the player's known facts.
 async function applyNameAliasPass() {
   const rawPlays = await getAllPlaysRawDB();
   const aliases = buildNameAliases(rawPlays);
-  if (aliases.size === 0) return;
   const affected = rawPlays.filter((p) => {
-    const name = String(standardizePlayKeys(p._raw || p).FullName || "").trim().toLowerCase();
-    return name && aliases.has(name);
+    const raw = p._raw || p;
+    const name = String(standardizePlayKeys(raw).FullName || "").trim().toLowerCase();
+    return (name && aliases.has(name)) || hasBlankBioField(raw);
   });
   if (affected.length === 0) return;
   const recompiled = affected.map((p) => {

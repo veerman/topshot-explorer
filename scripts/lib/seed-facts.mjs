@@ -30,6 +30,12 @@ export function seedEditions() {
   return out;
 }
 
+/** Every set in the seed as { id, setName }, the third argument of
+ *  attachMintTotals (the debut rule's Rookie Ultimate sets) */
+export function seedSets() {
+  return loadSeed().setsOverview.map((s) => ({ id: s.id, setName: s.setName }));
+}
+
 let factsCache = null;
 export function seedFacts() {
   if (!factsCache) {

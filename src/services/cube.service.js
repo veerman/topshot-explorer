@@ -7,32 +7,7 @@ import teamsAdditions from "../../data/additions/teams.json";
 import { getMediaInfo } from "./ipfs.media";
 import { reconstructPlayer } from "./ipfs.generate";
 import { heroThumbUrl } from "./media.service";
-
-// The cube's score face wants short team codes. The first three letters of
-// the name read right for most franchises (TORonto, BOSton, MIAmi); the map
-// covers the ones where that misreads or collides.
-const TEAM_CODE_OVERRIDES = {
-  "los angeles lakers": "LAL",
-  "los angeles clippers": "LAC",
-  "la clippers": "LAC",
-  "los angeles sparks": "LAS",
-  "las vegas aces": "LVA",
-  "golden state warriors": "GSW",
-  "oklahoma city thunder": "OKC",
-  "new york knicks": "NYK",
-  "new york liberty": "NYL",
-  "new orleans pelicans": "NOP",
-  "new orleans hornets": "NOH",
-  "new jersey nets": "NJN",
-  "san antonio spurs": "SAS",
-  "phoenix suns": "PHX",
-  "brooklyn nets": "BKN"
-};
-const teamCode = (name) => {
-  const clean = String(name || "").trim();
-  if (!clean) return "";
-  return TEAM_CODE_OVERRIDES[clean.toLowerCase()] || clean.slice(0, 3).toUpperCase();
-};
+import { teamCode } from "./team.codes";
 
 const CUBE_MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 const cubeDate = (dateOfMoment) => {

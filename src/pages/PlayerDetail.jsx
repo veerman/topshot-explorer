@@ -3,7 +3,7 @@ import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.service";
 import { harmonizePlayerProfiles } from "../services/relationship.service";
 import { DataTable } from "../components/DataTable";
-import { getTeamNameWithEmoji, getTeamEmoji, getTeamDetailsById, isMismintPlay, teamKeyForPlay } from "../services/overrides.service";
+import { getTeamNameWithEmoji, getTeamEmoji, getTeamDetailsById, isMismintPlay, teamKeyForPlay, draftStatus } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply, SupplyWord } from "../components/Supply";
 import { buildTeamNameMap, isWnbaTeam, renderTeamLink, renderEmojiName, formatHeight, playerNameFromParam, calendarDateCell, buildPlayToSets } from "../utils/display.utils";
@@ -81,6 +81,7 @@ export function PlayerDetail() {
     let draftRound = "";
     let draftSelection = "";
     let draftTeam = "";
+    let draftEntry = "undrafted";
     const teams = new Set();
     const jerseys = new Set();
     let league = "NBA";
@@ -115,6 +116,9 @@ export function PlayerDetail() {
       if (!draftRound) draftRound = play.DraftRound_merged || play.DraftRound;
       if (!draftSelection && play.DraftSelection && play.DraftSelection !== "0") draftSelection = play.DraftSelection_merged || play.DraftSelection;
       if (!draftTeam) draftTeam = play.DraftTeam_merged || play.DraftTeam;
+      // One play with a round or pick makes the player drafted
+      const status = draftStatus(play);
+      if (status === "drafted" || (status === "allocated" && draftEntry === "undrafted")) draftEntry = status;
 
       if (play.TeamAtMoment) {
         teams.add(play.TeamAtMoment);
@@ -175,7 +179,8 @@ export function PlayerDetail() {
         draftYear,
         draftRound,
         draftSelection,
-        draftTeam
+        draftTeam,
+        draftEntry
       },
       plays: filteredPlays,
       playToSetsMap,
@@ -413,21 +418,23 @@ export function PlayerDetail() {
             </div>
             <div className="info-row">
               <span className="info-label">Draft Year</span>
-              <span className="info-value">{profile.draftYear || "Undrafted"}</span>
+              <span className="info-value">
+                {profile.draftEntry === "drafted" ? (profile.draftYear || "-") : profile.draftEntry === "allocated" ? "Allocated" : "Undrafted"}
+              </span>
             </div>
             <div className="info-row">
               <span className="info-label">Draft Round</span>
-              <span className="info-value">{profile.draftRound || "-"}</span>
+              <span className="info-value">{(profile.draftEntry === "drafted" && profile.draftRound) || "-"}</span>
             </div>
             <div className="info-row">
               <span className="info-label">Draft Selection</span>
               <span className="info-value">
-                {profile.draftSelection ? (profile.draftSelection.includes("/") ? profile.draftSelection : `Pick #${profile.draftSelection}`) : "-"}
+                {profile.draftEntry === "drafted" && profile.draftSelection ? (profile.draftSelection.includes("/") ? profile.draftSelection : `Pick #${profile.draftSelection}`) : "-"}
               </span>
             </div>
             <div className="info-row">
-              <span className="info-label">Drafting Team</span>
-              <span className="info-value">{renderTeamLink(profile.draftTeam, teamNameMap)}</span>
+              <span className="info-label">{profile.draftEntry === "allocated" ? "Allocated To" : "Drafting Team"}</span>
+              <span className="info-value">{profile.draftEntry === "undrafted" ? "-" : renderTeamLink(profile.draftTeam, teamNameMap)}</span>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { getArenaTwitterURL, formatHeight } from "../utils/display.utils";
+import { draftStatus } from "../services/overrides.service";
 
 /**
  * The information groups the play and edition pages share, one component
@@ -84,6 +85,7 @@ export function ProfileSection({ play }) {
 
 export function BiographySection({ play, renderTeamLink }) {
   const p = play || {};
+  const draft = draftStatus(p);
   const birthdate = (() => {
     if (!p.Birthdate) return dash;
     const parts = p.Birthdate.split("-");
@@ -105,19 +107,19 @@ export function BiographySection({ play, renderTeamLink }) {
         </div>
         <div className="info-row">
           <span className="info-label">Draft Year</span>
-          <span className="info-value">{p.DraftYear || "Undrafted"}</span>
+          <span className="info-value">{draft === "drafted" ? (p.DraftYear || dash) : draft === "allocated" ? "Allocated" : "Undrafted"}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Draft Round</span>
-          <span className="info-value">{p.DraftRound || dash}</span>
+          <span className="info-value">{(draft === "drafted" && p.DraftRound) || dash}</span>
         </div>
         <div className="info-row">
           <span className="info-label">Draft Selection</span>
-          <span className="info-value">{p.DraftSelection ? `Pick #${p.DraftSelection}` : dash}</span>
+          <span className="info-value">{draft === "drafted" && p.DraftSelection ? `Pick #${p.DraftSelection}` : dash}</span>
         </div>
         <div className="info-row">
-          <span className="info-label">Drafting Team</span>
-          <span className="info-value">{(play && renderTeamLink && renderTeamLink(p.DraftTeam)) || dash}</span>
+          <span className="info-label">{draft === "allocated" ? "Allocated To" : "Drafting Team"}</span>
+          <span className="info-value">{(draft !== "undrafted" && play && renderTeamLink && renderTeamLink(p.DraftTeam)) || dash}</span>
         </div>
       </div>
     </div>

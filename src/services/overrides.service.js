@@ -14,6 +14,7 @@ import mvpAwards from "../../data/awards/mvp.json";
 import royAwards from "../../data/awards/roy.json";
 import rookieSeasons from "../../data/additions/rookie_seasons.json";
 import { toHouseBirthplace } from "./birthplace.normalizer";
+import { teamCode } from "./team.codes";
 import { normPlayerName } from "./name-norm";
 import { playSigned } from "./autograph.service";
 
@@ -55,6 +56,23 @@ export function isSentinelValue(v) {
   return v === "N/A" || v === "<invalid Value>";
 }
 
+/*
+ * How a player entered the league, for display. The chain gives the
+ * undrafted a DraftYear too (their draft class, which the Rookie Year and
+ * Rookie Mint rules keep using) and marks them by a round and pick left
+ * empty or "N/A". A team with no round or pick is an allocation: the
+ * WNBA's founding players (Cooper, Swoopes, Leslie, Weatherspoon, Katie
+ * Smith). Returns "drafted", "undrafted" or "allocated".
+ */
+export function draftStatus(play) {
+  const has = (v) => {
+    const s = String(v ?? "").trim();
+    return s !== "" && s !== "0" && !isSentinelValue(s);
+  };
+  if (has(play?.DraftRound) || has(play?.DraftSelection)) return "drafted";
+  return has(play?.DraftTeam) ? "allocated" : "undrafted";
+}
+
 /**
  * Normalizes birthplace strings by separating with exactly one space after a comma,
  * and trimming/filtering out empty/whitespace segments.
@@ -86,6 +104,96 @@ export function normalizeTeamName(name) {
     return "LA Clippers";
   }
   return trimmed;
+}
+
+/*
+ * The team at the moment is one side of its game. Mints from play 9088
+ * write it as the nickname ("Dream") or the scoreboard code ("LVA"); either
+ * names exactly one side, which is then used in full. Whole words only, so
+ * "Nets" never matches "Charlotte Hornets" nor "Sun" the "Phoenix Suns".
+ * A name matching neither side, or both, is left alone.
+ */
+export function resolveTeamAtMoment(team, home, away) {
+  const name = String(team || "").trim();
+  const sides = [home, away].map((s) => String(s || "").trim()).filter(Boolean);
+  if (!name || sides.length === 0) return name;
+  const key = name.toLowerCase();
+  if (sides.some((s) => s.toLowerCase() === key)) return name;
+  const bySuffix = sides.filter((s) => s.toLowerCase().endsWith(" " + key));
+  if (bySuffix.length === 1) return bySuffix[0];
+  if (/^[A-Z]{2,4}$/.test(name)) {
+    const byCode = sides.filter((s) => teamCode(s) === name);
+    if (byCode.length === 1) return byCode[0];
+  }
+  return name;
+}
+
+/*
+ * The team id follows the team name. A blank id takes the id of the named
+ * franchise (teams.json, historical names included). An id naming another
+ * franchise, or no franchise teams.json knows, yields when the name is a
+ * side of the game and the id's team is not: name and game agree, the id is
+ * the odd one out (the Fever id on San Antonio Stars plays, the Dream id on
+ * three Phoenix Mercury plays, an unlisted id on a Houston Comets play).
+ * Squad ids are never second-guessed.
+ */
+export function resolveTeamId(id, team, home, away) {
+  const current = String(id || "").trim();
+  const names = getAdditionsTeamNameMap();
+  const key = String(team || "").trim().toLowerCase();
+  const nameId = names[key];
+  if (!nameId || current === nameId) return current;
+  if (!current) return nameId;
+  const idTeam = teamsAdditions[current];
+  if (idTeam && (idTeam.special || !idTeam.name)) return current;
+  const sides = [home, away].map((s) => String(s || "").trim().toLowerCase()).filter(Boolean);
+  const nameInGame = sides.includes(key);
+  const idInGame = sides.some((s) => names[s] === current);
+  return nameInGame && !idInGame ? nameId : current;
+}
+
+/** Height in inches, the chain's form; mints from play 9088 write "6-0" */
+export function normalizeHeight(height) {
+  const m = String(height ?? "").trim().match(/^(\d)-(\d{1,2})$/);
+  return m ? String(Number(m[1]) * 12 + Number(m[2])) : height;
+}
+
+/*
+ * A video file name where the story belongs ("bonner d 3 nylvphx verdap aug
+ * 1 2026", "olsen_l_3_pointer_gsvvwas_verdap_jul_6_2026"): lowercase words
+ * joined by spaces or underscores around a month, day and year. Never seen
+ * before play 9088; such a tagline reads as no tagline.
+ */
+const FILE_NAME_TAGLINE = /^[a-z0-9_ ]+$/;
+const FILE_NAME_DATE = /(^|[ _])(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[ _]\d{1,2}[ _]\d{4}([ _]|$)/;
+export function isFileNameTagline(str) {
+  const trimmed = String(str || "").trim();
+  return FILE_NAME_TAGLINE.test(trimmed) && FILE_NAME_DATE.test(trimmed);
+}
+
+/*
+ * PlayCategory is the fine category and PlayType the coarse type derived
+ * from it; every play before 9088 follows this table (Dunk and Layup are
+ * Rim; Jump Shot, Floater and Hook Shot are Mid-Range; the rest are their
+ * own type). Mints from 9088 put the play-by-play line in PlayType
+ * ("Driving Layup Shot: Missed" on a block, "Turnover: Bad Pass" on a
+ * steal), so any type outside the known set is derived from the category.
+ */
+const PLAY_TYPES = new Set(["Rim", "3 Pointer", "Mid-Range", "Mid Range", "2 Pointer", "Assist", "Reel", "Block", "Steal", "Handles", "Redemption", "Hustle"]);
+const PLAY_TYPE_BY_CATEGORY = { Dunk: "Rim", Layup: "Rim", "Jump Shot": "Mid-Range", Floater: "Mid-Range", "Hook Shot": "Mid-Range" };
+export function normalizePlayType(category, type) {
+  if (!type || PLAY_TYPES.has(type)) return type;
+  if (PLAY_TYPE_BY_CATEGORY[category]) return PLAY_TYPE_BY_CATEGORY[category];
+  return PLAY_TYPES.has(category) ? category : type;
+}
+
+// A blank category beside a play-by-play line for the player's own made
+// layup or dunk ("Driving Layup Shot: Made") is that category
+export function categoryFromPlayByPlay(type) {
+  const line = String(type || "");
+  if (!/:\s*Made$/.test(line)) return "";
+  if (/\bDunk\b/i.test(line)) return "Dunk";
+  return /\bLayup\b/i.test(line) ? "Layup" : "";
 }
 
 /**
@@ -141,14 +249,25 @@ export function normalizeBirthdate(str) {
   return `${yearUTC}-${monthUTC}-${dayUTC}`;
 }
 
+let easternFormatter = null;
+
 /**
  * Normalizes on-chain game timestamps (DateOfMoment) and standardizes them
  * in America/New_York (Eastern Time) as 'YYYY-MM-DD HH:MM:SS EST'.
  */
 export function normalizeDateOfMoment(str) {
   if (!str || isSentinelValue(str)) return "";
-  const trimmed = String(str).trim();
+  let trimmed = String(str).trim();
   if (trimmed === "") return "";
+
+  // Mints from play 9088 carry a bare game date ("8/1/2026", once
+  // "2026-08-13"), which new Date() reads as local midnight: a day early
+  // anywhere east of New York. The chain's own form for a moment with no
+  // game time is noon UTC (the reels), which keeps the day in every US zone.
+  const us = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (us) trimmed = `${us[3]}-${us[1].padStart(2, "0")}-${us[2].padStart(2, "0")}T12:00:00Z`;
+  else if (iso) trimmed = `${trimmed}T12:00:00Z`;
 
   const dateObj = new Date(trimmed);
   if (isNaN(dateObj.getTime())) {
@@ -156,7 +275,8 @@ export function normalizeDateOfMoment(str) {
   }
 
   try {
-    const formatter = new Intl.DateTimeFormat("en-US", {
+    // Built once: constructing it per play was most of a full compile's time
+    easternFormatter = easternFormatter || new Intl.DateTimeFormat("en-US", {
       timeZone: "America/New_York",
       year: "numeric",
       month: "2-digit",
@@ -168,7 +288,7 @@ export function normalizeDateOfMoment(str) {
       timeZoneName: "short"
     });
 
-    const parts = formatter.formatToParts(dateObj);
+    const parts = easternFormatter.formatToParts(dateObj);
     const partMap = {};
     parts.forEach(p => partMap[p.type] = p.value);
 
@@ -305,17 +425,19 @@ const STANDARD_PLAY_KEYS = {
 /**
  * Standardizes play metadata property keys case-insensitively to standard explorer casing.
  */
+// Every play spells the same few dozen keys, and this runs over every play
+// twice per compile (the bio index, then the play): look each spelling up once
+const standardKeyCache = new Map();
 export function standardizePlayKeys(play) {
   if (!play) return play;
   const result = {};
   Object.entries(play).forEach(([key, val]) => {
-    const lowerKey = key.toLowerCase();
-    const standardKey = STANDARD_PLAY_KEYS[lowerKey];
-    if (standardKey) {
-      result[standardKey] = val;
-    } else {
-      result[key] = val;
+    let standardKey = standardKeyCache.get(key);
+    if (standardKey === undefined) {
+      standardKey = STANDARD_PLAY_KEYS[key.toLowerCase()] || key;
+      standardKeyCache.set(key, standardKey);
     }
+    result[standardKey] = val;
   });
   return result;
 }
@@ -353,41 +475,127 @@ export function buildNameAliases(rawPlays) {
   });
   conflicts.forEach((k) => map.delete(k));
   nameAliases = map;
+  buildPlayerBioIndex(byId);
   return map;
+}
+
+/*
+ * Birthdate, birthplace and draft facts belong to the person: of the 917
+ * players with several plays before play 9088, none has two birthdates or
+ * two birthplaces. Mints from 9088 leave them blank (71 of 217
+ * birthdates), so a blank takes the value every other play of the player
+ * agrees on; any disagreement, "N/A" included, fills nothing. Keyed by
+ * league and canonical name, so a namesake in the other league never lends
+ * his facts. Primed by buildNameAliases, whose names it is keyed by.
+ * Height changes when a player is re-measured, but only a unanimous value
+ * fills, and on the new mints that value matched Dapper's own catalogue
+ * (Atlas) for all 46 players it could fill.
+ */
+const BIO_FILL_FIELDS = ["Birthdate", "Birthplace", "DraftYear", "DraftRound", "DraftSelection", "DraftTeam", "Height"];
+let playerBio = new Map();
+
+// The fields a team reel carries none of (every reel before play 9088)
+const PLAYER_FIELDS = ["FullName", "FirstName", "LastName", "Weight", "JerseyNumber", "PlayerPosition", "PrimaryPosition", "TotalYearsExperience", ...BIO_FILL_FIELDS];
+
+// True when a play's FullName is a team: its own team, a side of its game,
+// or any franchise in teams.json
+function fullNameIsTeam(play) {
+  const name = String(play.FullName || "").trim().toLowerCase();
+  if (!name) return false;
+  const own = [play.TeamAtMoment, play.HomeTeamName, play.AwayTeamName].map((s) => String(s || "").trim().toLowerCase());
+  return own.includes(name) || Boolean(getAdditionsTeamNameMap()[name]);
+}
+
+function playerBioKey(play) {
+  const name = String(play.FullName || "").trim().toLowerCase();
+  if (!name || isSentinelValue(play.FullName) || fullNameIsTeam(play)) return "";
+  const names = getAdditionsTeamNameMap();
+  const id = String(play.TeamAtMomentNBAID || "").trim()
+    || [play.TeamAtMoment, play.HomeTeamName, play.AwayTeamName].map((s) => names[String(s || "").trim().toLowerCase()]).find(Boolean);
+  return id ? `${isWnbaTeamId(id) ? "WNBA" : "NBA"}|${name}` : "";
+}
+
+/** True for a raw play the bio fill may touch: a named player with a blank bio field */
+export function hasBlankBioField(rawPlay) {
+  const play = standardizePlayKeys(rawPlay || {});
+  return Boolean(String(play.FullName || "").trim()) && BIO_FILL_FIELDS.some((field) => !String(play[field] ?? "").trim());
+}
+
+function bioValue(field, value) {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed || isSentinelValue(trimmed)) return trimmed;
+  if (field === "Birthdate") return normalizeBirthdate(trimmed);
+  if (field === "Birthplace") return normalizeBirthplace(trimmed);
+  if (field === "DraftTeam") return normalizeTeamName(trimmed);
+  if (field === "Height") return String(normalizeHeight(trimmed));
+  return trimmed;
+}
+
+function buildPlayerBioIndex(byId) {
+  const seen = new Map();
+  Object.entries(byId).forEach(([id, raw]) => {
+    const play = layerCorrections({ ...raw, playID: Number(id) });
+    const key = playerBioKey(play);
+    if (!key) return;
+    if (!seen.has(key)) seen.set(key, {});
+    const entry = seen.get(key);
+    BIO_FILL_FIELDS.forEach((field) => {
+      const value = bioValue(field, play[field]);
+      if (value) (entry[field] = entry[field] || new Set()).add(value);
+    });
+  });
+  const index = new Map();
+  seen.forEach((entry, key) => {
+    const agreed = {};
+    Object.entries(entry).forEach(([field, values]) => {
+      const [only] = values;
+      if (values.size === 1 && !isSentinelValue(only)) agreed[field] = only;
+    });
+    index.set(key, agreed);
+  });
+  playerBio = index;
+}
+
+/*
+ * Steps 1 to 4 of the compile: standard keys, then, unless Settings
+ * switches corrections off, overrides, additions and the canonical-name
+ * alias. Shared by the compile and the player bio index.
+ */
+function layerCorrections(play) {
+  // 1. Standardize keys of the incoming play object first
+  let result = standardizePlayKeys(play);
+  if (!result.playID || areOverridesDisabled()) return result;
+
+  const playIDStr = String(result.playID);
+
+  // 2. Apply overrides
+  let ownNameOverride = false;
+  if (playsOverrides[playIDStr]) {
+    const cleanOverride = standardizePlayKeys(playsOverrides[playIDStr]);
+    ownNameOverride = Boolean(String(cleanOverride.FullName || "").trim());
+    result = { ...result, ...cleanOverride };
+  }
+
+  // 3. Apply additions
+  if (playsAdditions[playIDStr]) {
+    const cleanAddition = standardizePlayKeys(playsAdditions[playIDStr]);
+    result = { ...result, ...cleanAddition };
+  }
+
+  // 4. Canonical-name alias (derived from other plays' FullName overrides);
+  // a play's own override always wins
+  if (!ownNameOverride && result.FullName && nameAliases.size > 0) {
+    const canonical = nameAliases.get(String(result.FullName).trim().toLowerCase());
+    if (canonical) result.FullName = canonical;
+  }
+  return result;
 }
 
 export function applyPlayOverrides(play) {
   if (!play) return play;
 
-  // 1. Standardize keys of the incoming play object first
-  let result = standardizePlayKeys(play);
+  const result = layerCorrections(play);
   if (!result.playID) return result;
-
-  const playIDStr = String(result.playID);
-  const disableOverrides = areOverridesDisabled();
-
-  if (!disableOverrides) {
-    // 2. Apply overrides
-    let ownNameOverride = false;
-    if (playsOverrides[playIDStr]) {
-      const cleanOverride = standardizePlayKeys(playsOverrides[playIDStr]);
-      ownNameOverride = Boolean(String(cleanOverride.FullName || "").trim());
-      result = { ...result, ...cleanOverride };
-    }
-
-    // 3. Apply additions
-    if (playsAdditions[playIDStr]) {
-      const cleanAddition = standardizePlayKeys(playsAdditions[playIDStr]);
-      result = { ...result, ...cleanAddition };
-    }
-
-    // 4. Canonical-name alias (derived from other plays' FullName overrides);
-    // a play's own override always wins
-    if (!ownNameOverride && result.FullName && nameAliases.size > 0) {
-      const canonical = nameAliases.get(String(result.FullName).trim().toLowerCase());
-      if (canonical) result.FullName = canonical;
-    }
-  }
 
   // Source Normalization: Dates, Timestamps, Birthplace, & Team Names
   if (!result.FullName || isSentinelValue(result.FullName) || result.FullName.trim() === "") {
@@ -408,6 +616,38 @@ export function applyPlayOverrides(play) {
       result[field] = normalizeTeamName(result[field]);
     }
   });
+  if (result.Height) {
+    result.Height = normalizeHeight(result.Height);
+  }
+  if (isFileNameTagline(result.description)) {
+    result.description = "";
+  }
+
+  // The team in full, then the id that follows it (the season and the bio
+  // fill below read the league off that id)
+  if (result.TeamAtMoment) {
+    result.TeamAtMoment = resolveTeamAtMoment(result.TeamAtMoment, result.HomeTeamName, result.AwayTeamName);
+  }
+  const teamId = resolveTeamId(result.TeamAtMomentNBAID, result.TeamAtMoment, result.HomeTeamName, result.AwayTeamName);
+  if (teamId !== String(result.TeamAtMomentNBAID || "").trim()) {
+    result.TeamAtMomentNBAID = teamId;
+  }
+
+  // A team reel names no player. Mints from 9088 put the team in FullName
+  // (and a height on one); every earlier reel leaves the player fields out.
+  if (fullNameIsTeam(result)) {
+    PLAYER_FIELDS.forEach((field) => {
+      if (field in result) result[field] = "";
+    });
+  }
+
+  // Person facts the play leaves blank, from the player's other plays
+  const bio = playerBio.get(playerBioKey(result));
+  if (bio) {
+    BIO_FILL_FIELDS.forEach((field) => {
+      if (bio[field] && !String(result[field] ?? "").trim()) result[field] = bio[field];
+    });
+  }
 
   // WNBA seasons are single calendar years; new mints sometimes arrive with
   // NBA-format ranges ("2025-26" on a 2025 WNBA play). Deterministic
@@ -424,6 +664,8 @@ export function applyPlayOverrides(play) {
 
   if (category === "Play Coming Soon") category = "";
   if (type === "Play Coming Soon") type = "";
+  if (!category) category = categoryFromPlayByPlay(type);
+  type = normalizePlayType(category, type);
 
   result.PlayCategory = category || "";
   result.PlayType = type || "";
@@ -769,13 +1011,22 @@ function getDebutName(play) {
  * plays from a raw snapshot attach it from the seed's set contents. Plays
  * without it derive as if every play were numbered.
  */
-export function attachMintTotals(plays, editions) {
+// Rookie Ultimate sets by their chain name ("2025 Rookie Ultimates", "WNBA
+// Rookie Ultimate 2026"); the debut rule reads which plays sit in one
+const ROOKIE_ULTIMATE_SET = /\brookie ultimates?\b/i;
+export function attachMintTotals(plays, editions, sets = null) {
   const totals = new Map();
+  const ultimateSets = new Set((sets || []).filter((s) => ROOKIE_ULTIMATE_SET.test(String(s.setName || ""))).map((s) => Number(s.id)));
+  const ultimatePlays = new Set();
   (editions || []).forEach((e) => {
     const id = Number(e.playID);
     totals.set(id, (totals.get(id) || 0) + (Number(e.momentCount) || 0));
+    if (ultimateSets.has(Number(e.setID))) ultimatePlays.add(id);
   });
-  (plays || []).forEach((p) => { p.mintTotal = totals.get(Number(p.playID)) || 0; });
+  (plays || []).forEach((p) => {
+    p.mintTotal = totals.get(Number(p.playID)) || 0;
+    p.inRookieUltimate = ultimatePlays.has(Number(p.playID));
+  });
   return plays;
 }
 
@@ -800,11 +1051,12 @@ const playCategory = (play) => String((play && play.PlayCategory) || "").trim().
  *   3. Twins share it (getCalculatedPlayTags): another play by the same
  *      player from the same game in the same play category is the same
  *      highlight re-created for a companion set (a Diamond Edition, a
- *      Signature Edition) and carries the badge too.
+ *      Signature Edition) and carries the badge too, except a copy in a
+ *      Rookie Ultimate set, which Dapper Labs never badges.
  * Scored against Dapper Labs' own badging over every player: 1,415 agree,
- * none missing, five extra (one-of-one twins of a Debut play, withheld by
- * tags_suppress on data/additions/plays.json, each shown on the Corrections
- * page). This replaces the earlier policy
+ * none missing, none extra beyond one team-moment one-of-one withheld by
+ * tags_suppress on data/additions/plays.json (8832, shown on the
+ * Corrections page). This replaces the earlier policy
  * that let EVERY same-game sibling share the badge, which was fitted to
  * 13 legends pairs and over-reached on 80 other plays.
  */
@@ -1398,9 +1650,11 @@ export function getCalculatedPlayTags(play, allPlays, tsdIndex, mintClock) {
             // Rule 3 (see buildTsdIndex): a twin of the debut, the same
             // game and the same play category, is the same highlight
             // re-created for a companion set and shares the badge. A
-            // different highlight from the same game does not.
+            // different highlight from the same game does not, nor does a
+            // Rookie Ultimate copy: Dapper Labs badges the Diamond Edition
+            // one-of-ones of a debut but never the Rookie Ultimate ones.
             const day = gameDay(play);
-            if (day !== "" && day === gameDay(primaryTsdPlay) && playCategory(play) === playCategory(primaryTsdPlay)) {
+            if (day !== "" && day === gameDay(primaryTsdPlay) && playCategory(play) === playCategory(primaryTsdPlay) && !play.inRookieUltimate) {
               tags.add("Top Shot Debut");
             }
           }

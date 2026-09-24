@@ -295,7 +295,17 @@ then applies, in order:
    off: sentinel blanking (`"N/A"`, `"<invalid Value>"`), birthdate to
    `YYYY-MM-DD`, moment date to Eastern time, birthplace to house format,
    the one team-name rewrite (Los Angeles Clippers to LA Clippers);
-6. WNBA season repair and the "Play Coming Soon" scrub.
+6. the repairs for the mint format that arrived with play 9088, each a
+   shape no earlier play has: height in inches; a video file name as
+   the tagline reads as none; the team at the moment resolved to the
+   side of its game its nickname or code names ("Dream", "LVA"); the
+   team id following that name (a blank id filled, an id naming a
+   franchise outside the game replaced); a team reel's FullName and
+   player fields blanked; a blank birthdate, birthplace, draft field or height
+   taken from the player's other plays when they all agree (the player
+   bio index, primed with the name aliases); PlayType derived from
+   PlayCategory when it holds a play-by-play line;
+7. WNBA season repair and the "Play Coming Soon" scrub.
 
 Steps 2 to 4 are what the Settings switch bypasses; normalisation is not a
 correction.
@@ -329,7 +339,7 @@ stripped before build so a wrong Dapper tag can never display:
 
 | Badge | Rule |
 |---|---|
-| Top Shot Debut | the player's lowest play id; a one-of-one yields to a numbered play from the same game; a twin of the debut (same game, same play category) shares the badge. Chain data alone; 1,415 of 1,415 Atlas badges reproduced, five extras withheld by `tags_suppress` |
+| Top Shot Debut | the player's lowest play id; a one-of-one yields to a numbered play from the same game; a twin of the debut (same game, same play category) shares the badge, unless it is in a Rookie Ultimate set. Chain data alone; 1,415 of 1,415 Atlas badges reproduced, one extra withheld by `tags_suppress` |
 | Rookie Year | `NbaSeason` starts in the player's rookie season |
 | Rookie Mint | the edition was **minted** during the rookie season, using the mint clock |
 | Championship Year, Cup Year | `teams.json` lists that season for the team at the moment, and the moment is not a cross-league cameo |
@@ -911,7 +921,7 @@ state.
 ## 10. Reuse map
 
 Portable as they are, no chain or UI coupling: `birthplace.normalizer.js`,
-`name-norm.js`, `parallel.groups.js`, `set.status.js`, `hero-quads.js`,
+`name-norm.js`, `team.codes.js`, `parallel.groups.js`, `set.status.js`, `hero-quads.js`,
 `scripts/lib/json-file.mjs`, `scripts/node-json-hook.mjs`, the whole
 `data/` tree.
 

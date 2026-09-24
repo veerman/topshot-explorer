@@ -254,11 +254,12 @@ export function getAllPlaysDB() {
   if (playsCache) {
     return Promise.resolve(playsCache);
   }
-  // Each play carries its mint total (the debut rule needs it), joined
-  // from the editions store on read so a plays record never goes stale
-  // when mint counts refresh; saving editions drops this cache too
-  return Promise.all([getAllRecords("plays"), getAllEditionsDB()]).then(([records, editions]) => {
-    playsCache = attachMintTotals(records, editions);
+  // Each play carries its mint total and whether it sits in a Rookie
+  // Ultimate set (the debut rule needs both), joined from the editions and
+  // sets stores on read so a plays record never goes stale when mint
+  // counts refresh; saving editions drops this cache too
+  return Promise.all([getAllRecords("plays"), getAllEditionsDB(), getAllSetsDB()]).then(([records, editions, sets]) => {
+    playsCache = attachMintTotals(records, editions, sets);
     return playsCache;
   });
 }
@@ -285,6 +286,7 @@ export function getAllPlaysRawDB() {
 export function saveSetsDB(setsArray) {
   return putRecordsBatch("sets", setsArray).then((ok) => {
     setsCache = null;
+    playsCache = null; // plays carry the Rookie Ultimate mark joined from sets
     return ok;
   });
 }

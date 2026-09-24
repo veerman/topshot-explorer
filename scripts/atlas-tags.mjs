@@ -25,7 +25,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { loadRawPlays } from "./lib/raw-plays.mjs";
-import { seedEditions } from "./lib/seed-facts.mjs";
+import { seedEditions, seedSets } from "./lib/seed-facts.mjs";
 import {
   compilePlayMetadata, buildTsdIndex, buildMintClock, buildNameAliases, getCalculatedPlayTags, attachMintTotals,
   COMPUTABLE_TAG_NAMES, TAG_BADGES, isWnbaTeamId as isWnbaId
@@ -90,7 +90,7 @@ async function main() {
 
   const raw = await loadRawPlays({ rawPath: opt("--raw", null), saveRawPath: opt("--save-raw", null) });
   buildNameAliases(raw);
-  const plays = attachMintTotals(Object.entries(raw).map(([id, m]) => compilePlayMetadata(id, m)).filter(Boolean), seedEditions());
+  const plays = attachMintTotals(Object.entries(raw).map(([id, m]) => compilePlayMetadata(id, m)).filter(Boolean), seedEditions(), seedSets());
   const byId = new Map(plays.map((p) => [String(p.playID), p]));
   const tsdIndex = buildTsdIndex(plays);
   const mintClock = buildMintClock(plays);
