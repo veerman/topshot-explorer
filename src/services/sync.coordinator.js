@@ -6,7 +6,7 @@
   getSetCIDs,
   fetchPlayBatch
 } from "./fcl.service";
-import { compilePlayMetadata, compileSetMetadata, buildNameAliases, hasBlankBioField, standardizePlayKeys, teamKeyForPlay } from "./overrides.service";
+import { compilePlayMetadata, compileSetMetadata, buildNameAliases, hasBlankBioField, standardizePlayKeys, teamKeyForPlay, areOverridesDisabled } from "./overrides.service";
 import {
   saveSyncStatsDB,
   getSyncStatsDB,
@@ -35,6 +35,7 @@ import setsAdditions from "../../data/additions/sets.json";
 import seriesOverrides from "../../data/overrides/series.json";
 import seriesAdditions from "../../data/additions/series.json";
 import editionsAdditions from "../../data/additions/editions.json";
+import teamsAdditions from "../../data/additions/teams.json";
 
 // Progress chatter: on in development, and in production only when the
 // console asks for it (localStorage.debugSync = "1"). Warnings and errors
@@ -96,24 +97,31 @@ export function cyrb128(str) {
 // databases recompile their plays/sets from the stored _raw backups once.
 const NORMALIZATION_VERSION = "8"; // 8: the chain's "+0000 UTC" timestamps read as ISO (Safari kept the UTC day); 7: weights as bare pounds; 6: the play 9088+ mint format (team names and ids, play types, bare dates, heights, file-name taglines, team reels, bio fill); 5: Team Coop on the 2026 WNBA All-Star plays; 4: All-Star entities on the 2025 final plays, Hornets id, Rookie Mint tags dropped
 
-// The inputs are static imports, so the hash cannot change within a session;
-// computing it once avoids re-serializing over a megabyte of JSON per call.
-let cachedOverridesHash = null;
+// The hash covers exactly what the stored compile reads: the play and set
+// corrections, teams.json (team names and ids, team reels and the bio
+// fill all resolve through it), NORMALIZATION_VERSION, and the Settings
+// switch that turns corrections off. Series names and edition additions
+// are applied when data is read, never stored, so they stay out: hashing
+// them recompiled every play in every browser for nothing, while a
+// teams.json fix never reached a stored database. With the switch in the
+// hash, a recompile cut short (Settings reloads the page soon after) is
+// redone on the next sync.
+// The files are static imports, so only the switch can change within a
+// session; hashing them once avoids re-serializing a megabyte per call.
+let cachedFilesHash = null;
 
 export function getCurrentOverridesHash() {
-  if (cachedOverridesHash === null) {
-    cachedOverridesHash = cyrb128(
+  if (cachedFilesHash === null) {
+    cachedFilesHash = cyrb128(
       JSON.stringify(playsOverrides) +
       JSON.stringify(playsAdditions) +
       JSON.stringify(setsOverrides) +
       JSON.stringify(setsAdditions) +
-      JSON.stringify(seriesOverrides) +
-      JSON.stringify(seriesAdditions) +
-      JSON.stringify(editionsAdditions) +
+      JSON.stringify(teamsAdditions) +
       NORMALIZATION_VERSION
     );
   }
-  return cachedOverridesHash;
+  return areOverridesDisabled() ? `${cachedFilesHash}:off` : cachedFilesHash;
 }
 
 // Maps a getSetDetails() response into the editions and IPFS records persisted

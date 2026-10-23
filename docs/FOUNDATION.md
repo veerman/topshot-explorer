@@ -339,11 +339,15 @@ Steps 2 to 4 are what the Settings switch bypasses; normalisation is not a
 correction.
 
 **Recompile trigger.** `getCurrentOverridesHash()` in
-`sync.coordinator.js` hashes the seven bundled JSON files plus
-`NORMALIZATION_VERSION`. On mismatch the database recompiles every play
-and set from `_raw`, locally, in the background; no resync. **Bump
+`sync.coordinator.js` hashes exactly what the stored compile reads: the
+play and set overrides and additions, `teams.json`, and
+`NORMALIZATION_VERSION`, with the Settings corrections switch appended.
+Series names and edition additions are applied when data is read, so
+they are not hashed. On mismatch the database recompiles every play and
+set from `_raw`, locally, in the background; no resync. **Bump
 `NORMALIZATION_VERSION` whenever normalisation logic changes**, or cached
-browsers keep the old output.
+browsers keep the old output; a new data file the compile reads joins
+the hash.
 
 **Name aliases.** When an override corrects a `FullName`, the raw spelling
 it replaced maps to the canonical name for every play, including future
