@@ -42,7 +42,17 @@ const CACHEABLE_SEARCH = new Set(["", "?block_height=final", "?block_height=seal
 // that turn one cheap request into upstream work (sign-in verification,
 // a username fetch from nbatopshot.com, a wall signature). Edge cache hits
 // never count. Without a binding the check passes.
-const clientKey = (request) => request.headers.get("cf-connecting-ip") || "anonymous";
+// An IPv6 client is keyed by its /64, the block one subscriber is given,
+// so a rented range cannot spread its requests over fresh addresses
+const ipKey = (ip) => {
+  if (!ip.includes(":")) return ip;
+  const [head, tail = ""] = ip.split("::");
+  const h = head ? head.split(":") : [];
+  const t = tail ? tail.split(":") : [];
+  const groups = [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill("0"), ...t];
+  return `${groups.slice(0, 4).join(":")}::/64`;
+};
+const clientKey = (request) => ipKey(request.headers.get("cf-connecting-ip") || "anonymous");
 const overLimit = async (limiter, key) => {
   if (!limiter) return false;
   try {
@@ -317,7 +327,9 @@ const lookupAddress = async (url, request, env, ctx) => {
     res.headers.set("x-lookup-cache", "HIT");
     return res;
   }
-  if (await overLimit(env.LOOKUP_LIMIT, clientKey(request))) return tooMany("lookups");
+  // Counted per client and per signed-in wallet: a limit per IP alone let
+  // one wallet behind many addresses read the table at many times the rate
+  if (await overLimit(env.LOOKUP_LIMIT, clientKey(request)) || await overLimit(env.LOOKUP_LIMIT, `wallet:${session.address}`)) return tooMany("lookups");
 
   const row = await env.LOOKUP_DB.prepare("SELECT username, dapper, parents, children, checked_at FROM lookup WHERE address = ?1").bind(address).first();
   let status = 404;

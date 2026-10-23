@@ -773,8 +773,8 @@ profile page by address echoes the address back. The hosted site answers
 `GET /lookup/address/<addr>` from a lookup table in Cloudflare D1: the
 username, the wallet kind, and the account-linking parents and children
 with their names. One address per request, cached a day at the edge and
-rate limited per client, so pages get the names they show and nobody
-gets the table. The table is loaded from a private collector census that
+rate limited per client (an IPv6 client by its /64) and per signed-in
+wallet, so pages get the names they show and nobody gets the table. The table is loaded from a private collector census that
 is not part of this repository and never will be; the username route
 writes every name it resolves into it. `src/services/usernames.service.js`
 asks for the addresses a page shows, caches answers for the session, and
