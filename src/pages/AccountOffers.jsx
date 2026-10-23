@@ -14,7 +14,7 @@ import { getEditionTier } from "../services/set.status";
 import { playSummary, getLeagueName, tierFacetRank as tierRank, playerPath } from "../utils/display.utils";
 import { formatOfferAmount } from "../services/offers.service";
 import { MultiSelect } from "../components/MultiSelect";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 
 /*
  * Active marketplace offers MADE BY an account, enumerated live from its
@@ -44,8 +44,7 @@ function writeFiltersToLocation(filters, sort) {
     params.set("sort", sort.key);
     params.set("dir", sort.dir);
   }
-  const qs = toQuery(params);
-  window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+  replaceQuery(params);
 }
 
 export function AccountOffers() {

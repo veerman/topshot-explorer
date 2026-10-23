@@ -6,7 +6,7 @@ import { getMediaInfo } from "../services/ipfs.media";
 import { useIpfsMedia } from "../hooks/useIpfsMedia";
 import { useDbData } from "../hooks/useDbData";
 import { buildEditionList, useEditionPicker } from "../components/EditionPicker";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 import { Loader } from "../components/Loader";
 import { LoadError } from "../components/LoadError";
 import { HoloDisplay } from "../components/HoloDisplay";
@@ -294,8 +294,7 @@ function Stage({ edition, ipfsMedia }) {
     setHolo(next);
     const params = new URLSearchParams(window.location.search);
     if (next) params.set("holo", next); else params.delete("holo");
-    const qs = toQuery(params);
-    window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    replaceQuery(params);
   }, []);
   const closeHolo = useCallback(() => setHoloAndUrl(""), [setHoloAndUrl]);
 

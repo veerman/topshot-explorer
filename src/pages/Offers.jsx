@@ -13,7 +13,7 @@ import { buildIdentityContext, BLANK_IDENTITY, EDITION_HEADINGS } from "../servi
 import { externalNftUrlByName, externalEditionUrlByName } from "../services/flowEvents.service";
 import { loadOffersSnapshot, formatOfferAmount } from "../services/offers.service";
 import { MultiSelect } from "../components/MultiSelect";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { useUsernames, addressTitle } from "../services/usernames.service";
 import { AddressName } from "../components/AddressName";
@@ -105,8 +105,7 @@ function writeStateToLocation(filters, tab, sort, acceptedSort) {
     params.set("asort", acceptedSort.key);
     params.set("adir", acceptedSort.dir);
   }
-  const qs = toQuery(params);
-  window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+  replaceQuery(params);
 }
 
 // Blank play facts for rows with no local metadata (serial-level and

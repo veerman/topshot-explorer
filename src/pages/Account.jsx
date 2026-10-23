@@ -41,7 +41,7 @@ import { Loader } from "../components/Loader";
 import { LoadError } from "../components/LoadError";
 import { getEditionTier } from "../services/set.status";
 import { isMismintPlay } from "../services/overrides.service";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 
 // Fetches the light data-only tuples [momentID, setID, playID, serial,
 // subeditionID] for an account's WHOLE collection (sharing the account
@@ -109,10 +109,9 @@ function writeFiltersToLocation(filters, groupByEdition, sort) {
     params.set("sort", sort.key);
     params.set("dir", sort.dir);
   }
-  const qs = toQuery(params);
   // replaceState keeps this out of the history stack (Back leaves the
   // page, not the filters) and never triggers a router re-render
-  window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+  replaceQuery(params);
 }
 
 // Run raw on-chain play metadata through the same overrides/normalization

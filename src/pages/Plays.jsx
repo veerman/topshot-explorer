@@ -14,7 +14,7 @@ import { LeagueFilter } from "../components/LeagueFilter";
 import { MultiSelect } from "../components/MultiSelect";
 import { useAccountCollection } from "../hooks/useAccountCollection";
 import { useFacetFilters, writeFilters, cascadeOf } from "../hooks/useFacetFilters";
-import { toQuery } from "../utils/query";
+import { toQuery, replaceQuery } from "../utils/query";
 import { playTableColumns, buildPlayRecord, buildPlayToSets } from "../components/PlayTable";
 
 // The tag-consistency audit lives on the Corrections page (Open Findings tab),
@@ -96,8 +96,7 @@ export function Plays() {
     const params = new URLSearchParams(window.location.search);
     FACET_KEYS.forEach((k) => params.delete(k));
     writeFilters(params, filters, EMPTY_FILTERS);
-    const qs = toQuery(params);
-    window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    replaceQuery(params);
   }, [filters]);
 
   // Debut index and mint clock over ALL plays (not the league-filtered

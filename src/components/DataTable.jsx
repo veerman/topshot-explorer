@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from "react";
 import { Pagination } from "./Pagination";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 
 function extractTextFromReact(node) {
   if (!node) return "";
@@ -229,11 +229,7 @@ export function DataTable({
     setOrDelete("dir", sortOrder, sortOrder === defaultSortOrder);
     setOrDelete("page", String(currentPage), currentPage === 1);
     setOrDelete("size", String(pageSize), pageSize === defaultPageSize);
-    const qs = toQuery(params);
-    const next = window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash;
-    if (next !== window.location.pathname + window.location.search + window.location.hash) {
-      window.history.replaceState(null, "", next);
-    }
+    replaceQuery(params);
     // urlKeyed/defaultSortKey derive from stable props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, columnFilters, sortColumn, sortOrder, currentPage, pageSize]);

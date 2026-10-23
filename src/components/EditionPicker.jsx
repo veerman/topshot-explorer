@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useFacetFilters, cascadeOf, writeFilters } from "../hooks/useFacetFilters";
-import { toQuery } from "../utils/query";
+import { replaceQuery } from "../utils/query";
 import { MultiSelect } from "./MultiSelect";
 
 /**
@@ -86,8 +86,7 @@ export function useEditionPicker(editions, { urlParam = "edition" } = {}) {
     params.delete(urlParam);
     writeFilters(params, filters, EMPTY_FILTERS);
     if (selected) params.set(urlParam, selected.key);
-    const qs = toQuery(params);
-    window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    replaceQuery(params);
   }, [filters, selected, urlParam]);
 
   const alpha = (a, b) => a.localeCompare(b);
