@@ -826,7 +826,9 @@ Close, navigating or landing on an account puts the links back; the
 lookup history drops under the box. The mobile column keeps the links
 and shows the box in place. "Sign in" means connect a wallet (Flow
 Wallet or Dapper Wallet; the picker hides Blocto and NuFi through
-`discovery.authn.exclude`). The connected wallet becomes
+`discovery.authn.exclude`; FCL's WalletConnect plugin, which needs a
+project id the app does not configure, is replaced by a stand-in,
+`src/shims/fcl-wc.js`, saving 147 KB compressed). The connected wallet becomes
 the account in view: the address box gives way to the chip (✓ marks the
 wallet's own address) and the account menu's single address row carries
 the wallet kind and a "signed in" mark when the wallet is the account in

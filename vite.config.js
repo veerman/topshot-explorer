@@ -242,6 +242,12 @@ export default defineConfig({
   // dev, which multiplies badly on 9k-row tables (Preact DevTools browser
   // extension integration goes with it; HMR is unaffected)
   plugins: [preact({ devToolsEnabled: false }), serveDerivedAssets(), serveUserLookup(), serveAddressLookup(), serveAuth(), serveWall()],
+  // FCL's WalletConnect plugin never runs here (no walletconnect.projectId
+  // is configured) but FCL imports it statically: a stand-in with the same
+  // exports keeps it out of the bundle (src/shims/fcl-wc.js)
+  resolve: {
+    alias: [{ find: /^@onflow\/fcl-wc$/, replacement: fileURLToPath(new URL('./src/shims/fcl-wc.js', import.meta.url)) }]
+  },
   // Imported JSON ships as a JSON.parse(string) rather than a JS object
   // literal: the JSON parser is several times faster than the JS parser
   // for the ~1.6MB of data files in the bundle
