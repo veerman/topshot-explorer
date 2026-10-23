@@ -345,6 +345,10 @@ async function fetchCollection(address, cachedMoments) {
 export async function setAccountAddress(input, { remember = true } = {}) {
   const address = normalizeAddress(input);
   if (!address) return;
+  // Cancel the previous address's fetch: a fresh cached copy returns below
+  // without starting one of its own, and a slow fetch of the account just
+  // left would otherwise land its graph and moments under this address
+  fetchToken++;
   try { localStorage.setItem(STORAGE_KEY, address); } catch { /* private mode */ }
   if (remember) rememberAddress(address);
   const included = readGroup(address);
