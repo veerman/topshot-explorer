@@ -314,33 +314,51 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // on every sync via the lightweight getMintCounts query (no IPFS resolver
 // work) and rewrites only the rows that actually changed.
 const MINT_REFRESH_CHUNK = 10;
+// Chain calls in flight at once in the per-visit passes
+const SYNC_CONCURRENCY = 4;
+
+/** Runs fn over items, `limit` at a time */
+async function inPool(items, limit, fn) {
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) await fn(items[next++]);
+  }));
+}
 
 async function refreshMintCounts() {
   const [sets, editions] = await Promise.all([getAllSetsDB(), getAllEditionsDB()]);
   if (sets.length === 0) return 0;
   const byID = new Map(editions.map((e) => [String(e.id), e]));
-  const setIDs = sets.map((s) => Number(s.id)).sort((a, b) => a - b);
+  // A locked set gains no plays and a retired edition mints no more, so a
+  // locked set whose editions are all retired has counts that can never
+  // change (184 of 285 sets on 2026-10-23): it is not asked again
+  const settled = (s) => s.locked && (s.playIDs || []).length > 0
+    && s.playIDs.every((p) => (byID.get(`${Number(s.id)}_${Number(p)}`) || {}).retired === true);
+  const setIDs = sets.filter((s) => !settled(s)).map((s) => Number(s.id)).sort((a, b) => a - b);
+  const chunks = [];
+  for (let i = 0; i < setIDs.length; i += MINT_REFRESH_CHUNK) chunks.push(setIDs.slice(i, i + MINT_REFRESH_CHUNK));
   const changed = [];
-  for (let i = 0; i < setIDs.length; i += MINT_REFRESH_CHUNK) {
-    const chunk = setIDs.slice(i, i + MINT_REFRESH_CHUNK);
-    let counts;
+  let done = 0;
+  await inPool(chunks, SYNC_CONCURRENCY, async (chunk) => {
+    let counts = null;
     try {
       counts = await getMintCounts(chunk);
     } catch (err) {
       console.warn(`Mint-count refresh failed for sets ${chunk[0]}-${chunk[chunk.length - 1]}:`, err);
-      continue;
     }
-    Object.entries(counts).forEach(([setID, plays]) => {
+    Object.entries(counts || {}).forEach(([setID, plays]) => {
       Object.entries(plays).forEach(([playID, v]) => {
         const row = byID.get(`${Number(setID)}_${Number(playID)}`);
         if (!row) return; // edition not synced yet; Phase 4 will create it
         if (Number(row.momentCount) !== v.minted || Boolean(row.retired) !== v.retired) {
-          changed.push({ ...row, momentCount: v.minted, retired: v.retired });
+          // Chain fields only: rows read back carry editions.json merged in
+          changed.push({ id: row.id, setID: row.setID, playID: row.playID, momentCount: v.minted, retired: v.retired, playOrder: row.playOrder });
         }
       });
     });
-    updateStatus({ progressPercent: Math.min(99, Math.round(((i + chunk.length) / setIDs.length) * 100)) });
-  }
+    done++;
+    updateStatus({ progressPercent: Math.min(99, Math.round((done / chunks.length) * 100)) });
+  });
   if (changed.length > 0) {
     await saveEditionsDB(changed);
 
@@ -470,11 +488,11 @@ async function refreshSets(liveSets, mediaCursor) {
     if (!picks.includes(id)) picks.push(id);
   }
   let found = 0;
-  for (const id of picks) {
+  await inPool(picks, SYNC_CONCURRENCY, async (id) => {
     const rows = await fetchCidRows(id, missing.get(id));
     await saveIPFSCIDsDB(rows);
     found += rows.length;
-  }
+  });
   if (found > 0) log(`Media refresh: ${found} editions gained media across sets ${picks.join(", ")}.`);
   return picks.length > 0 ? picks[picks.length - 1] : mediaCursor;
 }
