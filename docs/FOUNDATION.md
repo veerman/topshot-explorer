@@ -205,9 +205,14 @@ override a chain fix has made unnecessary.
 4. Otherwise diff the contract's `nextPlayID` / `nextSetID` against the
    stored ones and fetch only the new range. New plays and sets are
    detected purely by those counters, never by scanning events.
-5. Compare `playIDs` on every unlocked set against the live overview; an
-   expanded open set is re-detailed. This is the only way a play added
-   to an existing set is noticed.
+5. On every pass compare each stored set with the live overview (one
+   call, edge-cached). A set that gained plays gets its edition rows and
+   the new plays' media, then its set row; a set locked since gets its
+   flag. Dapper creates plays first and fills sets later, so this runs
+   whether or not the pass saw a new play id. The same pass asks the
+   resolver again for five sets whose editions still lack media, newest
+   first (`mediaRefreshCursor` in the sync stats), since Dapper registers
+   media after the mint (`refreshSets`).
 6. On every pass re-read mint counts and retired flags for every edition
    (10 sets per call) and write back only the rows that changed. Open
    editions keep minting; counts are never allowed to go stale.
@@ -220,9 +225,9 @@ override a chain fix has made unnecessary.
 
 Self-heals run in the "nothing new" branch: empty teams store, empty
 editions store, prototype-era fake CIDs (any CID shorter than 46
-characters; real ones are 46 for `Qm...` or 59 for `bafy...`), missing
-edition placeholders, and a one-shot IPFS backfill gated by a
-localStorage flag.
+characters; real ones are 46 for `Qm...` or 59 for `bafy...`) and missing
+edition placeholders. The one-shot IPFS backfill gated by a localStorage
+flag is gone: step 5 covers its sets, 27 and 52 included.
 
 ### 2.5 The IndexedDB shape
 
@@ -234,7 +239,7 @@ Database `TopShotExplorerDB`, version 6, in `src/services/db.service.js`.
 | `sets` | `id` (int) | `{ id, setName, series, locked, playIDs[], _raw }` |
 | `editions` | `"setID_playID"` | `{ id, setID, playID, momentCount, retired, playOrder }` |
 | `ipfs` | `"setID_playID"` | `{ id, setID, playID, cids: { FIELD: CID } }`; no row means no media registered |
-| `sync_stats` | `"current_stats"` | `{ nextPlayID, nextSetID, totalSupply, currentSeries, overridesHash, lastSyncTime, playRefreshCursor }` |
+| `sync_stats` | `"current_stats"` | `{ nextPlayID, nextSetID, totalSupply, currentSeries, overridesHash, lastSyncTime, playRefreshCursor, mediaRefreshCursor }` |
 | `teams` | `TeamAtMomentNBAID` (out-of-line) | `{ TeamName, TeamID }` |
 | `account_collections` | address (lowercase) | `{ address, fetchedAt, moments: [[momentID, setID, playID, serial, subID, 1-if-on-EVM]] }`, plus `"<address>:locks"` rows |
 

@@ -380,6 +380,108 @@ async function refreshPlaysSlice(cursor, maxPlayID) {
   return end >= maxPlayID ? 1 : end + 1;
 }
 
+// Sets keep changing after a browser first stored them: Dapper creates
+// plays first and fills a set later (274 of 285 sets hold plays older than
+// the set), so a visit that sees no new play id can still bring new
+// editions; sets get locked; and media is registered on an edition long
+// after its mint (no 2026 WNBA set had any on 2026-10-23). The seed carries
+// all of that to new browsers only. This pass, on every visit, carries it
+// to returning ones from the one sets-overview call (edge-cached), plus a
+// call only for what changed and a few sets' missing media per visit.
+const MEDIA_SETS_PER_VISIT = 5;
+
+/** CID rows for these plays of a set (150 per resolver call); empty when none registered */
+async function fetchCidRows(setID, playIDs) {
+  const rows = [];
+  for (let i = 0; i < playIDs.length; i += 150) {
+    const cidsByPlay = await getSetCIDs(setID, playIDs.slice(i, i + 150));
+    Object.entries(cidsByPlay || {}).forEach(([playID, cids]) => {
+      if (cids && Object.keys(cids).length > 0) {
+        rows.push({ id: `${Number(setID)}_${Number(playID)}`, setID: Number(setID), playID: Number(playID), cids });
+      }
+    });
+  }
+  return rows;
+}
+
+/** Returns the media cursor for the next visit (a set id; the walk goes down from it) */
+async function refreshSets(liveSets, mediaCursor) {
+  const [storedSets, editions, ipfs] = await Promise.all([getAllSetsDB(), getAllEditionsDB(), getAllIPFSDB()]);
+  const setByID = new Map(storedSets.map((s) => [Number(s.id), s]));
+  const editionsBySet = new Map();
+  editions.forEach((e) => {
+    const s = Number(e.setID);
+    if (!editionsBySet.has(s)) editionsBySet.set(s, new Map());
+    editionsBySet.get(s).set(Number(e.playID), e);
+  });
+
+  // 1. Plays added to a set, and sets locked since. A grown set's edition
+  // rows and its new plays' media land before the set row, so a failure
+  // leaves the set as it was and the next visit tries again
+  const changed = [];
+  for (const live of liveSets) {
+    const have = setByID.get(Number(live.id));
+    if (!have) continue; // a new set arrives through Phases 1 and 4
+    const livePlays = (live.playIDs || []).map(Number);
+    const havePlays = (have.playIDs || []).map(Number);
+    const samePlays = livePlays.length === havePlays.length && livePlays.every((p, i) => p === havePlays[i]);
+    if (samePlays && Boolean(have.locked) === Boolean(live.locked)) continue;
+    if (!samePlays) {
+      const stored = editionsBySet.get(Number(live.id)) || new Map();
+      // Chain fields only: rows read back carry editions.json merged in.
+      // A new row's count is filled by the mint-count refresh after this
+      const rows = livePlays.map((playID, idx) => {
+        const e = stored.get(playID);
+        return { id: `${Number(live.id)}_${playID}`, setID: Number(live.id), playID, momentCount: e ? Number(e.momentCount) || 0 : 0, retired: e ? Boolean(e.retired) : false, playOrder: idx + 1 };
+      });
+      await saveEditionsDB(rows);
+      await saveIPFSCIDsDB(await fetchCidRows(live.id, livePlays.filter((p) => !stored.has(p))));
+      log(`Set ${live.id} (${live.setName}) now holds ${livePlays.length} plays, was ${havePlays.length}.`);
+    }
+    changed.push(live);
+  }
+  if (changed.length > 0) await saveSetsDB(changed.map(compileSetMetadata));
+
+  // 2. Media registered after the mint: a few sets with editions still
+  // without any, newest first, the walk resuming where the last visit
+  // stopped and wrapping at the oldest
+  const withMedia = new Set(ipfs.filter((r) => Object.keys(r.cids || {}).length > 0).map((r) => String(r.id)));
+  const skip = new Set(changed.map((s) => Number(s.id)));
+  const missing = new Map(); // setID -> playIDs without media
+  editions.forEach((e) => {
+    const s = Number(e.setID);
+    if (skip.has(s) || withMedia.has(`${s}_${Number(e.playID)}`)) return;
+    if (!missing.has(s)) missing.set(s, []);
+    missing.get(s).push(Number(e.playID));
+  });
+  const ids = [...missing.keys()].sort((a, b) => b - a);
+  const below = Number(mediaCursor) > 0 ? Number(mediaCursor) : Infinity;
+  const picks = ids.filter((id) => id < below).slice(0, MEDIA_SETS_PER_VISIT);
+  for (const id of ids) {
+    if (picks.length >= Math.min(MEDIA_SETS_PER_VISIT, ids.length)) break;
+    if (!picks.includes(id)) picks.push(id);
+  }
+  let found = 0;
+  for (const id of picks) {
+    const rows = await fetchCidRows(id, missing.get(id));
+    await saveIPFSCIDsDB(rows);
+    found += rows.length;
+  }
+  if (found > 0) log(`Media refresh: ${found} editions gained media across sets ${picks.join(", ")}.`);
+  return picks.length > 0 ? picks[picks.length - 1] : mediaCursor;
+}
+
+// The sets pass both sync branches run; its media cursor is persisted with
+// the stats (kept as it was when offline)
+async function nextMediaRefreshCursor(cachedStats, loadSetsOverview) {
+  try {
+    return await refreshSets(await loadSetsOverview(), cachedStats.mediaRefreshCursor);
+  } catch (err) {
+    console.warn("Sets refresh failed (offline?):", err);
+    return cachedStats.mediaRefreshCursor;
+  }
+}
+
 // The pass both sync branches run before saving the stats: the cursor it
 // returns is persisted with them (kept as it was when offline)
 async function nextPlayRefreshCursor(cachedStats, maxPlayID) {
@@ -638,42 +740,11 @@ export async function runSmartSync() {
         log(`Edition placeholder heal: created ${placeholders.length} rows for ${editionBare.length} sets.`);
       }
 
-      // Self-heal 4 (2026-09-02): the biggest sets (27 and 52, Platinum
-      // Ice) blow the Cadence computation limit in getSetDetails, so every
-      // sync path built on it leaves their editions without IPFS rows.
-      // Backfill any set that has plays but zero ipfs rows through the
-      // lightweight resolver-only query, once per browser (sets with no
-      // registered media stay empty, so the flag stops repeat queries).
-      if (localStorage.getItem("ipfs_light_heal_v1") !== "done") {
-        try {
-          const ipfsNow = await getAllIPFSDB();
-          const setsWithRows = new Set(ipfsNow.map((r) => Number(r.setID)));
-          const bare = existingSets.filter((s) => (s.playIDs || []).length > 0 && !setsWithRows.has(Number(s.id)));
-          if (bare.length > 0) {
-            updateStatus({ stage: "Backfilling IPFS CIDs...", progressPercent: 0 });
-            const healed = [];
-            for (const set of bare) {
-              const playIDs = (set.playIDs || []).map(Number);
-              for (let i = 0; i < playIDs.length; i += 150) {
-                const cidsByPlay = await getSetCIDs(set.id, playIDs.slice(i, i + 150));
-                Object.entries(cidsByPlay || {}).forEach(([playID, cids]) => {
-                  if (cids && Object.keys(cids).length > 0) {
-                    healed.push({ id: `${Number(set.id)}_${Number(playID)}`, setID: Number(set.id), playID: Number(playID), cids });
-                  }
-                });
-              }
-            }
-            if (healed.length > 0) {
-              await saveIPFSCIDsDB(healed);
-
-              log(`IPFS light heal: backfilled ${healed.length} editions across ${bare.length} sets.`);
-            }
-          }
-          localStorage.setItem("ipfs_light_heal_v1", "done");
-        } catch (err) {
-          console.warn("IPFS light backfill failed (offline?):", err);
-        }
-      }
+      // Plays added to stored sets, locks, and media registered since
+      // (refreshSets; it also covers the biggest sets, 27 and 52, which
+      // getSetDetails cannot return and the once-per-browser media heal
+      // used to backfill)
+      const mediaRefreshCursor = await nextMediaRefreshCursor(cachedStats, getSetsOverview);
 
       // Even with no new plays or sets, open editions keep minting: refresh
       // the stored counts so they track the chain instead of freezing
@@ -688,7 +759,7 @@ export async function runSmartSync() {
       const playRefreshCursor = await nextPlayRefreshCursor(cachedStats, liveMaxPlayID);
 
       // Proactively keep sync stats up to date with on-chain values to prevent repetitive incremental checks
-      await saveSyncStatsDB({ ...liveStats, overridesHash: persistHash, playRefreshCursor });
+      await saveSyncStatsDB({ ...liveStats, overridesHash: persistHash, playRefreshCursor, mediaRefreshCursor });
 
       updateStatus({
         totalPlays: liveMaxPlayID,
@@ -749,55 +820,6 @@ export async function runSmartSync() {
       }
       
       await rebuildTeams();
-
-      // Check if any open sets expanded due to play additions on-chain
-      try {
-        log("Checking open sets for on-chain expansions...");
-        const cachedSets = await getAllSetsDB();
-        const openSets = cachedSets.filter(s => !s.locked);
-        
-        if (openSets.length > 0) {
-          updateStatus({ stage: "Phase 3.5: Checking open sets for expansions..." });
-          const liveSetsOverview = await fetchSetsOverviewOnce();
-          const expandedSets = [];
-          
-          for (const openSet of openSets) {
-            const liveSet = liveSetsOverview.find(ls => Number(ls.id) === Number(openSet.id));
-            if (liveSet && liveSet.playIDs) {
-              // Compare numerically: live playIDs arrive as strings from FCL
-              const cachedPlayIDs = new Set((openSet.playIDs || []).map(Number));
-              const hasNewPlays = liveSet.playIDs.some(id => !cachedPlayIDs.has(Number(id))) ||
-                                  liveSet.playIDs.length !== cachedPlayIDs.size;
-              
-              if (hasNewPlays) {
-                log(`Detected expanded open set ${openSet.id} (${openSet.setName})`);
-                expandedSets.push(liveSet);
-              }
-            }
-          }
-          
-          if (expandedSets.length > 0) {
-            updateStatus({ stage: `Phase 3.5: Syncing ${expandedSets.length} expanded sets...` });
-            
-            // 1. Save updated sets to IndexedDB
-            await saveSetsDB(expandedSets.map(compileSetMetadata));
-            
-            // 2. Fetch fresh set details (editions + IPFS media) for the expanded sets
-            for (const set of expandedSets) {
-              log(`Re-syncing editions/IPFS CIDs for expanded set ${set.id}`);
-              const setDetails = await getSetDetails(set.id);
-              const { editions, ipfsRecords } = mapSetDetailsToRecords(setDetails);
-              await saveEditionsDB(editions);
-              await saveIPFSCIDsDB(ipfsRecords);
-            }
-            log("Successfully updated all expanded sets.");
-          } else {
-            log("No open sets expanded.");
-          }
-        }
-      } catch (err) {
-        console.warn("Failed checking/updating expanded open sets:", err);
-      }
     }
 
     // New plays can arrive with variant spellings whose canonical form only
@@ -824,6 +846,9 @@ export async function runSmartSync() {
       }
     }
 
+    // Plays added to stored sets, locks, and media registered since
+    const mediaRefreshCursor = await nextMediaRefreshCursor(cachedStats, fetchSetsOverviewOnce);
+
     // Refresh mint counts for the sets that were NOT refetched above
     updateStatus({ stage: "Refreshing mint counts..." });
     try {
@@ -836,7 +861,7 @@ export async function runSmartSync() {
     const playRefreshCursor = await nextPlayRefreshCursor(cachedStats, liveMaxPlayID);
 
     // Save sync stats to DB
-    await saveSyncStatsDB({ ...liveStats, overridesHash: persistHash, playRefreshCursor });
+    await saveSyncStatsDB({ ...liveStats, overridesHash: persistHash, playRefreshCursor, mediaRefreshCursor });
 
     
     updateStatus({
@@ -866,10 +891,6 @@ export async function forceFullSync() {
 
   try {
     await clearAllStoresDB();
-    // The once-per-browser IPFS backfill must rerun after a wipe, or the
-    // Platinum Ice sets (which the heavy set-details query cannot deliver)
-    // would stay without media rows forever
-    try { localStorage.removeItem("ipfs_light_heal_v1"); } catch { /* ignore */ }
     const liveStats = await getTopshotStats();
     await performPhasedFullSync(liveStats);
   } catch (err) {
