@@ -5,7 +5,12 @@
 // their fields; new rows are appended in sequence order. Idempotent: run
 // it any time, commit the file, deploy.
 //
-//   node scripts/wall-fold.mjs [--dry]
+//   node scripts/wall-fold.mjs [--dry] [--close]
+//
+// --close ends Early Adopters: the file gains `closedAt`, after which the
+// sign route refuses new signatures (deploy/cloudflare/wall.js) and the
+// page shows the list alone. Every fold also writes EARLY-ADOPTERS.md, the
+// thank-you page in the repository, from the same entries.
 //
 // Needs wrangler access to the D1 database named in
 // deploy/cloudflare/wrangler.jsonc. Moderation happens here: a row you do
@@ -19,9 +24,11 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const FILE = `${ROOT}data/early_adopters.json`;
+const PAGE = `${ROOT}EARLY-ADOPTERS.md`;
 const CONFIG = `${ROOT}deploy/cloudflare/wrangler.jsonc`;
 const REST = "https://rest-mainnet.onflow.org";
 const dry = process.argv.includes("--dry");
+const close = process.argv.includes("--close");
 
 // Sequence numbers removed from the file on purpose stay out
 const DROPPED = new Set((JSON.parse(readFileSync(FILE, "utf8")).dropped || []).map(Number));
@@ -37,6 +44,8 @@ function d1(sql) {
   return (out[0] && out[0].results) || [];
 }
 
+// getLength, not getIDs().length: copying the id arrays of 25 big
+// collections ran past the 100,000 computation limit (2026-10-23)
 const COUNT_SCRIPT = `
 import NonFungibleToken from 0x1d7e57aa55817448
 access(all) fun main(addrs: [Address]): [Int] {
@@ -44,7 +53,7 @@ access(all) fun main(addrs: [Address]): [Int] {
   for a in addrs {
     var n = 0
     if let col = getAccount(a).capabilities.borrow<&{NonFungibleToken.CollectionPublic}>(/public/MomentCollection) {
-      n = col.getIDs().length
+      n = col.getLength()
     }
     out.append(n)
   }
@@ -107,11 +116,30 @@ for (const r of fresh) {
 }
 
 const entries = [...byAddress.values()].sort((a, b) => a.seq - b.seq);
-const out = { foldedAt: new Date().toISOString(), dropped: [...DROPPED], entries };
+const now = new Date().toISOString();
+const closedAt = file.closedAt || (close ? now : null);
+const out = { foldedAt: now, ...(closedAt ? { closedAt } : {}), dropped: [...DROPPED], entries };
+
+// The repository's thank-you page: the username only where the signer
+// chose to show it, the address always and in full
+const longDay = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+const shortDay = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+const page = [
+  "# Early Adopters",
+  "",
+  `A shout-out to the first collectors who tried Top Shot Explorer and showed their support, each signing with their wallet on the Flow Blockchain.${closedAt ? ` Early Adopters concluded on ${longDay(closedAt)}.` : ""}`,
+  "",
+  "| # | Collector | Address | Signed |",
+  "|---|---|---|---|",
+  ...entries.map((e) => `| ${e.seq} | ${e.username ? `@${e.username}` : ""} | \`${e.address}\` | ${shortDay(e.signedAt)} |`),
+  ""
+].join("\n");
+
 if (dry) {
   console.log(JSON.stringify(out, null, 1).slice(0, 2000));
 } else {
   writeFileSync(FILE, JSON.stringify(out, null, 1) + "\n");
+  writeFileSync(PAGE, page);
   if (fresh.length > 0) d1(`UPDATE wall SET folded = 1 WHERE seq <= ${Math.max(...fresh.map((r) => Number(r.seq)))}`);
-  console.log(`wrote ${entries.length} entries to data/early_adopters.json; commit it and deploy`);
+  console.log(`wrote ${entries.length} entries to data/early_adopters.json and EARLY-ADOPTERS.md${closedAt ? `; Early Adopters closed ${closedAt}` : ""}; commit them and deploy`);
 }

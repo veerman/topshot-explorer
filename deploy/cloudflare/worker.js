@@ -18,7 +18,7 @@ import {
   makeChallenge, verifySignIn, makeSession, readSession, cookieValue, sessionCookie, clearedCookie,
   sessionMayLookup, DENIED_FLAG, SESSION_COOKIE
 } from "./auth.js";
-import { signWall, wallEntryFor, wallPending } from "./wall.js";
+import { signWall, wallEntryFor, wallPending, WALL_CLOSED, WALL_CLOSED_MESSAGE } from "./wall.js";
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from "./graph.js";
 import { proxyAllowed, PROXY_BODY_MAX } from "./proxy-policy.js";
 import {
@@ -272,6 +272,7 @@ const wallRoutes = async (url, request, env, ctx) => {
     return entry ? json(200, entry) : json(404, { error: "not signed yet" });
   }
   if (path === "/wall/sign" && request.method === "POST") {
+    if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE });
     // A signature reads the account graph from the chain and writes a
     // row; a few per minute per wallet is plenty
     if (await overLimit(env.ABUSE_LIMIT, `wall:${session.address}`)) return tooMany("signatures");

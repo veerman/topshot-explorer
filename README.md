@@ -105,9 +105,11 @@ npm run atlas:parallels    derive sets_parallels.json from the snapshot; --apply
 npm run atlas:tags         badges, seasons and dates vs our data; --import copies
                            Atlas badges into additions tags (then reconcile)
 npm run wall:fold          Fold the Early Adopters wall from the hosted table into
-                           data/early_adopters.json (commit it, then deploy)
+                           data/early_adopters.json and EARLY-ADOPTERS.md (commit
+                           them, then deploy); --close ends Early Adopters
 npm run wall:reset -- --yes  Empty the hosted wall and restart at #1 (--file also
-                           empties data/early_adopters.json); for testing
+                           empties data/early_adopters.json); for testing, and
+                           refused once the wall has closed
 npm run atlas:editions     Atlas's numeric edition id per edition (atlasEditionID in
                            data/dapper/editions.json, beside the old site's
                            legacyEditionUUID) plus reward tags; --apply writes

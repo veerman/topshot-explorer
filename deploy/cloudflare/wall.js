@@ -15,6 +15,16 @@
 //
 // `db` is D1-shaped: db.prepare(sql).bind(...args).first() / .all() /
 // .run(); the dev server wraps node:sqlite to the same shape.
+//
+// Early Adopters ends when the fold stamps `closedAt` into the shipped
+// file (scripts/wall-fold.mjs --close): from the next deploy the sign
+// route answers 410 with WALL_CLOSED_MESSAGE, for new signers and changes
+// alike, so the list that ships is the whole wall. The wall itself stays.
+
+import record from "../../data/early_adopters.json" with { type: "json" };
+
+export const WALL_CLOSED = Boolean(record.closedAt);
+export const WALL_CLOSED_MESSAGE = "Early Adopters has concluded.";
 
 export const WALL_SCHEMA = `CREATE TABLE IF NOT EXISTS wall (
   seq INTEGER PRIMARY KEY AUTOINCREMENT,

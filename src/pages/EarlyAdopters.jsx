@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSession, connectWallet, signIn, stepOf } from "../services/wallet.service";
-import { useWall, allEntries, signTheWall, myEntry, foldedAt } from "../services/wall.service";
+import { useWall, allEntries, signTheWall, myEntry, foldedAt, closedAt, foldedEntryOf } from "../services/wall.service";
 import { approxCreatedAt, formatMonth } from "../services/flow.address";
 import { AboutTabs } from "../components/AboutTabs";
 
@@ -14,7 +14,9 @@ const day = (iso) => (iso ? new Date(iso).toLocaleDateString("en-US", { month: "
  * records the address (proved by the sign-in), the username if they chose
  * to show it, the linked accounts, the block and the time. The folded
  * entries ship in data/early_adopters.json; newer ones show as pending
- * until the next fold commits them. It confers nothing.
+ * until the next fold commits them. Once the fold closes the wall
+ * (closedAt) the file is the whole list and the page only reads it. It
+ * confers nothing.
  */
 export function EarlyAdopters() {
   const s = useSession();
@@ -29,7 +31,7 @@ export function EarlyAdopters() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (s.status !== "signed") return undefined;
+    if (s.status !== "signed" || closedAt) return undefined;
     let alive = true;
     const address = s.address;
     myEntry().then((e) => { if (alive) { setMineState({ address, entry: e }); if (e) setShowName(e.showName); } });
@@ -67,7 +69,7 @@ export function EarlyAdopters() {
       <div className="glass-panel ea-head">
         <h1 className="ea-title">Early Adopters</h1>
         <p className="text-muted ea-lead">
-          The first collectors to put their name on the almanac, in the order they did. Sign with your linked wallet, or your Dapper wallet. The list ships with the code. It confers nothing; it says they were here.
+          The first collectors to put their name on the almanac, in the order they did. {closedAt ? "Early Adopters has concluded." : "Sign with your linked wallet, or your Dapper wallet."} The list ships with the code. It confers nothing; it says they were here.
         </p>
         <div className="ea-count">
           <span className="ea-count-num font-mono">{fmt(w.total)}</span>
@@ -75,7 +77,13 @@ export function EarlyAdopters() {
         </div>
 
         <div className="ea-sign">
-          {s.status === "signed" ? (
+          {closedAt ? (
+            s.status === "signed" && foldedEntryOf(s.address) ? (
+              <p className="ea-signed">
+                You signed <span className="font-mono">#{fmt(foldedEntryOf(s.address).seq)}</span> at block <span className="font-mono">{fmt(foldedEntryOf(s.address).block)}</span>.
+              </p>
+            ) : null
+          ) : s.status === "signed" ? (
             mine ? (
               <p className="ea-signed">
                 You signed <span className="font-mono">#{fmt(mine.seq)}</span> at block <span className="font-mono">{fmt(mine.block)}</span>{mine.folded ? "." : ", pending the next commit."}

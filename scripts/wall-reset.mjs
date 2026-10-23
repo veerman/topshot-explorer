@@ -15,6 +15,13 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const FILE = `${ROOT}data/early_adopters.json`;
 const CONFIG = `${ROOT}deploy/cloudflare/wrangler.jsonc`;
 
+// A closed wall is the real thing, not a test: its signers are kept
+const closedAt = JSON.parse(readFileSync(FILE, "utf8")).closedAt;
+if (closedAt) {
+  console.log(`Early Adopters concluded on ${closedAt.slice(0, 10)}; its signatures are permanent and this script will not delete them.`);
+  process.exit(1);
+}
+
 if (!process.argv.includes("--yes")) {
   console.log("This deletes every signature on the hosted wall. Run again with --yes (add --file to also empty data/early_adopters.json).");
   process.exit(1);

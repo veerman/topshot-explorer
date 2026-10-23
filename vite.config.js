@@ -8,7 +8,7 @@ import { lookupUser } from './deploy/cloudflare/lookup.js'
 import {
   makeChallenge, verifySignIn, makeSession, readSession, cookieValue, sessionCookie, clearedCookie, sessionMayLookup, SESSION_COOKIE
 } from './deploy/cloudflare/auth.js'
-import { WALL_SCHEMA, signWall, wallEntryFor, wallPending } from './deploy/cloudflare/wall.js'
+import { WALL_SCHEMA, signWall, wallEntryFor, wallPending, WALL_CLOSED, WALL_CLOSED_MESSAGE } from './deploy/cloudflare/wall.js'
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from './deploy/cloudflare/graph.js'
 
 // Wallet sign-in in dev: the same auth.js the Worker runs, with a dev
@@ -74,6 +74,7 @@ const serveWall = () => ({
         return entry ? json(200, entry) : json(404, { error: 'not signed yet' })
       }
       if (path === '/sign' && req.method === 'POST') {
+        if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE })
         const body = (await readJsonBody(req)) || {}
         const graph = await fetchAccountGraph('https://rest-mainnet.onflow.org', session.address)
         const kind = wallKindOf(graph)

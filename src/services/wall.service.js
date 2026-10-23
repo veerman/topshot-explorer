@@ -12,13 +12,16 @@ const norm = (a) => { const x = String(a || "").trim().toLowerCase(); return x.s
 
 export const foldedEntries = (folded.entries || []).map((e) => ({ ...e, address: norm(e.address), pending: false }));
 export const foldedAt = folded.foldedAt || null;
+// Set when the fold closed Early Adopters: the file is then the whole list,
+// with nothing pending and nothing more to sign
+export const closedAt = folded.closedAt || null;
 const lastFoldedSeq = foldedEntries.reduce((m, e) => Math.max(m, e.seq || 0), 0);
 const foldedByAddress = new Map(foldedEntries.map((e) => [e.address, e]));
 
 /** The folded entry for an address (the permanent marker), or null */
 export const foldedEntryOf = (address) => foldedByAddress.get(norm(address)) || null;
 
-let wall = { status: "unknown", pending: [], total: foldedEntries.length, available: true };
+let wall = { status: closedAt ? "ready" : "unknown", pending: [], total: foldedEntries.length, available: true };
 const listeners = new Set();
 const set = (patch) => { wall = { ...wall, ...patch }; listeners.forEach((fn) => fn(wall)); };
 
