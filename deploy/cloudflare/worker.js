@@ -67,6 +67,10 @@ const tooMany = (what) =>
     status: 429, headers: { "content-type": "application/json", "cache-control": "no-store", "retry-after": "60" }
   });
 
+// The access node sends its content type twice, which reads back joined
+// ("application/json, application/json; charset=UTF-8"); keep the first
+const contentTypeOf = (res) => (res.headers.get("content-type") || "application/json").split(",")[0].trim();
+
 const proxyFlow = async (request, url, env, ctx) => {
   const upstreamPath = url.pathname.slice("/flow".length);
   const upstreamUrl = FLOW_UPSTREAM + upstreamPath + url.search;
@@ -81,9 +85,18 @@ const proxyFlow = async (request, url, env, ctx) => {
       body
     });
 
-  if (request.method !== "POST" || upstreamPath !== CACHEABLE_PATH || !CACHEABLE_SEARCH.has(url.search)) {
+  // The app runs scripts only against the latest block (the cacheable
+  // forms); any other script query is not one of its reads
+  if (request.method === "POST" && upstreamPath === CACHEABLE_PATH && !CACHEABLE_SEARCH.has(url.search)) return new Response("not proxied", { status: 403 });
+  if (request.method !== "POST" || upstreamPath !== CACHEABLE_PATH) {
     if (await overLimit(env.PROXY_LIMIT, clientKey(request))) return tooMany("requests");
-    return forward(request.method === "GET" || request.method === "HEAD" ? undefined : request.body);
+    const upstream = await forward(request.method === "GET" || request.method === "HEAD" ? undefined : request.body);
+    // Only what the app reads: the status, the body and its type. The
+    // upstream answer passed through whole carried the access node's
+    // Access-Control-Allow-Origin: *, so any website could have its
+    // visitors' browsers read the chain through this Worker, at the site's
+    // cost; the app is same-origin and needs no CORS header.
+    return new Response(upstream.body, { status: upstream.status, headers: { "content-type": contentTypeOf(upstream) } });
   }
 
   // Key the cache on the exact request body (script text plus arguments),
@@ -106,7 +119,7 @@ const proxyFlow = async (request, url, env, ctx) => {
   const upstream = await forward(requestBytes);
   const bodyBytes = new Uint8Array(await upstream.arrayBuffer());
   const headers = {
-    "content-type": upstream.headers.get("content-type") || "application/json",
+    "content-type": contentTypeOf(upstream),
     "x-flow-cache": "MISS"
   };
 
