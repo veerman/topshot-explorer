@@ -20,37 +20,21 @@ import {
 } from "./auth.js";
 import { signWall, wallEntryFor, wallPending, WALL_CLOSED, WALL_CLOSED_MESSAGE } from "./wall.js";
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from "./graph.js";
-import { proxyAllowed, PROXY_BODY_MAX } from "./proxy-policy.js";
+import { proxyAllowed, PROXY_BODY_MAX, scriptTtl } from "./proxy-policy.js";
 import {
   bookFromObjects, foldEvents, bakeObjects, mergeAccepted, shardRows, blockTimeMs,
   BOOK_KEY, OTHER_KEY, STATS_KEY, STATE_KEY, shardKey, ACCEPTED_STATE_CAP
 } from "../../src/services/offers.core.js";
 
 const FLOW_UPSTREAM = "https://rest-mainnet.onflow.org";
-const CACHE_TTL_SECONDS = 300;
-// Play metadata is immutable once minted, so the app's play-batch script
-// (recognizable by its PlayInfo struct) caches for a week: nearly every
-// visitor's biggest sync cost is then a warm edge hit. Everything else
-// (set details, mint counts, counters, collections) keeps changing and
-// stays at the short TTL.
-const IMMUTABLE_TTL_SECONDS = 604800;
-const IMMUTABLE_SCRIPT_MARKER = "struct PlayInfo";
+// TTL tiers: scriptTtl in proxy-policy.js (a day for play metadata, five
+// minutes for everything else).
 // Only deterministic pure reads are cached: Cadence script executions
 // against the latest block. FCL sends these as ?block_height=final (the
 // bare and sealed forms mean the same thing); a numeric pinned height is
 // not the read every visitor repeats, so it passes through uncached.
 const CACHEABLE_PATH = "/v1/scripts";
 const CACHEABLE_SEARCH = new Set(["", "?block_height=final", "?block_height=sealed"]);
-
-// The script rides base64-encoded in the JSON body; decode it to pick the
-// TTL tier. Any parse hiccup just means the short default.
-const ttlForBody = (bytes) => {
-  try {
-    const body = JSON.parse(new TextDecoder().decode(bytes));
-    if (atob(body.script || "").includes(IMMUTABLE_SCRIPT_MARKER)) return IMMUTABLE_TTL_SECONDS;
-  } catch { /* default tier */ }
-  return CACHE_TTL_SECONDS;
-};
 
 // ---- per-client limits ----------------------------------------------------
 // Two rate-limit bindings (wrangler.jsonc): PROXY_LIMIT for uncached Flow
@@ -121,7 +105,7 @@ const proxyFlow = async (request, url, env, ctx) => {
   if (upstream.status === 200) {
     const stored = new Response(bodyBytes, {
       status: 200,
-      headers: { ...headers, "cache-control": `public, max-age=${ttlForBody(requestBytes)}` }
+      headers: { ...headers, "cache-control": `public, max-age=${scriptTtl(requestBytes, bodyBytes)}` }
     });
     ctx.waitUntil(cache.put(cacheKey, stored));
   }

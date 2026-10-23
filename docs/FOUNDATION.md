@@ -112,8 +112,9 @@ same-origin reverse proxy that caches script results by request body:
 - Key = SHA-256 of the exact request body. Script bodies are
   deterministic, so every visitor after the first hits the cache.
 - TTL 300 s, except scripts whose body contains `struct PlayInfo` (the
-  play-metadata batch, which changes rarely if ever, 2.4) which cache for
-  a week.
+  play-metadata batch, which changes rarely, 2.4) which cache for a day,
+  unless the answer holds a play not minted yet (`metadata: nil`), which
+  keeps the short tier (`scriptTtl` in `deploy/cloudflare/proxy-policy.js`).
 - Store only HTTP 200. REST errors arrive as real statuses, unlike the
   v1 gRPC-web transport.
 
@@ -220,8 +221,8 @@ override a chain fix has made unnecessary.
    along each time (`playRefreshCursor` in the sync stats; about 47 visits
    cover the catalogue, then it starts over), and recompile only a play
    whose raw metadata changed on chain. Edits are rare, so this is one
-   small request per visit, never a re-download; with the proxy's week-long
-   cache on the play script, an edit reaches a regular visitor within weeks.
+   small request per visit, never a re-download; with the proxy's day-long
+   cache on the play script, an edit reaches a regular visitor within days.
 
 Self-heals run in the "nothing new" branch: empty teams store, empty
 editions store, prototype-era fake CIDs (any CID shorter than 46
