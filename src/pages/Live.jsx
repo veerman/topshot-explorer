@@ -746,9 +746,13 @@ export function Live() {
         });
       }
     }
+    // The cap trims the oldest LIVE rows only; pages fetched with Older
+    // events never count against it. Counting them made the excess
+    // outgrow the live rows once those pages held MAX_STORE events, and
+    // every new event was deleted as it arrived.
     if (!older && store.size > MAX_STORE) {
       const live = [...store.values()].filter((r) => r.height >= liveFloorRef.current).sort((a, b) => a.height - b.height);
-      for (const r of live.slice(0, store.size - MAX_STORE)) store.delete(r.key);
+      for (const r of live.slice(0, Math.max(0, live.length - MAX_STORE))) store.delete(r.key);
     }
   }, []);
 
