@@ -25,12 +25,89 @@ const bump = () => { version += 1; listeners.forEach((fn) => fn(version)); };
 // cached for gated answers, so a sign-in can ask again (resetLookups).
 let gated = false;
 export const isGated = () => gated;
+// Whether names may be asked for at all, as the one /auth/me check says
+// (wallet.service sets it): null until that answers, and lookups wait for
+// it. Asking first sent one doomed 401 per address on screen, a hundred
+// or more on Live and Offers, for every signed-out reader.
+let open = null;
+// At most this many lookups at once; the rest wait their turn. After a
+// 429 (the route allows 60 misses a minute per client), a server error or
+// a network failure, the address waits too, and nothing is asked before
+// retryAt: those answers used to be cached as "no name" for the session.
+const MAX_IN_FLIGHT = 6;
+const queued = new Set();
+let active = 0;
+let retryAt = 0;
+let retryTimer = null;
+const RETRY = Symbol("retry");
+
 export function resetLookups() {
   cache.clear();
   inflight.clear();
-  gated = false;
+  queued.clear();
+  gated = open === false;
   available = true;
+  retryAt = 0;
   bump();
+}
+
+/**
+ * The session check's answer: names may be asked for (signed in) or not.
+ * Closed on a host that signs readers in, it is gated (the pages offer the
+ * sign-in line); on a host without sign-in there are simply no names.
+ */
+export function setLookupGate(isOpen, hostSignsIn = true) {
+  open = Boolean(isOpen);
+  if (!hostSignsIn) available = false;
+  gated = !open && hostSignsIn;
+  if (!open) queued.clear();
+  bump();
+  pump();
+}
+
+function pump() {
+  if (open !== true || !available || gated) return;
+  const wait = retryAt - Date.now();
+  if (wait > 0) {
+    if (!retryTimer) retryTimer = setTimeout(() => { retryTimer = null; pump(); }, wait);
+    return;
+  }
+  for (const a of queued) {
+    if (active >= MAX_IN_FLIGHT) break;
+    queued.delete(a);
+    start(a);
+  }
+}
+
+function start(a) {
+  active += 1;
+  const p = fetch(`/lookup/address/${a}`, { headers: { accept: "application/json" } })
+    .then(async (res) => {
+      if (!(res.headers.get("content-type") || "").includes("application/json")) { available = false; return null; }
+      if (res.status === 401) { gated = true; return undefined; }
+      if (res.status === 404) return null;
+      if (res.status === 429 || res.status >= 500) {
+        retryAt = Math.max(retryAt, Date.now() + (Number(res.headers.get("retry-after")) || 30) * 1000);
+        return RETRY;
+      }
+      if (!res.ok) return null;
+      return await res.json();
+    })
+    .catch(() => {
+      retryAt = Math.max(retryAt, Date.now() + 30000);
+      return RETRY;
+    })
+    .then((rec) => {
+      active -= 1;
+      inflight.delete(a);
+      // undefined = gated: remembered as nothing, so a later sign-in retries
+      if (rec === RETRY) queued.add(a);
+      else if (rec !== undefined) cache.set(a, rec);
+      bump();
+      pump();
+      return rec === undefined || rec === RETRY ? null : rec;
+    });
+  inflight.set(a, p);
 }
 
 const norm = (address) => {
@@ -38,31 +115,20 @@ const norm = (address) => {
   return a ? (a.startsWith("0x") ? a : `0x${a}`) : "";
 };
 
-/** Fetch one address's record (memoised); resolves to the record or null */
+/**
+ * Ask for one address's record (memoised). Resolves to the record, or to
+ * null while it waits its turn: the answer lands in the cache and every
+ * subscribed page re-renders (bump).
+ */
 export function lookupAddress(address) {
   const a = norm(address);
   if (!a) return Promise.resolve(null);
   if (cache.has(a)) return Promise.resolve(cache.get(a));
   if (inflight.has(a)) return inflight.get(a);
-  if (!available || gated) return Promise.resolve(null);
-  const p = fetch(`/lookup/address/${a}`, { headers: { accept: "application/json" } })
-    .then(async (res) => {
-      if (!(res.headers.get("content-type") || "").includes("application/json")) { available = false; return null; }
-      if (res.status === 401) { gated = true; return undefined; }
-      if (res.status === 404) return null;
-      if (!res.ok) return null;
-      return await res.json();
-    })
-    .catch(() => null)
-    .then((rec) => {
-      // undefined = gated: remembered as nothing, so a later sign-in retries
-      if (rec !== undefined) cache.set(a, rec);
-      inflight.delete(a);
-      bump();
-      return rec === undefined ? null : rec;
-    });
-  inflight.set(a, p);
-  return p;
+  if (!available || gated || open === false) return Promise.resolve(null);
+  queued.add(a);
+  pump();
+  return inflight.get(a) || Promise.resolve(null);
 }
 
 /** The record if already known; asks for it otherwise (null meanwhile) */

@@ -1,6 +1,6 @@
 import * as fcl from "@onflow/fcl";
 import { useState, useEffect } from "react";
-import { resetLookups } from "./usernames.service";
+import { resetLookups, setLookupGate } from "./usernames.service";
 import { getAccountContext, setAccountAddress, clearAccountAddress } from "./account.context";
 
 /**
@@ -82,8 +82,11 @@ export const isProved = (s = session) => s.status === "signed" && Boolean(s.wall
 export function ensureSession() {
   if (asked) return asked;
   try { watchWallet(); } catch { /* no window */ }
+  // A host without the sign-in route answers with the app shell, not JSON
+  let hostSignsIn = false;
   asked = fetch("/auth/me", { headers: { accept: "application/json" } })
     .then(async (res) => {
+      hostSignsIn = (res.headers.get("content-type") || "").includes("application/json");
       if (res.status === 200) {
         const body = await res.json();
         set({ status: "signed", address: body.address });
@@ -93,7 +96,10 @@ export function ensureSession() {
         set({ status: "anonymous", address: null });
       }
     })
-    .catch(() => set({ status: "anonymous", address: null }));
+    .catch(() => set({ status: "anonymous", address: null }))
+    // Username lookups wait for this answer: only a signed-in reader asks,
+    // and a host without sign-in has no names to ask for
+    .then(() => setLookupGate(session.status === "signed", hostSignsIn));
   return asked;
 }
 
@@ -189,6 +195,7 @@ export async function signIn({ quiet = false } = {}) {
     const body = await vRes.json();
     set({ status: "signed", address: body.address, busy: false, error: null, challenge: null });
     resetLookups();
+    setLookupGate(true);
   } catch (err) {
     set({ busy: false, error: quiet ? null : (err && err.message) || String(err) });
   }
@@ -219,5 +226,6 @@ export async function signOut() {
   try { await fcl.unauthenticate(); } catch { /* not connected */ }
   set({ status: "anonymous", address: null, busy: false, error: null, wallet: null, challenge: null });
   resetLookups();
+  setLookupGate(false);
   if (wallet && getAccountContext().address === wallet.address) clearAccountAddress();
 }
