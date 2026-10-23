@@ -260,18 +260,12 @@ const EventRow = memo(function EventRow({ rec, isOpen, onToggle, dbMaps, momentI
     if (/\.MomentWithdrawn$/.test(n)) return list(["seller", d.owner ?? d.seller]);
     if (/\.MomentPurchased$/.test(n)) return list(["seller", d.seller ?? movedFromOf(d.id)], ["buyer", resolvedOwnerOf(d.id)]);
     if (n === "NFTStorefrontV2.ListingAvailable") return list(["seller", d.storefrontAddress]);
-    if (n === "NFTStorefrontV2.ListingCompleted" && !isTopShotType(d.nftType)) {
-      // Another collection's NFT: the transaction's standard NFT moves
-      // (sale) or its authorizer (delist), once that lookup has landed
+    if (n === "NFTStorefrontV2.ListingCompleted") {
+      // The transaction's own standard NFT moves (sale) or its authorizer
+      // (delist), once that lookup has landed; never the moment's cached
+      // holder, which is whoever held it when the moment was first seen
       const p = partyInfo.get(`${rec.txId}:${d.nftID}`);
       return p ? list(["seller", p.from], ["buyer", p.to]) : [];
-    }
-    if (n === "NFTStorefrontV2.ListingCompleted") {
-      // Sale: the absorbed Withdraw names the seller, the Deposit the
-      // buyer. Delist: the resolved holder is the canceller
-      return d.purchased
-        ? list(["seller", movedFromOf(d.nftID)], ["buyer", resolvedOwnerOf(d.nftID)])
-        : list(["seller", resolvedOwnerOf(d.nftID)]);
     }
     if (n === "OffersV2.OfferAvailable") return list(["buyer", d.offerAddress]);
     if (n === "OffersV2.OfferCompleted") {
@@ -556,7 +550,7 @@ export function Live() {
         if (moves) {
           // The Withdraw side names who the moment left (the seller);
           // the Deposit side names where it landed (the buyer)
-          movedFrom = moves.from;
+          movedFrom = (moves.withdrawals.find((x) => x.id === momentID) || {}).from || moves.from;
           const landed = moves.deposits.find((x) => x.id === momentID);
           if (landed) candidates = [withPrefix(landed.to), ...candidates];
         }
@@ -972,7 +966,8 @@ export function Live() {
       const parties = partiesRefOf(r);
       if (parties) {
         requestParties(parties);
-        continue;
+        // A moment still needs its identity (set, play, serial) below
+        if (!isTopShotType(parties.nftType)) continue;
       }
       const ref = momentRefOf(r);
       if (!ref) continue;

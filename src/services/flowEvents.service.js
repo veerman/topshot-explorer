@@ -155,6 +155,9 @@ const NFT_DEPOSITED = "A.1d7e57aa55817448.NonFungibleToken.Deposited";
 async function fetchTxTopShotMoves(txId) {
   const data = await getJson(`/v1/transaction_results/${txId}`);
   const deposits = [];
+  // Each moment's own sender; `from` (the first) stays for callers that
+  // only need the transaction's one seller
+  const withdrawals = [];
   let from = null;
   // Generic moves keyed by "type:id"; a withdraw and a deposit of the
   // same NFT fold into one {from, to}
@@ -176,6 +179,7 @@ async function fetchTxTopShotMoves(txId) {
     } else if (e.type === "A.0b2a3299cc857e29.TopShot.Withdraw") {
       const d = decodeEventPayload(e.payload);
       if (!from && d.from) from = d.from;
+      if (d.id !== undefined && d.from) withdrawals.push({ id: Number(d.id), from: d.from });
     } else if (e.type === NFT_WITHDRAWN) {
       const d = decodeEventPayload(e.payload);
       const m = nftMove(d);
@@ -186,7 +190,7 @@ async function fetchTxTopShotMoves(txId) {
       if (m && d.to) m.to = d.to;
     }
   }
-  return { deposits, from, nfts: [...nftsByKey.values()] };
+  return { deposits, withdrawals, from, nfts: [...nftsByKey.values()] };
 }
 
 /**
@@ -421,18 +425,19 @@ export function absorbedMomentId(rec) {
 }
 
 /**
- * A storefront sale or delist of ANOTHER collection's NFT names no
- * address in its payload, the same as a Top Shot one, but there is no
- * collection script to confirm a holder against. The transaction still
- * tells: a sale moved the NFT (NonFungibleToken.Withdrawn from the
- * seller, Deposited to the buyer), a delist was authorized by the
- * storefront's owner. Returns { txId, nftType, nftID, purchased } for
- * such a row, else null; Top Shot rows go through momentRefOf.
+ * A storefront sale or delist names no address in its payload. The
+ * transaction tells: a sale moved the NFT (NonFungibleToken.Withdrawn from
+ * the seller, Deposited to the buyer), a delist was authorized by the
+ * storefront's owner. Read per row, from that transaction, for every
+ * collection: a moment's holder cached from an earlier row is whoever held
+ * it then, so a moment first seen listed showed its seller as the buyer.
+ * Returns { txId, nftType, nftID, purchased } for such a row, else null;
+ * a Top Shot row still goes through momentRefOf for which moment it is.
  */
 export function partiesRefOf(rec) {
   const d = rec.data || {};
   if (shortName(rec.type) !== "NFTStorefrontV2.ListingCompleted") return null;
-  if (!d.nftType || isTopShotType(d.nftType)) return null;
+  if (!d.nftType) return null;
   if (d.nftID === undefined || d.nftID === null) return null;
   return { txId: rec.txId, nftType: d.nftType, nftID: Number(d.nftID), purchased: !!d.purchased };
 }
