@@ -108,14 +108,26 @@ async function catchUp(snap) {
   };
 }
 
+// A book loaded longer ago than this is loaded again on the next visit to
+// the page: a tab left open keeps this module for hours while the cron
+// republishes every half hour
+const SNAPSHOT_STALE_MS = 10 * 60 * 1000;
+let snapshotAt = 0;
+
 export function loadOffersSnapshot() {
+  if (snapshotPromise && Date.now() - snapshotAt > SNAPSHOT_STALE_MS) snapshotPromise = null;
   if (!snapshotPromise) {
-    snapshotPromise = (async () => {
+    snapshotAt = Date.now();
+    const p = (async () => {
       const published = await loadPublished();
       const snap = published || await loadBundled();
       if (!snap) return null;
       return catchUp(snap);
     })().catch(() => null);
+    snapshotPromise = p;
+    // A failed load is not remembered: one network blip on the first
+    // visit used to mean "no offer data" for the rest of the session
+    p.then((snap) => { if (!snap && snapshotPromise === p) snapshotPromise = null; });
   }
   return snapshotPromise;
 }
