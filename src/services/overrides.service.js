@@ -257,6 +257,17 @@ export function normalizeBirthdate(str) {
 
 let easternFormatter = null;
 
+// The chain's own timestamp form, "2019-11-06 00:30:00 +0000 UTC" (8,872
+// of 9,322 plays). V8 reads it, but Safari's Date does not (a space where
+// ISO has "T", then the "UTC" word), and an unread date fell back to the
+// raw string: the UTC day, a day late for every evening game on an iPhone.
+// Rebuilt as ISO before any new Date(), the same instant everywhere.
+const CHAIN_TIMESTAMP = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)\s*([+-]\d{2}):?(\d{2})(?:\s*UTC)?$/;
+const chainTimestampToIso = (str) => {
+  const m = str.match(CHAIN_TIMESTAMP);
+  return m ? `${m[1]}T${m[2]}${m[3]}:${m[4]}` : str;
+};
+
 /**
  * Normalizes on-chain game timestamps (DateOfMoment) and standardizes them
  * in America/New_York (Eastern Time) as 'YYYY-MM-DD HH:MM:SS EST'.
@@ -274,6 +285,7 @@ export function normalizeDateOfMoment(str) {
   const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (us) trimmed = `${us[3]}-${us[1].padStart(2, "0")}-${us[2].padStart(2, "0")}T12:00:00Z`;
   else if (iso) trimmed = `${trimmed}T12:00:00Z`;
+  else trimmed = chainTimestampToIso(trimmed);
 
   const dateObj = new Date(trimmed);
   if (isNaN(dateObj.getTime())) {
@@ -330,7 +342,7 @@ export function parseMomentDate(str) {
     const d = new Date(`${m[1]}T${m[2]}${offset}`);
     return isNaN(d.getTime()) ? null : d;
   }
-  const d = new Date(trimmed);
+  const d = new Date(chainTimestampToIso(trimmed));
   return isNaN(d.getTime()) ? null : d;
 }
 
