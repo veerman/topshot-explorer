@@ -11,9 +11,12 @@ import {
 import { WALL_SCHEMA, signWall, wallEntryFor, wallPending, WALL_CLOSED, WALL_CLOSED_MESSAGE } from './deploy/cloudflare/wall.js'
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from './deploy/cloudflare/graph.js'
 
-// Wallet sign-in in dev: the same auth.js the Worker runs, with a dev
-// secret unless SESSION_SECRET is set. Cookies are not Secure on http.
-const DEV_SESSION_SECRET = (globalThis.process && globalThis.process.env.SESSION_SECRET) || 'dev-session-secret'
+// Wallet sign-in in dev: the same auth.js the Worker runs, with a fresh
+// random secret per server start unless SESSION_SECRET is set (a fixed one
+// sat in this public file, so with `--host` anyone on the same network
+// could mint a session and read the census through /lookup/address). A
+// restart signs dev readers out. Cookies are not Secure on http.
+const DEV_SESSION_SECRET = (globalThis.process && globalThis.process.env.SESSION_SECRET) || globalThis.crypto.randomUUID()
 const readJsonBody = (req) => new Promise((resolve) => {
   let raw = ''
   req.on('data', (c) => { raw += c })
