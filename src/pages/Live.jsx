@@ -24,6 +24,12 @@ import { MultiSelect } from "../components/MultiSelect";
 
 const POLL_S = 10;
 const MAX_STORE = 3000; // live events kept in memory before the oldest drop off
+// A stream that fell behind (a hidden tab, a pause, failed polls) catches
+// up a few 250-block windows per poll instead of skipping the gap; one
+// further behind than CATCH_UP_MAX windows (about an hour) restarts at the
+// newest window, as a fresh stream does
+const CATCH_UP_PER_POLL = 4;
+const CATCH_UP_MAX = 15;
 const MAX_ROWS = 250;   // rows rendered at once; "Older events" adds another page
 
 const ENABLED_KEY = "mkt_event_types_v1";
@@ -769,13 +775,22 @@ export function Live() {
           const last = lastByTypeRef.current[t] || 0;
           // A type polled before continues from where it left off; a fresh
           // one backfills the full window the API allows (about 4 minutes)
-          const from = Math.max(last > 0 ? last + 1 : 0, sealed - (MAX_EVENT_SPAN - 1), 0);
-          if (from > sealed) return;
-          const blocks = await getEvents(t, from, sealed);
-          lastByTypeRef.current[t] = sealed;
-          if (!(t in firstByTypeRef.current)) firstByTypeRef.current[t] = from;
-          liveFloorRef.current = Math.min(liveFloorRef.current, from);
-          ingest(blocks, t);
+          const newest = Math.max(sealed - (MAX_EVENT_SPAN - 1), 0);
+          let from = last > 0 && sealed - last <= CATCH_UP_MAX * MAX_EVENT_SPAN ? last + 1 : newest;
+          for (let w = 0; w < CATCH_UP_PER_POLL && from <= sealed; w++) {
+            const to = Math.min(from + MAX_EVENT_SPAN - 1, sealed);
+            const blocks = await getEvents(t, from, to);
+            if (!(t in firstByTypeRef.current)) firstByTypeRef.current[t] = from;
+            liveFloorRef.current = Math.min(liveFloorRef.current, from);
+            ingest(blocks, t);
+            // Every block of the range is listed, empty or not, but a node
+            // behind the one that named `sealed` cuts the range at its own
+            // tip without saying so: advance only as far as it answered
+            const covered = (blocks || []).reduce((m, b) => Math.max(m, Number(b.block_height) || 0), from - 1);
+            lastByTypeRef.current[t] = covered;
+            if (covered < to) break;
+            from = covered + 1;
+          }
         })
       );
       setTip(sealed);
