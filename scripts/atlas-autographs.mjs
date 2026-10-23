@@ -17,7 +17,7 @@
 // where the list names the signed parallels (0 = Standard; ids from
 // SUBEDITION_NAMES), sorted. Editions with nothing signed are absent.
 //
-// Join: Atlas play GUID -> data/dapper/plays.json playUUID -> Flow play id;
+// Join: Atlas's play id is the Flow play id (scripts/lib/atlas-join.mjs);
 // the Flow set is Atlas's set id (Atlas reuses the Flow ids).
 //
 // Usage:
@@ -30,21 +30,19 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { SUBEDITION_NAMES } from "../src/services/fcl.service.js";
 import { flag, opt } from "./lib/args.mjs";
+import { atlasPlayJoin } from "./lib/atlas-join.mjs";
 import { writeFileAtomic } from "./lib/json-file.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ATLAS_PATH = path.resolve(ROOT, opt("--atlas", "data/atlas/editions.json"));
 const OUT_PATH = path.join(ROOT, "data", "autographs.json");
-const DAPPER_PLAYS_PATH = path.join(ROOT, "data", "dapper", "plays.json");
 const dryRun = flag("--dry-run");
 
 const NOTE = "Which parallels of an edition carry the printed autograph, from Atlas (Dapper Labs' catalogue). The chain flags an autograph on the play, one value for every parallel, so it cannot say which parallel is signed; Atlas marks each (set, play, parallel). Key setID_playID; value the signed subedition ids (0 = Standard). Editions with nothing signed are absent. Refresh with `npm run atlas:harvest` then `npm run atlas:autographs`.";
 
 function main() {
   const atlas = JSON.parse(readFileSync(ATLAS_PATH, "utf8"));
-  const dapperPlays = JSON.parse(readFileSync(DAPPER_PLAYS_PATH, "utf8"));
-  const flowIdByGuid = new Map();
-  Object.entries(dapperPlays).forEach(([id, e]) => { if (e && e.playUUID) flowIdByGuid.set(e.playUUID, id); });
+  const flowPlayID = atlasPlayJoin();
   const subIdByName = new Map(Object.entries(SUBEDITION_NAMES).map(([id, name]) => [String(name).toLowerCase(), Number(id)]));
 
   const signed = new Map(); // key -> Set(subID)
@@ -52,7 +50,7 @@ function main() {
   const signedPlays = new Set();
   let unjoined = 0, unknownParallel = 0, signedRows = 0, signedMoments = 0;
   atlas.editions.forEach((e) => {
-    const playID = flowIdByGuid.get(e.guid);
+    const playID = flowPlayID(e);
     if (!playID) { unjoined++; return; }
     if ((e.play || {}).PlayerAutographType === "Printed Autograph") flaggedPlays.add(playID);
     if (!e.autographedAt) return;

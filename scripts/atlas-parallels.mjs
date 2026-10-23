@@ -8,9 +8,9 @@
 // `parallel` name, and TopShot.getAllSubeditions() gives the on-chain id for
 // each parallel name, so the two together give the mapping.
 //
-// A set maps to its Flow set through its plays (Atlas play GUID ->
-// data/dapper/plays.json playUUID -> Flow play id -> the Flow set of that
-// name containing the play), or directly when data/dapper/sets.json pins
+// A set maps to its Flow set through its plays (Atlas's play id is the Flow
+// play id, scripts/lib/atlas-join.mjs; then the Flow set of that name
+// containing the play), or directly when data/dapper/sets.json pins
 // the Atlas set number with atlasSetID.
 //
 // Usage:
@@ -23,6 +23,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { initFCL, getSetsOverview, getSubeditions, SUBEDITION_MINT_COUNTS } from "../src/services/fcl.service.js";
 import { flag, opt } from "./lib/args.mjs";
+import { atlasPlayJoin } from "./lib/atlas-join.mjs";
 import { writeFileAtomic } from "./lib/json-file.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,7 +37,6 @@ const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 async function main() {
   const atlas = JSON.parse(readFileSync(ATLAS_PATH, "utf8"));
   const dapperSets = JSON.parse(readFileSync(path.join(ROOT, "data", "dapper", "sets.json"), "utf8"));
-  const dapperPlays = JSON.parse(readFileSync(path.join(ROOT, "data", "dapper", "plays.json"), "utf8"));
   const current = JSON.parse(readFileSync(PARALLELS_PATH, "utf8"));
   console.log(`Atlas sheet from ${atlas.fetchedAt}: ${atlas.editions.length} editions`);
 
@@ -57,8 +57,7 @@ async function main() {
       setsByPlay.set(Number(p), list);
     });
   });
-  const flowPlayByGuid = new Map();
-  Object.entries(dapperPlays).forEach(([id, e]) => { if (e && e.playUUID) flowPlayByGuid.set(e.playUUID, Number(id)); });
+  const flowPlayID = atlasPlayJoin();
   const directSet = new Map();
   Object.entries(dapperSets).forEach(([id, e]) => { if (e && Number.isInteger(e.atlasSetID)) directSet.set(String(e.atlasSetID), Number(id)); });
 
@@ -69,11 +68,11 @@ async function main() {
   const votes = new Map(); // atlasSetId -> Map(flowSetId -> count)
   const looseVotes = new Map();
   const atlasSetNames = new Map();
-  const atlasSetPlays = new Map(); // atlasSetId -> Set(guid)
+  const atlasSetPlays = new Map(); // atlasSetId -> Set(play)
   atlas.editions.forEach((e) => {
     atlasSetNames.set(e.setId, e.setName);
-    (atlasSetPlays.get(e.setId) || atlasSetPlays.set(e.setId, new Set()).get(e.setId)).add(e.guid);
-    const flowPlay = flowPlayByGuid.get(e.guid);
+    const flowPlay = flowPlayID(e);
+    (atlasSetPlays.get(e.setId) || atlasSetPlays.set(e.setId, new Set()).get(e.setId)).add(flowPlay || e.guid);
     if (!flowPlay || e.parallel !== "Standard") return;
     (setsByPlay.get(flowPlay) || []).forEach((s) => {
       const target = s.name === norm(e.setName) ? votes : looseVotes;

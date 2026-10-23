@@ -47,10 +47,13 @@ export const SUBEDITION_MINT_COUNTS = {
   19: 25,
   20: 10,
   21: 5,
-  22: 1
+  22: 1,
+  23: 17,
+  24: 4
 };
 
-// On-chain subedition names (TopShot.getAllSubeditions, 2026-09-01), for
+// On-chain subedition names (TopShot.getAllSubeditions, 2026-09-01; 23 and
+// 24 arrived with the Run It Back and Immortals parallels, 2026-10), for
 // pages that only need labels and should not wait on a chain call (the home
 // parallels chart). The detail pages still read the live list.
 export const SUBEDITION_NAMES = {
@@ -75,7 +78,9 @@ export const SUBEDITION_NAMES = {
   19: "Hexwave",
   20: "Jukebox",
   21: "Galactic",
-  22: "Omega"
+  22: "Omega",
+  23: "Animated",
+  24: "Illustrated"
 };
 
 // Cadence Address arguments want the bare hex, whatever prefix came in

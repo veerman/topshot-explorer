@@ -31,7 +31,7 @@ import { toQuery } from "../utils/query";
 // Parallel size groups (parallel.groups.js, shared with the Sets page
 // filter the parallels matrix links to)
 // The parallels behind each size group, rarest first, so the column head
-// can name them ("1 to 10" alone does not say what the number is). Only
+// can name them ("1 to 24" alone does not say what the number is). Only
 // the subeditions that actually contributed to this league's matrix are
 // listed (Voltage and Championship appear in WNBA sets only).
 const parallelNotes = (subIDs) => {

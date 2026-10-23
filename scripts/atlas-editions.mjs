@@ -11,7 +11,7 @@
 // edition's id is what gets stored; parallels have their own Atlas ids and
 // are only counted here until a surface needs them.
 //
-// Join: Atlas play GUID -> data/dapper/plays.json playUUID -> Flow play id; the Flow
+// Join: Atlas's play id is the Flow play id (scripts/lib/atlas-join.mjs); the Flow
 // set is the one holding that play with Atlas's set id (Atlas reuses the
 // Flow ids), else the single same-named set holding it.
 //
@@ -26,13 +26,13 @@ import path from "node:path";
 import { initFCL, getSetsOverview } from "../src/services/fcl.service.js";
 import { REWARD_TAGS } from "../src/services/overrides.service.js";
 import { flag, opt } from "./lib/args.mjs";
+import { atlasPlayJoin } from "./lib/atlas-join.mjs";
 import { readJsonPreservingEol, writeJsonAtomic } from "./lib/json-file.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ATLAS_PATH = path.resolve(ROOT, opt("--atlas", "data/atlas/editions.json"));
 const EDITIONS_PATH = path.join(ROOT, "data", "additions", "editions.json");
 const DAPPER_EDITIONS_PATH = path.join(ROOT, "data", "dapper", "editions.json");
-const DAPPER_PLAYS_PATH = path.join(ROOT, "data", "dapper", "plays.json");
 const apply = flag("--apply");
 const SHOW = 12;
 
@@ -40,7 +40,6 @@ const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 async function main() {
   const atlas = JSON.parse(readFileSync(ATLAS_PATH, "utf8"));
-  const dapperPlays = JSON.parse(readFileSync(DAPPER_PLAYS_PATH, "utf8"));
   const setsOverrides = JSON.parse(readFileSync(path.join(ROOT, "data", "overrides", "sets.json"), "utf8"));
   const { data: editions, eol, trailing } = readJsonPreservingEol(EDITIONS_PATH);
   const { data: dapper, eol: dEol, trailing: dTrailing } = readJsonPreservingEol(DAPPER_EDITIONS_PATH);
@@ -57,9 +56,8 @@ async function main() {
       setsByPlay.set(Number(p), list);
     });
   });
-  const flowPlayByGuid = new Map();
-  Object.entries(dapperPlays).forEach(([id, e]) => { if (e && e.playUUID) flowPlayByGuid.set(e.playUUID, Number(id)); });
-  console.log(`Flow: ${flowSets.length} sets; ${flowPlayByGuid.size} plays carry a playUUID link`);
+  const flowPlayID = atlasPlayJoin();
+  console.log(`Flow: ${flowSets.length} sets`);
 
   const next = new Map(); // "setID_playID" -> atlas id
   const rewards = new Map(); // "setID_playID" -> reward tags on the Standard edition
@@ -68,8 +66,8 @@ async function main() {
   let parallels = 0;
   atlas.editions.forEach((e) => {
     if (e.parallel !== "Standard") { parallels++; return; }
-    const play = flowPlayByGuid.get(e.guid);
-    if (!play) { unjoined.push(`Atlas ${e.id} (${e.setName} / ${e.play?.FullName || "?"}): play GUID ${e.guid} has no playUUID link`); return; }
+    const play = flowPlayID(e);
+    if (!play) { unjoined.push(`Atlas ${e.id} (${e.setName} / ${e.play?.FullName || "?"}): no play id, and play GUID ${e.guid} has no playUUID link`); return; }
     const holders = setsByPlay.get(play) || [];
     let set = holders.find((s) => s.id === Number(e.setId));
     if (!set) {

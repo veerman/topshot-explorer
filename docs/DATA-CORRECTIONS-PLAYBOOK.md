@@ -304,22 +304,39 @@ FACTUAL require a lookup against a basketball reference.
 
 ### Atlas answer sheet (scripts, 2026-09-01)
 - `npm run atlas:harvest` snapshots every Atlas edition (one per set, play
-  and parallel) into `data/atlas/editions.json`: play GUID, set, tier,
+  and parallel) into `data/atlas/editions.json`: play id, set, tier,
   parallel name, badges, mint counts, and the play facts worth
   cross-checking. Headless Chrome on nbatopshot.com, no login.
 - `npm run atlas:parallels` derives `data/sets_parallels.json` from it. The
   chain cannot: per-subedition mint counts live on the SubeditionAdmin
   resource in Dapper's storage, which scripts cannot read. Atlas's
   `parallel` name joins `TopShot.getAllSubeditions()` for the id; Atlas sets
-  join Flow sets through play GUIDs (or a numeric `setID_dapper`). Dry run
+  join Flow sets through their plays (or a numeric `setID_dapper`). Dry run
   by default; `--apply` writes, `--prune` drops parallels Atlas no longer
   lists.
 - `npm run atlas:tags` compares Atlas badges with our derived tags (TSD, RY,
   CY, RM) and stored tags (Rookie Premiere, MVP Year, ...), plus NbaSeason
   and moment dates. `--import` copies Atlas badges into additions `tags`;
   run `npm run reconcile` after, so agreeing copies are stripped and only
-  disagreements reach the Corrections page. Plays without a `playID_dapper` link
-  are listed as unjoined, not guessed.
+  disagreements reach the Corrections page. `--only` limits the import to
+  named badges (the awards Atlas adds once a season ends). Rows that join
+  no Flow play are listed as unjoined, not guessed.
+- The join (2026-10-23): Atlas's `editionTemplateId` is the Flow play id,
+  so every script joins on it (`scripts/lib/atlas-join.mjs`). The play GUID
+  read from the asset path vanished on the autumn 2026 mints, whose assets
+  are named by NBA game id and event; joined that way, all 576 rows added
+  since September were silently skipped.
+- Atlas rewrites its own copy. Between the 2026-09-11 and 2026-10-23
+  snapshots it rewrote 368 `DateOfMoment` rows (sets 271 to 274) from the
+  chain's midnight-UTC form to noon UTC on the Eastern day; the chain did
+  not change. Ours already matched every one but David Thompson's (play
+  9037), where Atlas was right: the Nuggets lost 133-129 in overtime at San
+  Antonio on 1981-02-22 (Basketball-Reference box score and Nuggets
+  schedule; Land of Basketball), and the chain's midnight UTC read as the
+  21st in Eastern time. Dapper may push such rewrites to the chain with
+  `updatePlayMetadata`; `npm run seed` records any that arrive in
+  `data/chain_edits.json`, and `npm run reconcile` then reports the
+  overrides they make unnecessary.
 
 ## Out-of-bounds repairs (2026-08-31)
 

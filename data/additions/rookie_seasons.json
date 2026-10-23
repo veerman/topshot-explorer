@@ -31,6 +31,11 @@
       "league": "WNBA",
       "draft": null
     },
+    "Aminata Gueye": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": null
+    },
     "Antonia Delaere": {
       "season": "2026",
       "league": "WNBA",
@@ -325,6 +330,11 @@
       "season": "2026",
       "league": "WNBA",
       "draft": "2019"
+    },
+    "Marine Fauthoux": {
+      "season": "2026",
+      "league": "WNBA",
+      "draft": "2021"
     },
     "Megan McConnell": {
       "season": "2025",

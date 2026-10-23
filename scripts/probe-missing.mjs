@@ -2,8 +2,9 @@
 // chain (per public/seed/topshot-seed.json) but absent from the lookup:
 // editions newer than the original 2026-08-29 day-long run, the Platinum
 // Ice sets the heavy chain query could never deliver, and the transient
-// failures from that run's errors.log. NEVER re-probes existing entries;
-// CIDs are content-addressed, so done is done forever.
+// failures from that run's errors.log. NEVER re-probes existing entries
+// (dead ones only with --recheck-dead); CIDs are content-addressed, so a
+// measured file is done forever.
 //
 // Downloads headers only, like the original run:
 //   images: one ranged GET (128KB) carries dimensions + EXIF + the total
@@ -17,6 +18,13 @@
 // skips CIDs already probed); failures go to scratch/ipfs-probe/errors-incremental.log.
 // When every missing CID is accounted for, the new entries merge into
 // data/ipfs_media.json and data/ipfs_dead.json automatically.
+//
+//   --recheck-dead   probe every CID the lookup records as dead again
+//                    instead. Dapper restores files now and then (16 of
+//                    219 answered again on 2026-10-23): one that answers
+//                    is measured and leaves ipfs_dead.json, one still
+//                    dead stays. Kept out of the resume file, so the
+//                    normal merge never sees these records.
 import { readFileSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { execFile } from "node:child_process";
@@ -57,10 +65,13 @@ if (existsSync(RESULTS_PATH)) {
   });
 }
 
+const recheckDead = flag("--recheck-dead");
 const missing = [...chainCids].filter((c) => !(c in media) && !alreadyProbed.has(c));
-console.log(`chain CIDs: ${chainCids.size} | in lookup: ${chainCids.size - missing.length - alreadyProbed.size + [...alreadyProbed].filter((c) => c in media).length} | to probe now: ${Math.min(missing.length, LIMIT)} (resumed past ${alreadyProbed.size})`);
+const deadNow = Object.keys(media).filter((c) => media[c] === 0);
+if (recheckDead) console.log(`dead CIDs in the lookup: ${deadNow.length} | to probe now: ${Math.min(deadNow.length, LIMIT)}`);
+else console.log(`chain CIDs: ${chainCids.size} | in lookup: ${chainCids.size - missing.length - alreadyProbed.size + [...alreadyProbed].filter((c) => c in media).length} | to probe now: ${Math.min(missing.length, LIMIT)} (resumed past ${alreadyProbed.size})`);
 if (flag("--dry")) process.exit(0);
-const queue = missing.slice(0, LIMIT);
+const queue = (recheckDead ? deadNow : missing).slice(0, LIMIT);
 
 // ---- Helpers ---------------------------------------------------------
 
@@ -198,6 +209,7 @@ async function probeOne(cid) {
 
 // ---- Run -------------------------------------------------------------
 let done = 0, dead = 0, failed = 0;
+const rechecked = [];
 await runPool(queue, CONCURRENCY, async (cid) => {
   let record = null;
   try {
@@ -208,7 +220,8 @@ await runPool(queue, CONCURRENCY, async (cid) => {
   }
   if (record) {
     if (record.dead) dead++;
-    appendFileSync(RESULTS_PATH, JSON.stringify(record) + "\n");
+    if (recheckDead) rechecked.push(record);
+    else appendFileSync(RESULTS_PATH, JSON.stringify(record) + "\n");
   }
   done++;
   process.stdout.write(`\r  probed ${done}/${queue.length} (dead ${dead}, failed ${failed})   `);
@@ -227,23 +240,33 @@ const trimTrailing = (arr) => {
   while (arr.length > 0 && (arr[arr.length - 1] === null || arr[arr.length - 1] === undefined)) arr.pop();
   return arr;
 };
+// A probe record as its lookup entry (the format in data/ipfs_media.json _meta)
+const entryOf = (r) => {
+  if (r.dead) return 0;
+  if (r.kind === "image") return trimTrailing([r.format, r.width, r.height, r.size ?? null, r.author ?? null, r.camera ?? null, r.photoDate ?? null]);
+  return ["mp4", r.width, r.height, r.size ?? null, r.duration, r.videoKbps, r.audioKbps || 0];
+};
 
-const records = readFileSync(RESULTS_PATH, "utf8").split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
-let added = 0, newlyDead = 0;
-const deadList = JSON.parse(readFileSync(DEAD_PATH, "utf8"));
+let added = 0, newlyDead = 0, revived = 0;
+let deadList = JSON.parse(readFileSync(DEAD_PATH, "utf8"));
 const deadSet = new Set(deadList);
-records.forEach((r) => {
-  if (r.cid in media) return; // never overwrite
-  if (r.dead) {
-    media[r.cid] = 0;
-    if (!deadSet.has(r.cid)) { deadSet.add(r.cid); deadList.push(r.cid); newlyDead++; }
-  } else if (r.kind === "image") {
-    media[r.cid] = trimTrailing([r.format, r.width, r.height, r.size ?? null, r.author ?? null, r.camera ?? null, r.photoDate ?? null]);
-  } else {
-    media[r.cid] = ["mp4", r.width, r.height, r.size ?? null, r.duration, r.videoKbps, r.audioKbps || 0];
-  }
-  added++;
-});
+if (recheckDead) {
+  // A dead entry is the one entry a probe may overwrite: the file is back
+  rechecked.filter((r) => !r.dead).forEach((r) => {
+    media[r.cid] = entryOf(r);
+    deadSet.delete(r.cid);
+    revived++;
+  });
+  deadList = deadList.filter((c) => deadSet.has(c));
+} else {
+  const records = readFileSync(RESULTS_PATH, "utf8").split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
+  records.forEach((r) => {
+    if (r.cid in media) return; // never overwrite
+    media[r.cid] = entryOf(r);
+    if (r.dead && !deadSet.has(r.cid)) { deadSet.add(r.cid); deadList.push(r.cid); newlyDead++; }
+    added++;
+  });
+}
 // Idempotent source note: strip any prior incremental-probe clauses so the
 // string carries one dated clause, not one per merge ever run
 mediaFile._meta.source = String(mediaFile._meta.source)
@@ -251,7 +274,8 @@ mediaFile._meta.source = String(mediaFile._meta.source)
   + `; incremental probe ${new Date().toISOString().slice(0, 10)} (scripts/probe-missing.mjs)`;
 writeJsonAtomic(MEDIA_PATH, mediaFile);
 writeJsonAtomic(DEAD_PATH, deadList);
-console.log(`Merged ${added} new entries into ${MEDIA_PATH} (${newlyDead} newly dead -> ${DEAD_PATH}). Lookup now has ${Object.keys(media).length} entries.`);
+if (recheckDead) console.log(`Rechecked ${rechecked.length} dead CIDs: ${revived} answer again and were measured into ${MEDIA_PATH}; ${deadList.length} stay in ${DEAD_PATH}.`);
+else console.log(`Merged ${added} new entries into ${MEDIA_PATH} (${newlyDead} newly dead -> ${DEAD_PATH}). Lookup now has ${Object.keys(media).length} entries.`);
 
 // The home page's stat cards read the baked summary, keep it in step
 await import("./build-ipfs-summary.mjs");

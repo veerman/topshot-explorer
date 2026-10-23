@@ -3774,7 +3774,8 @@
   },
   "8649": {
     "tags": [
-      "Rookie Premiere"
+      "Rookie Premiere",
+      "Rookie of the Year"
     ]
   },
   "8650": {
@@ -3866,6 +3867,26 @@
     ],
     "note": "a one-of-one team moment; Dapper Labs does not badge it."
   },
+  "8849": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
+  "8863": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "8864": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "8865": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
   "8866": {
     "tags": [
       "Rookie Premiere"
@@ -3946,6 +3967,11 @@
       "Rookie Premiere"
     ]
   },
+  "8898": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
   "8916": {
     "tags": [
       "Rookie Premiere",
@@ -3964,6 +3990,11 @@
     ]
   },
   "8934": {},
+  "8936": {
+    "tags": [
+      "Rookie of the Year"
+    ]
+  },
   "8939": {},
   "8942": {},
   "8943": {},
@@ -4038,6 +4069,114 @@
   "9083": {
     "tags": [
       "Rookie of the Year"
+    ]
+  },
+  "9103": {
+    "tags": [
+      "Rookie of the Year"
+    ]
+  },
+  "9115": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
+  "9136": {
+    "tags": [
+      "Rookie Premiere",
+      "Rookie of the Year"
+    ]
+  },
+  "9137": {
+    "tags": [
+      "Rookie Premiere",
+      "Rookie of the Year"
+    ]
+  },
+  "9138": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9139": {
+    "tags": [
+      "Rookie Premiere",
+      "Rookie of the Year"
+    ],
+    "tags_suppress": [
+      "Rookie of the Year"
+    ],
+    "note": "Jackie Stiles was the 2001 Rookie of the Year; Lauren Jackson never won it (Wikipedia, Basketball-Reference). Dapper Labs badges it."
+  },
+  "9143": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
+  "9148": {
+    "tags": [
+      "Rookie Premiere",
+      "Rookie of the Year"
+    ]
+  },
+  "9149": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9150": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9151": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9152": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9153": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9154": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9155": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9157": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
+  "9169": {
+    "tags": [
+      "Rookie of the Year"
+    ]
+  },
+  "9309": {
+    "tags": [
+      "MVP Year"
+    ]
+  },
+  "9321": {
+    "tags": [
+      "Rookie Premiere"
+    ]
+  },
+  "9322": {
+    "tags": [
+      "Rookie Premiere"
     ]
   }
 }

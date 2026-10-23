@@ -21,14 +21,19 @@
 //     --raw <file>      reuse a saved raw-plays snapshot
 //     --save-raw <file> save the fetched raw-plays snapshot for reuse
 //     --full            ignore the previous seed and refetch everything
-//                       (default runs are incremental: plays are immutable
-//                       so only new ids are fetched, and LOCKED sets reuse
-//                       their previous CIDs since a locked set can never
-//                       gain plays)
+//                       (default runs read every play again and compare
+//                       it with the previous seed, recording any edit in
+//                       data/chain_edits.json; LOCKED sets reuse their
+//                       previous CIDs since a locked set can never gain
+//                       plays, asking again only for editions without media)
+//
+// Every run keeps a dated copy of the seed under scratch/snapshots/.
 import { readFileSync, existsSync, statSync } from "node:fs";
 import path from "node:path";
 import { initFCL, getTopshotStats, getSetsOverview, getMintCounts, getSetCIDs } from "../src/services/fcl.service.js";
 import { loadRawPlays } from "./lib/raw-plays.mjs";
+import { diffPlays, recordChainEdits } from "./lib/chain-edits.mjs";
+import { keepSnapshot } from "./lib/snapshot.mjs";
 import { withRetries } from "./lib/retry.mjs";
 import { runPool } from "./lib/pool.mjs";
 import { flag, opt } from "./lib/args.mjs";
@@ -61,7 +66,20 @@ if (!flag("--full") && existsSync(SEED_PATH)) {
 
 initFCL();
 const stats = await withRetries(() => getTopshotStats(), "stats");
-const playsRaw = await loadRawPlays({ rawPath: opt("--raw"), saveRawPath: opt("--save-raw"), previousRaw: prevSeed?.playsRaw });
+// Every play is read again on every run (about 47 calls): plays can be
+// edited on chain after the mint, so the previous seed is the copy to
+// compare with, never one to reuse (scripts/lib/chain-edits.mjs)
+const playsRaw = await loadRawPlays({ rawPath: opt("--raw"), saveRawPath: opt("--save-raw") });
+if (prevSeed?.playsRaw && !opt("--raw")) {
+  const edits = diffPlays(prevSeed.playsRaw, playsRaw);
+  if (edits.length) {
+    recordChainEdits(edits, prevSeed.generatedAt, new Date().toISOString());
+    console.log(`  ${edits.length} field(s) edited on chain since the previous seed, on ${new Set(edits.map((e) => e.play)).size} play(s); recorded in data/chain_edits.json`);
+    edits.slice(0, 20).forEach((e) => console.log(`    play ${e.play} ${e.field}: ${JSON.stringify(e.before)} -> ${JSON.stringify(e.after)}`));
+  } else {
+    console.log("  no play edited on chain since the previous seed");
+  }
+}
 
 console.log("Fetching sets overview...");
 const setsOverview = await withRetries(() => getSetsOverview(), "sets overview");
@@ -77,8 +95,11 @@ for (let i = 0; i < setIDs.length; i += MINT_CHUNK) {
 process.stdout.write("\n");
 
 // CIDs from the previous seed, for sets that were ALREADY locked then:
-// a locked set can never gain plays and registered CIDs never change,
-// so those sets skip the chain entirely. Open sets always refetch.
+// a locked set can never gain plays and registered CIDs have never changed
+// (all 228 locked sets re-read on 2026-10-23 matched), so those editions
+// skip the chain. An edition still without media is asked again: Dapper
+// registers media after the mint (no 2026 WNBA set had any on 2026-10-23).
+// Open sets always refetch.
 const prevLockedCids = new Map();
 if (prevSeed?.setsOverview && prevSeed?.setDetails) {
   const lockedBefore = new Set(prevSeed.setsOverview.filter((s) => s.locked).map((s) => Number(s.id)));
@@ -94,19 +115,21 @@ console.log(`Fetching IPFS CIDs for ${setsOverview.length} sets...`);
 const cidsBySet = {};
 let done = 0;
 let reused = 0;
+let askedAgain = 0;
+const hasCids = (c) => Boolean(c) && Object.keys(c).length > 0;
 await runPool(setsOverview, CONCURRENCY, async (set) => {
   const playIDs = set.playIDs || [];
   const prior = set.locked ? prevLockedCids.get(Number(set.id)) : null;
-  if (prior && playIDs.every((p) => prior[Number(p)] !== undefined)) {
-    cidsBySet[Number(set.id)] = prior;
-    done++;
-    reused++;
-    process.stdout.write(`\r  fetched ${done}/${setsOverview.length} sets`);
-    return;
-  }
   const merged = {};
-  for (let i = 0; i < playIDs.length; i += CID_CHUNK) {
-    const chunk = playIDs.slice(i, i + CID_CHUNK);
+  let toFetch = playIDs;
+  if (prior) {
+    toFetch = playIDs.filter((p) => !hasCids(prior[Number(p)]));
+    playIDs.forEach((p) => { if (hasCids(prior[Number(p)])) merged[Number(p)] = prior[Number(p)]; });
+    reused++;
+    askedAgain += toFetch.length;
+  }
+  for (let i = 0; i < toFetch.length; i += CID_CHUNK) {
+    const chunk = toFetch.slice(i, i + CID_CHUNK);
     Object.assign(merged, await withRetries(() => getSetCIDs(set.id, chunk), `cids set ${set.id}`));
   }
   cidsBySet[Number(set.id)] = merged;
@@ -114,7 +137,7 @@ await runPool(setsOverview, CONCURRENCY, async (set) => {
   process.stdout.write(`\r  fetched ${done}/${setsOverview.length} sets`);
 });
 process.stdout.write("\n");
-if (reused > 0) console.log(`  CIDs reused for ${reused} locked sets from the previous seed`);
+if (reused > 0) console.log(`  CIDs reused for ${reused} locked sets from the previous seed; ${askedAgain} of their editions without media asked again`);
 
 // Assemble the exact shape mapSetDetailsToRecords consumes in the app
 const setDetails = setsOverview.map((set) => ({
@@ -144,3 +167,4 @@ const mb = (statSync(SEED_PATH).size / 1048576).toFixed(1);
 const editionCount = setDetails.reduce((n, s) => n + s.editions.length, 0);
 const cidCells = setDetails.reduce((n, s) => n + s.editions.filter((e) => Object.keys(e.ipfsCIDs).length > 0).length, 0);
 console.log(`Wrote ${SEED_PATH} (${mb} MB): ${Object.keys(playsRaw).length} plays, ${setsOverview.length} sets, ${editionCount} editions (${cidCells} with CIDs).`);
+keepSnapshot(SEED_PATH, "seed.json");

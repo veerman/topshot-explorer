@@ -16,7 +16,7 @@
 // (0 is Standard; ids from SUBEDITION_NAMES). The edition's count is the
 // sum, never stored twice. Editions with nothing burned are absent.
 //
-// Join: Atlas play GUID -> data/dapper/plays.json playUUID -> Flow play id;
+// Join: Atlas's play id is the Flow play id (scripts/lib/atlas-join.mjs);
 // the Flow set is Atlas's set id (Atlas reuses the Flow ids).
 //
 // Usage:
@@ -29,28 +29,26 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { SUBEDITION_NAMES } from "../src/services/fcl.service.js";
 import { flag, opt } from "./lib/args.mjs";
+import { atlasPlayJoin } from "./lib/atlas-join.mjs";
 import { writeFileAtomic } from "./lib/json-file.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ATLAS_PATH = path.resolve(ROOT, opt("--atlas", "data/atlas/editions.json"));
 const OUT_PATH = path.join(ROOT, "data", "burns.json");
-const DAPPER_PLAYS_PATH = path.join(ROOT, "data", "dapper", "plays.json");
 const dryRun = flag("--dry-run");
 
 const NOTE = "Moments destroyed per edition, from Atlas (Dapper Labs' catalogue): the chain never decrements an edition's count, so this is the only source of a remaining supply. Key setID_playID; value the burned count when every destroyed moment was Standard, else { subeditionID: n } per subedition (0 = Standard), the edition count being their sum. Editions with nothing burned are absent. Refresh with `npm run atlas:harvest` then `npm run atlas:burns`.";
 
 function main() {
   const atlas = JSON.parse(readFileSync(ATLAS_PATH, "utf8"));
-  const dapperPlays = JSON.parse(readFileSync(DAPPER_PLAYS_PATH, "utf8"));
-  const flowIdByGuid = new Map();
-  Object.entries(dapperPlays).forEach(([id, e]) => { if (e && e.playUUID) flowIdByGuid.set(e.playUUID, id); });
+  const flowPlayID = atlasPlayJoin();
   const subIdByName = new Map(Object.entries(SUBEDITION_NAMES).map(([id, name]) => [String(name).toLowerCase(), Number(id)]));
 
   const perEdition = new Map(); // key -> Map(subID -> n)
   let unjoined = 0, unknownParallel = 0, atlasEditions = 0, burnedTotal = 0;
   atlas.editions.forEach((e) => {
     atlasEditions++;
-    const playID = flowIdByGuid.get(e.guid);
+    const playID = flowPlayID(e);
     if (!playID) { unjoined++; return; }
     const burned = Number(e.numBurned) || 0;
     if (burned === 0) return;

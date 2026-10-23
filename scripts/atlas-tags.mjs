@@ -1,7 +1,7 @@
 // Answer-sheet comparison: Atlas badges and play facts vs our data.
 //
-// For every Atlas play (joined to its Flow play through data/dapper/plays.json
-// playUUID) this reports, per badge, where Atlas and we agree and where
+// For every Atlas play (joined to its Flow play by scripts/lib/atlas-join.mjs)
+// this reports, per badge, where Atlas and we agree and where
 // we differ: derived tags (Top Shot Debut, Rookie Year, Championship Year,
 // Rookie Mint) against the app's own derivation, the rest (Rookie Premiere,
 // MVP Year, ...) against the stored tags. It also cross-checks NbaSeason and
@@ -14,6 +14,9 @@
 //         data/additions/plays.json tags (then run `npm run reconcile`, which
 //         strips the copies our derivation already produces; the rest show
 //         on the Corrections page as disagreements)
+//   --only <a,b>       with --import, write only these badges and leave
+//                      every other stored badge as it is (e.g. the awards
+//                      Atlas adds after a season: --only "MVP Year,Rookie of the Year")
 //   --atlas <file>     answer sheet (default data/atlas/editions.json)
 //   --raw <file>       saved raw play snapshot instead of a chain fetch
 //   --save-raw <file>  save the fetched snapshot for later runs
@@ -31,12 +34,12 @@ import {
   COMPUTABLE_TAG_NAMES, TAG_BADGES, isWnbaTeamId as isWnbaId
 } from "../src/services/overrides.service.js";
 import { flag, opt } from "./lib/args.mjs";
+import { atlasPlayJoin } from "./lib/atlas-join.mjs";
 import { readJsonPreservingEol, writeJsonAtomic } from "./lib/json-file.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ATLAS_PATH = path.resolve(ROOT, opt("--atlas", "data/atlas/editions.json"));
 const ADDITIONS_PATH = path.join(ROOT, "data", "additions", "plays.json");
-const DAPPER_PLAYS_PATH = path.join(ROOT, "data", "dapper", "plays.json");
 const SHOW = Number(opt("--show", 15));
 const doImport = flag("--import");
 const REPORT = opt("--report", null);
@@ -46,6 +49,10 @@ const REPORT = opt("--report", null);
 // the reward badges are edition-level and belong to `npm run
 // atlas:editions`)
 const ATLAS_VOCAB = TAG_BADGES.filter((b) => !b.reward).map((b) => b.tag).filter((t) => t !== "Cup Year" && t !== "Autograph");
+const ONLY = opt("--only", null);
+const IMPORT_VOCAB = ONLY ? ONLY.split(",").map((t) => t.trim()) : ATLAS_VOCAB;
+const unknownOnly = IMPORT_VOCAB.filter((t) => !ATLAS_VOCAB.includes(t));
+if (unknownOnly.length) throw new Error(`--only names badges Atlas does not assert here: ${unknownOnly.join(", ")}`);
 const dateOnly = (s) => (String(s || "").match(/^\d{4}-\d{2}-\d{2}/) || [""])[0];
 
 
@@ -73,20 +80,20 @@ const houseSeason = (season, wnba) => {
 async function main() {
   const atlas = JSON.parse(readFileSync(ATLAS_PATH, "utf8"));
   const { data: additions, eol, trailing } = readJsonPreservingEol(ADDITIONS_PATH);
-  const dapperPlays = JSON.parse(readFileSync(DAPPER_PLAYS_PATH, "utf8"));
   console.log(`Atlas sheet from ${atlas.fetchedAt}: ${atlas.editions.length} editions`);
 
-  // One Atlas play per GUID: badges are the union over its editions
+  // One Atlas play per Flow play (or per GUID while nothing joins it):
+  // badges are the union over its editions
+  const flowPlayID = atlasPlayJoin();
   const atlasPlays = new Map();
   atlas.editions.forEach((e) => {
-    if (!e.guid) return;
-    const p = atlasPlays.get(e.guid) || { badges: new Set(), play: e.play, editions: 0 };
+    const key = flowPlayID(e) || e.guid;
+    if (!key) return;
+    const p = atlasPlays.get(key) || { badges: new Set(), play: e.play, editions: 0 };
     e.badges.forEach((b) => p.badges.add(b));
     p.editions++;
-    atlasPlays.set(e.guid, p);
+    atlasPlays.set(key, p);
   });
-  const flowIdByGuid = new Map();
-  Object.entries(dapperPlays).forEach(([id, e]) => { if (e && e.playUUID) flowIdByGuid.set(e.playUUID, id); });
 
   const raw = await loadRawPlays({ rawPath: opt("--raw", null), saveRawPath: opt("--save-raw", null) });
   buildNameAliases(raw);
@@ -105,11 +112,11 @@ async function main() {
   // Rows for the Markdown report: { kind, id, name, team, date, season, ours, atlas, note }
   const rows = [];
 
-  atlasPlays.forEach((a, guid) => {
+  atlasPlays.forEach((a, key) => {
     a.badges.forEach((b) => { vocab[b] = (vocab[b] || 0) + 1; });
-    const flowId = flowIdByGuid.get(guid);
+    const flowId = typeof key === "number" ? String(key) : null;
     const play = flowId && byId.get(flowId);
-    if (!play) { unjoined.push(`${(a.play || {}).FullName || (a.play || {}).TeamAtMoment || "?"} ${dateOnly((a.play || {}).DateOfMoment)} (${guid})`); return; }
+    if (!play) { unjoined.push(`${(a.play || {}).FullName || (a.play || {}).TeamAtMoment || "?"} ${dateOnly((a.play || {}).DateOfMoment)} (${key})`); return; }
     joined++;
     const derived = new Set(getCalculatedPlayTags({ ...play, tags: [] }, null, tsdIndex, mintClock));
     const stored = new Set((additions[flowId] && additions[flowId].tags) || []);
@@ -147,18 +154,21 @@ async function main() {
     }
 
     if (doImport) {
-      // Atlas owns the badges it can assert; anything else stored stays
-      const keep = [...stored].filter((t) => !ATLAS_VOCAB.includes(t));
-      const next = [...keep, ...ATLAS_VOCAB.filter((t) => a.badges.has(t))];
-      const entry = (additions[flowId] = additions[flowId] || {});
+      // Atlas owns the badges it can assert (or the --only ones); anything
+      // else stored stays, in its stored order, and new ones are appended
+      const next = [...stored].filter((t) => !IMPORT_VOCAB.includes(t) || a.badges.has(t));
+      IMPORT_VOCAB.forEach((t) => { if (a.badges.has(t) && !next.includes(t)) next.push(t); });
+      // A new entry is created only to hold a badge
+      const entry = additions[flowId] || {};
       const before = JSON.stringify(entry.tags || []);
       if (next.length === 0) delete entry.tags; else entry.tags = next;
+      if (additions[flowId] || next.length) additions[flowId] = entry;
       if (JSON.stringify(entry.tags || []) !== before) imported++;
     }
   });
 
   console.log(`Atlas plays: ${atlasPlays.size}; joined to Flow plays: ${joined}; unjoined: ${unjoined.length}`);
-  if (unjoined.length) console.log(`  unjoined (no playUUID link yet; usually new mints or twins):\n    ${unjoined.slice(0, SHOW).join("\n    ")}${unjoined.length > SHOW ? `\n    ... ${unjoined.length - SHOW} more` : ""}`);
+  if (unjoined.length) console.log(`  unjoined (no play id and no playUUID link):\n    ${unjoined.slice(0, SHOW).join("\n    ")}${unjoined.length > SHOW ? `\n    ... ${unjoined.length - SHOW} more` : ""}`);
   console.log("Atlas badge vocabulary (plays):", JSON.stringify(vocab));
   const unknownVocab = Object.keys(vocab).filter((b) => !ATLAS_VOCAB.includes(b));
   if (unknownVocab.length) console.log(`  not tracked here (edition-level reward badges go through atlas:editions): ${unknownVocab.join(", ")}`);

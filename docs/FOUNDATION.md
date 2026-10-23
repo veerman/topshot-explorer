@@ -27,7 +27,7 @@ build the wrong thing.
 
 | Word | Meaning | Chain identity |
 |---|---|---|
-| **Play** | One video highlight, a historical event: player, game, date. | `playID` (UInt32) on the `TopShot` contract, immutable metadata once minted |
+| **Play** | One video highlight, a historical event: player, game, date. | `playID` (UInt32) on the `TopShot` contract; metadata set at mint, editable by Dapper's admin since 2026-09-22 (2.4) |
 | **Set** | A collection of plays released under one name, in one series, with one tier. | `setID` (UInt32); `locked` once closed to new plays |
 | **Edition** | A play inside a set, plus an optional subedition. The same play in another set is a different edition. **Only editions are minted.** | `setID_playID`, optionally `setID_playID_subeditionID` |
 | **Moment** | One minted copy of an edition, with a serial number, owned by one account. The collectible. | `momentID` (UInt64) NFT id, plus `serialNumber` |
@@ -112,7 +112,8 @@ same-origin reverse proxy that caches script results by request body:
 - Key = SHA-256 of the exact request body. Script bodies are
   deterministic, so every visitor after the first hits the cache.
 - TTL 300 s, except scripts whose body contains `struct PlayInfo` (the
-  play-metadata batch, immutable once minted) which cache for a week.
+  play-metadata batch, which changes rarely if ever, 2.4) which cache for
+  a week.
 - Store only HTTP 200. REST errors arrive as real statuses, unlike the
   v1 gRPC-web transport.
 
@@ -132,7 +133,7 @@ ones you will reuse, with the batch sizes measured on mainnet:
 |---|---|---|
 | `getTopshotStats()` | `{ totalSupply, nextPlayID, nextSetID, currentSeries }` | One call, under 100 ms. The change detector for everything. |
 | `getSetsOverview()` | `[{ id, setName, playIDs[], series, locked }]` | One call. `playIDs` order is the edition `playOrder`. |
-| `fetchPlayBatch(playIDs)` | `[{ playID, metadata {String:String} }]` | 200 per call. Immutable; safe to cache forever. |
+| `fetchPlayBatch(playIDs)` | `[{ playID, metadata {String:String} }]` | 200 per call. Editable on chain since 2026-09-22, rarely; see 2.4. |
 | `getMintCounts(setIDs)` | `{ setID: { playID: { minted, retired } } }` | 10 sets per call. Wire shape is `[minted, retired01]` per play. |
 | `getSetCIDs(setID, playIDs)` | `{ playID: { FIELD: CID } }` | 150 plays per call, resolver only. |
 | `getSetDetails(setID)` | everything above for one set, plus `ipfsGateway` | **Blows the 100,000-unit computation limit on sets 27 and 52** (Platinum Ice; set 27 fails at 100,002). Never use it for a bulk walk. |
@@ -171,11 +172,25 @@ renders from it. Getting that copy has two paths.
 and writes `public/seed/topshot-seed.json` (about 14 MB, a few MB
 compressed): `{ generatedAt, stats, playsRaw, setsOverview, setDetails }`.
 It is built from `getSetsOverview` plus `getMintCounts` plus `getSetCIDs`,
-never `getSetDetails`, so the big sets never fail. Plays are reused from
-the previous seed (immutable), locked sets skip the chain entirely, open
-sets always refetch. `--if-stale` skips the walk when the file is under
-24 hours old, so UI-only deploys cost nothing. The file is optional: a
-build without it full-syncs identically.
+never `getSetDetails`, so the big sets never fail. Every play is read
+again and compared with the previous seed; locked sets reuse their CIDs
+and ask again only for editions still without media; open sets always
+refetch. `--if-stale` skips the walk when the file is under 24 hours old,
+so UI-only deploys cost nothing. Each run keeps a dated copy under
+`scratch/snapshots/` (gitignored), as does each full Atlas harvest. The
+file is optional: a build without it full-syncs identically.
+
+**Plays can change.** The TopShot contract update of 2026-09-22 added
+`updatePlayMetadata(playID, key, value)`, which sets one field of an
+existing play and emits `PlayMetadataUpdated`; the older
+`updatePlayTagline` sets the tagline and emits nothing. So no event query
+sees every edit, only a full re-read does (about 47 calls), which is why
+the seed re-reads every play. Each difference from the previous seed is
+appended to `data/chain_edits.json` (`scripts/lib/chain-edits.mjs`): play,
+field, raw value before and after, and the two seed times that bracket
+the edit. As of 2026-10-23 no play had been edited. Overrides still layer
+on top of whatever the chain now says, and `npm run reconcile` reports an
+override a chain fix has made unnecessary.
 
 **Browser.** `src/services/sync.coordinator.js` runs once per app load
 (no timer):
@@ -196,6 +211,12 @@ build without it full-syncs identically.
 6. On every pass re-read mint counts and retired flags for every edition
    (10 sets per call) and write back only the rows that changed. Open
    editions keep minting; counts are never allowed to go stale.
+7. On every pass re-read one batch of 200 existing plays, a batch further
+   along each time (`playRefreshCursor` in the sync stats; about 47 visits
+   cover the catalogue, then it starts over), and recompile only a play
+   whose raw metadata changed on chain. Edits are rare, so this is one
+   small request per visit, never a re-download; with the proxy's week-long
+   cache on the play script, an edit reaches a regular visitor within weeks.
 
 Self-heals run in the "nothing new" branch: empty teams store, empty
 editions store, prototype-era fake CIDs (any CID shorter than 46
@@ -213,7 +234,7 @@ Database `TopShotExplorerDB`, version 6, in `src/services/db.service.js`.
 | `sets` | `id` (int) | `{ id, setName, series, locked, playIDs[], _raw }` |
 | `editions` | `"setID_playID"` | `{ id, setID, playID, momentCount, retired, playOrder }` |
 | `ipfs` | `"setID_playID"` | `{ id, setID, playID, cids: { FIELD: CID } }`; no row means no media registered |
-| `sync_stats` | `"current_stats"` | `{ nextPlayID, nextSetID, totalSupply, currentSeries, overridesHash, lastSyncTime }` |
+| `sync_stats` | `"current_stats"` | `{ nextPlayID, nextSetID, totalSupply, currentSeries, overridesHash, lastSyncTime, playRefreshCursor }` |
 | `teams` | `TeamAtMomentNBAID` (out-of-line) | `{ TeamName, TeamID }` |
 | `account_collections` | address (lowercase) | `{ address, fetchedAt, moments: [[momentID, setID, playID, serial, subID, 1-if-on-EVM]] }`, plus `"<address>:locks"` rows |
 
@@ -231,7 +252,8 @@ invalidate RAM caches after the write lands, not before.
 2. Poll `getTopshotStats()` for the two counters.
 3. `getSetsOverview()` once; it gives names, series, `locked`, and the
    ordered play list.
-4. `fetchPlayBatch` in 200s for play metadata; keep the results forever.
+4. `fetchPlayBatch` in 200s for play metadata; keep the results, but read
+   them again now and then, since a play can be edited on chain (2.4).
 5. `getMintCounts` in 10s and `getSetCIDs` in 150s. Never `getSetDetails`
    for a bulk walk.
 6. Re-read mint counts every pass; write back diffs.
@@ -277,6 +299,7 @@ mistakes, additions add knowledge, exclusions remove noise.**
 | `logos.json` | the recipe for cutting badges and team logos out of set art | hand-tuned |
 | `dapper/*.json` | Dapper's own ids beside ours (`playUUID`, `legacyEditionUUID`, `atlasEditionID`, `legacySetUUID`). Loaded only by the Legacy page, by dynamic import. | generated |
 | `atlas/editions.json` | the latest Atlas snapshot, not committed, read only by the comparison scripts | generated |
+| `chain_edits.json` | play metadata edited on chain after the mint: `{ since, seen, play, field, before, after }`, append-only; absent until the first edit | generated by `npm run seed` |
 
 Set-level exclusions are deliberately not in `plays_exclude.json`:
 Platinum Ice reuses Base Set play ids, so `burned` and `mismint` are set
@@ -467,7 +490,10 @@ ranged GET of the first 128 KB per image (dimensions, EXIF, total size
 from `Content-Range`) and an `ffprobe` of the gateway URL per video (the
 moov atom only). A CID is content-addressed, so a probed entry is never
 re-probed. A 404 or a `text/html` answer marks the CID dead; transient
-failures stay unknown and block the merge, which is all-or-nothing. Every
+failures stay unknown and block the merge, which is all-or-nothing. A dead
+file can come back (16 of 219 did by 2026-10-23), so `npm run ipfs:probe --
+--recheck-dead` tries every dead CID again, measures the ones that answer
+and drops them from `ipfs_dead.json`. Every
 video is h264 in mp4 at about 30 fps; when bytes are unknown, estimate
 `duration x (videoKbps + audioKbps) x 125`. 61% of videos carry audio.
 
@@ -826,7 +852,12 @@ the page shows the file plus the rows since the last fold as pending
 carries "Early Adopter #N" for a folded address. Sequence numbers are
 signing order and never change; a row removed from the file on purpose
 is listed under `dropped` so a fold does not bring it back. It confers
-nothing.
+nothing. Every fold also writes `EARLY-ADOPTERS.md`, the thank-you page in
+the repository. `--close` ends Early Adopters by stamping `closedAt` into
+the file: the sign route then answers 410 ("Early Adopters has
+concluded."), the page keeps showing the shipped list without the sign
+controls, and `npm run wall:reset` refuses to run. Early Adopters
+concluded on 2026-10-23 with 28 signatures.
 
 The same census yields three aggregates that do ship, in `data/`:
 `flow_account_clock.json` (creation number to date: Flow mainnet hands
@@ -863,7 +894,16 @@ minutes, the only Atlas traffic in the repo. The sweep asks for no sort:
 Atlas then serves ids descending, an order that cannot move while the
 sweep runs. Under the site's default order (30-day dollar volume) a row
 slid across a page boundary and each sweep came back one edition short,
-a different one each time. The comparison scripts then report differences:
+a different one each time.
+
+Every comparison joins an Atlas row to its Flow play through Atlas's
+`editionTemplateId`, which is the Flow play id (`scripts/lib/atlas-join.mjs`;
+14,467 of 14,467 rows on 2026-10-23, each a play of the same set on chain).
+The scripts used to read Dapper's play UUID out of the row's asset path,
+but the mints of autumn 2026 name their assets by NBA game id and event
+(`play_0022600089_19`), so that path carries no UUID and those rows went
+unjoined; the UUID now only feeds the Legacy page. The comparison scripts
+then report differences:
 
 | Script | Question it answers |
 |---|---|
@@ -913,8 +953,8 @@ references a hosting provider; deleting `deploy/` leaves a working app.
 
 What is optional: the seed, the caching proxy, the username route, the
 media bucket, the offers cron. What is not in the repo: the Atlas
-snapshot, the 46 GB image mirror and its `ipfs_dirs.json`, the media-sync
-state.
+snapshot, the dated seed and Atlas copies under `scratch/snapshots/`, the
+46 GB image mirror and its `ipfs_dirs.json`, the media-sync state.
 
 ---
 

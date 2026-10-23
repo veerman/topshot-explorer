@@ -5,7 +5,11 @@
 // clients, so the calls run from inside a real Chrome page on nbatopshot.com
 // (puppeteer-core, no login needed). One edition per (set, play, parallel),
 // slimmed to what the other atlas-* scripts consume:
-//   id, guid (play GUID from the asset path; joins data/dapper/plays.json playUUID),
+//   id, playId (Atlas's editionTemplateId, which is the Flow play id; the
+//   join every script uses, scripts/lib/atlas-join.mjs),
+//   guid (Dapper's play UUID, read from the asset path; mints from autumn
+//   2026 name their assets by NBA game id and event instead, so it is null
+//   there; still joins data/dapper/plays.json playUUID for the Legacy page),
 //   setId, setName, seriesId, tier, parallel ("Standard" or a parallel
 //   name), badges (titles), numMinted, maxMintSize, numBurned, autographedAt
 //   (per edition: which parallel is actually signed), and the play fields
@@ -29,6 +33,7 @@ import path from "node:path";
 import puppeteer from "puppeteer-core";
 import { opt, num } from "./lib/args.mjs";
 import { writeFileAtomic } from "./lib/json-file.mjs";
+import { keepSnapshot } from "./lib/snapshot.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.resolve(ROOT, opt("--out", "data/atlas/editions.json"));
@@ -89,6 +94,8 @@ async function main() {
           fields.forEach((f) => { if (meta[f] !== undefined && meta[f] !== "") play[f] = meta[f]; });
           return {
             id: e.id,
+            // Atlas's edition template is the Flow play: its id is the play id
+            playId: Number(e.editionTemplateId) || null,
             guid: (((e.metadata || {}).assetPathPrefix || "").match(/play_([0-9a-f-]{36})/) || [])[1] || null,
             setId: e.setId,
             setName: (e.set || {}).name || "",
@@ -152,10 +159,12 @@ async function main() {
       parallels[e.parallel] = (parallels[e.parallel] || 0) + 1;
       e.badges.forEach((b) => { badges[b] = (badges[b] || 0) + 1; });
     });
-    console.log(`Wrote ${path.relative(ROOT, OUT)}: ${list.length} editions (${list.filter((e) => !e.guid).length} without a play GUID)`);
+    console.log(`Wrote ${path.relative(ROOT, OUT)}: ${list.length} editions (${list.filter((e) => !e.playId).length} without a play id, ${list.filter((e) => !e.guid).length} without a play GUID)`);
     console.log("parallels:", JSON.stringify(parallels));
     console.log("badges (edition counts):", JSON.stringify(badges));
     if (list.length < total) console.warn(`WARNING: ${total - list.length} edition(s) short of Atlas's count; re-run`);
+    // A complete sweep is kept as the day's reference copy
+    else if (MAX_PAGES === Infinity) keepSnapshot(OUT, "atlas-editions.json");
   } finally {
     await browser.close();
   }

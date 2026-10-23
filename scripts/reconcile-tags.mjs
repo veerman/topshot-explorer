@@ -129,6 +129,25 @@ function reportUnusedOverrides(raw) {
   disabled = "false";
   refreshOverridesDisabledCache();
 
+  // The player bio index is built with every override in place, so an
+  // override can vouch for itself: when none of a player's plays carries a
+  // draft team on chain and one override supplies it, the fill hands that
+  // value back to the overridden play too. Before calling one unnecessary,
+  // compile its play again with that single field removed.
+  let indexDirty = false;
+  const survivesWithout = (id, field, expected) => {
+    const entry = playsOverrides[id];
+    const key = Object.keys(entry).find((k) => k.toLowerCase() === field.toLowerCase());
+    if (!key) return true;
+    const saved = entry[key];
+    delete entry[key];
+    buildNameAliases(raw);
+    const p = compilePlayMetadata(id, raw[id]);
+    entry[key] = saved;
+    indexDirty = true;
+    return String((p || {})[field] ?? "").trim() === expected;
+  };
+
   const rows = [];
   Object.entries(playsOverrides).forEach(([id, entry]) => {
     const a = withOv.get(id);
@@ -146,12 +165,14 @@ function reportUnusedOverrides(raw) {
       // compiles to the Eastern form, which is not a failure)
       const askedStr = String((applyPlayOverrides({ playID: Number(id), [field]: val }) || {})[field] ?? "").trim();
       if (withStr === withoutStr) {
-        rows.push({ id, field, reason: "unnecessary: raw or normalizer already yields this", value: valStr });
+        if (survivesWithout(id, field, withStr)) rows.push({ id, field, reason: "unnecessary: raw or normalizer already yields this", value: valStr });
       } else if (withStr !== valStr && withStr !== askedStr) {
         rows.push({ id, field, reason: `ineffective: final value is "${withStr}"`, value: valStr });
       }
     });
   });
+  // Leave the index as the reconcile below expects it, built with every override
+  if (indexDirty) buildNameAliases(raw);
   return rows;
 }
 

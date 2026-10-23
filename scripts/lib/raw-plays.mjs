@@ -16,8 +16,10 @@ const CONCURRENCY = 3;
 // lives in lib/retry.mjs now
 export { withRetries } from "./retry.mjs";
 
-// The previous seed's playsRaw, the standard `previousRaw` source: plays
-// are immutable, so a script only fetches ids the seed lacks. ROOT-relative
+// The seed's playsRaw, the standard `previousRaw` source: the seed reads
+// every play afresh on each run (plays can be edited on chain, see
+// chain-edits.mjs), so a script reusing it only fetches ids it lacks and is
+// as current as the last seed. ROOT-relative
 // (a cwd-relative read used to miss the seed silently when run from
 // anywhere but the repo root, causing a full 9,000-play refetch), and the
 // miss reason is logged so a slow run explains itself.
@@ -33,10 +35,10 @@ export function loadSeedPlaysRaw() {
   }
 }
 
-// Returns { [playID]: rawMetadata } for every play on chain. Play
-// metadata is immutable once minted, so entries in `previousRaw` (a
-// prior snapshot, e.g. the last seed's playsRaw) are reused verbatim
-// and only the ids it lacks are fetched.
+// Returns { [playID]: rawMetadata } for every play on chain. Entries in
+// `previousRaw` (a prior snapshot, e.g. the last seed's playsRaw) are
+// reused verbatim and only the ids it lacks are fetched; pass none to read
+// every play as the chain has it now.
 export async function fetchRawPlays(previousRaw = null) {
   initFCL();
   const stats = await withRetries(() => getTopshotStats(), "stats");
@@ -68,7 +70,7 @@ export async function fetchRawPlays(previousRaw = null) {
 
 // rawPath: read a saved snapshot instead of fetching; saveRawPath: save the
 // fetched snapshot for later runs; previousRaw: prior play map whose
-// entries are reused (plays are immutable), only new ids get fetched
+// entries are reused, only new ids get fetched
 export async function loadRawPlays({ rawPath = null, saveRawPath = null, previousRaw = null } = {}) {
   if (rawPath) {
     console.log(`Using raw snapshot ${rawPath}`);
