@@ -227,12 +227,15 @@ export function Sets() {
   }, [seriesSets, setLeagueMap]);
 
   // Zero-count league options are hidden below; if the active selection
-  // becomes one of them (e.g. after a series filter change), fall back to All
+  // becomes one of them (e.g. after a series filter change), fall back to All.
+  // Only once there are sets to count: before the data loads every count is
+  // 0, which used to drop a ?league= arriving from a Home link or a refresh
   useEffect(() => {
+    if (sets.length === 0) return;
     if (selectedLeague !== "all" && (leagueCounts[selectedLeague] ?? 0) === 0) {
       setSelectedLeague("all");
     }
-  }, [selectedLeague, leagueCounts, setSelectedLeague]);
+  }, [sets.length, selectedLeague, leagueCounts, setSelectedLeague]);
 
   // 4. Map sets into table records
   const tableRecords = useMemo(() => {
