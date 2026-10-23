@@ -177,6 +177,21 @@ const isDenied = async (env, address) => {
   }
 };
 
+// The deny list is read at sign-in (the flag rides in the cookie) and
+// again on each name lookup, remembered per isolate for a few minutes: a
+// session lasts 30 days, and with the flag alone one minted before the
+// address was denied kept reading names that long.
+const DENY_MEMO_MS = 5 * 60 * 1000;
+const denyMemo = new Map();
+const isDeniedNow = async (env, address) => {
+  const hit = denyMemo.get(address);
+  if (hit && Date.now() - hit.at < DENY_MEMO_MS) return hit.denied;
+  const denied = await isDenied(env, address);
+  if (denyMemo.size > 5000) denyMemo.clear();
+  denyMemo.set(address, { denied, at: Date.now() });
+  return denied;
+};
+
 const sessionOf = async (request, env) => {
   if (!env.SESSION_SECRET) return null;
   return readSession(env.SESSION_SECRET, cookieValue(request.headers.get("cookie"), SESSION_COOKIE));
@@ -291,7 +306,8 @@ const lookupAddress = async (url, request, env, ctx) => {
   // Names are for people who signed in with a wallet (a flagged session
   // reads as anonymous here). Checked before the cache so a cached answer
   // never leaks past the gate.
-  if (!sessionMayLookup(await sessionOf(request, env))) return json(401, { error: "sign in with your wallet to see usernames" });
+  const session = await sessionOf(request, env);
+  if (!sessionMayLookup(session) || await isDeniedNow(env, session.address)) return json(401, { error: "sign in with your wallet to see usernames" });
 
   const cache = caches.default;
   const cacheKey = new Request(`${url.origin}/__lookup-cache/address/${address}`);

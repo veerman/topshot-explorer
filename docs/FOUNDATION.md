@@ -804,7 +804,9 @@ signIn; stepOf says where the reader is). The Worker needs the
 `SESSION_SECRET` secret; without it sign-in answers 503 and names stay
 closed. A D1 table `denied(address)` flags a session at sign-in; a
 flagged session works everywhere except the gated lookup, which treats
-it as anonymous.
+it as anonymous. The lookup also reads the table itself (remembered per
+isolate for five minutes), so denying an address closes a session it
+already holds.
 
 The same sign-in signs the **Early Adopters wall** (`/about/early-adopters`,
 a tab of About): one row per address in a D1 table
