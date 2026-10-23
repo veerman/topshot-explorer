@@ -3,7 +3,7 @@ import { useEffect, useRef, lazy, Suspense } from "react";
 // Dev-only emoji lab: the guard is a build-time constant, so the page, its
 // fonts and manifest are excluded from production bundles entirely
 const EmojiLab = import.meta.env.DEV ? lazy(() => import("./dev/EmojiLab")) : null;
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigationType } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigationType, useParams } from "react-router-dom";
 import { initFCL } from "./services/fcl.service";
 import { runSmartSync } from "./services/sync.coordinator";
 import { Navbar } from "./components/Navbar";
@@ -57,6 +57,19 @@ const Sets = page(loadSets, "Sets");
 const SetDetail = page(loadSetDetail, "SetDetail");
 const Account = page(loadAccount, "Account");
 const AccountOffers = page(loadAccountOffers, "AccountOffers");
+
+// One page instance per address. Moving between two accounts (the parent
+// and child chips, the linked-account arrows) used to reuse the mounted
+// page, so a slow load of the account just left could land on the next
+// one: its moments, filters, or its lock map saved under the new address.
+function AccountPage() {
+  const { address } = useParams();
+  return <Account key={address} />;
+}
+function AccountOffersPage() {
+  const { address } = useParams();
+  return <AccountOffers key={address} />;
+}
 const Offers = page(loadOffers, "Offers");
 const Settings = page(loadSettings, "Settings");
 const EarlyAdopters = page(loadEarlyAdopters, "EarlyAdopters");
@@ -176,8 +189,8 @@ function App() {
           <Route path="/sets/:setID" element={<SetDetail />} />
           <Route path="/editions/:editionKey" element={<EditionDetail />} />
           <Route path="/corrections" element={<Corrections />} />
-          <Route path="/account/:address" element={<Account />} />
-          <Route path="/account/:address/offers" element={<AccountOffers />} />
+          <Route path="/account/:address" element={<AccountPage />} />
+          <Route path="/account/:address/offers" element={<AccountOffersPage />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/about/early-adopters" element={<EarlyAdopters />} />

@@ -59,6 +59,9 @@ export async function loadAccountLocks(address, momentIDs, { force = false, pers
     if (shouldAbort && shouldAbort()) return null;
     rows.push(...await getLockData(momentIDs.slice(i, i + 10000)));
   }
+  // Checked again before saving: a collection under 10,000 moments is one
+  // batch, so the loop alone never saw a cancel that came during it
+  if (shouldAbort && shouldAbort()) return null;
   const map = new Map(rows);
   if (persist) {
     sessionLockCache.set(key, map);
