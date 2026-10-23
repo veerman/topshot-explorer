@@ -248,8 +248,13 @@ export async function blockTimeMs(height) {
  * Applies every offer event in [from, to] to the book (and the state's
  * buyer registry and creation times). Windows fetch in parallel, events
  * apply in block order. Returns { accepted: rows (newest first), added,
- * removed, windows }. The caller advances state.height once it has
- * persisted the result: the fold itself never moves it.
+ * removed, windows, height }. `height` is how far the fold really read:
+ * every block of a range is listed, empty or not, but a node behind the
+ * one that named the tip cuts a range at its own tip without saying so,
+ * so a window counts only as far as both of its queries got, and events
+ * past the first shortfall wait for the next fold (adding an offer is
+ * idempotent by id). The caller advances state.height to `height` once it
+ * has persisted the result: the fold itself never moves it.
  */
 export async function foldEvents(book, state, from, to, { concurrency = 4, onProgress } = {}) {
   const windows = windowsFor(from, to);
@@ -277,11 +282,17 @@ export async function foldEvents(book, state, from, to, { concurrency = 4, onPro
         try { evs.push({ h, n, ts, kind: "completed", d: decodeEventPayload(e.payload) }); } catch { /* malformed: skip */ }
       });
     }
-    perWindow[i] = evs;
+    const reach = (blocks) => (blocks || []).reduce((m, b) => Math.max(m, Number(b.block_height) || 0), start - 1);
+    perWindow[i] = { evs, end, reached: Math.min(reach(created), reach(completed)) };
     done++;
     if (onProgress) onProgress(done, windows.length);
   });
-  const events = perWindow.flat().sort((a, b) => (a.h - b.h) || (a.kind === b.kind ? a.n - b.n : (a.kind === "available" ? -1 : 1)));
+  let height = from - 1;
+  for (const w of perWindow) {
+    height = Math.max(height, w.reached);
+    if (w.reached < w.end) break;
+  }
+  const events = perWindow.flatMap((w) => w.evs).filter((ev) => ev.h <= height).sort((a, b) => (a.h - b.h) || (a.kind === b.kind ? a.n - b.n : (a.kind === "available" ? -1 : 1)));
   const accepted = [];
   let added = 0, removed = 0;
   for (const ev of events) {
@@ -302,7 +313,7 @@ export async function foldEvents(book, state, from, to, { concurrency = 4, onPro
   }
   state.buyers = [...buyers];
   accepted.sort((a, b) => b[0] - a[0]);
-  return { accepted, added, removed, windows: windows.length };
+  return { accepted, added, removed, windows: windows.length, height };
 }
 
 // ---- accepted history ---------------------------------------------------

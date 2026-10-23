@@ -270,6 +270,9 @@ async function main() {
   // 1. Fold the events since the base, exactly as the cron does
   const from = state.height + 1;
   const touchedShards = {};
+  // How far the book is true: the fold's own reach (a lagging access node
+  // can cut it short of the tip), or the tip once verify rebuilds the book
+  let bookHeight = tip;
   if (from <= tip) {
     console.log(`fold: heights ${from}..${tip} (~${((tip - from) / BLOCKS_PER_DAY).toFixed(2)} days)`);
     const r = await foldEvents(book, state, from, tip, {
@@ -278,6 +281,7 @@ async function main() {
     });
     state.accepted = mergeAccepted(state.accepted, r.accepted, ACCEPTED_STATE_CAP);
     Object.assign(touchedShards, shardRows(r.accepted));
+    bookHeight = r.height;
     console.log(`fold done: +${r.added} -${r.removed} offers, ${r.accepted.length} accepted, ${state.buyers.length} buyers known`);
   } else {
     console.log("fold: nothing newer than the base");
@@ -290,14 +294,15 @@ async function main() {
     finalBook = await verify(book, state);
     state.rebasedAt = Date.now();
     state.rebasedHeight = tip;
+    bookHeight = tip;
   }
-  state.height = tip;
+  state.height = bookHeight;
   state.format = BOOK_FORMAT;
 
   // 3. Bake: bucket objects, the bundled fallback, the shards
-  const timeMs = await blockTimeMs(tip);
+  const timeMs = await blockTimeMs(bookHeight);
   const time = timeMs ? new Date(timeMs).toISOString() : null;
-  const objects = bakeObjects(finalBook, state, { height: tip, time });
+  const objects = bakeObjects(finalBook, state, { height: bookHeight, time });
   const fromTimeMs = state.firstHeight ? await blockTimeMs(state.firstHeight) : 0;
   const bundled = {
     ...objects[BOOK_KEY],
@@ -327,7 +332,7 @@ async function main() {
   // State last: the cron resumes from this height only once the book it
   // matches is published
   await putObject(STATE_KEY, state, "no-store");
-  console.log(`done: base at height ${tip}${time ? ` (${time})` : ""}; the cron folds forward from here`);
+  console.log(`done: base at height ${bookHeight}${time ? ` (${time})` : ""}; the cron folds forward from here`);
 }
 
 main().catch((err) => {

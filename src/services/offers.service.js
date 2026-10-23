@@ -100,11 +100,12 @@ async function catchUp(snap) {
     accepted,
     acceptedStats: stats || snap.acceptedStats,
     ...bookCounts(book),
-    height: tip,
-    scannedToHeight: tip,
+    // As far as the fold really read (a lagging node can cut it short)
+    height: r.height,
+    scannedToHeight: r.height,
     scannedToTime: new Date().toISOString(),
     fetchedAt: Date.now(),
-    caughtUp: { from: base, height: tip, windows: r.windows, added: r.added, removed: r.removed }
+    caughtUp: { from: base, height: r.height, windows: r.windows, added: r.added, removed: r.removed }
   };
 }
 

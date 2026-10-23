@@ -441,10 +441,12 @@ async function foldOffers(env) {
   if (from > tip) { console.log(`offers fold: nothing new past ${state.height}`); return; }
   const to = Math.min(tip, from + FOLD_MAX_WINDOWS * MAX_EVENT_SPAN - 1);
   const r = await foldEvents(book, state, from, to, { concurrency: FOLD_CONCURRENCY });
-  state.height = to;
+  // As far as the fold really read, which a lagging access node can cut
+  // short of `to`; the rest is read by the next run
+  state.height = r.height;
   state.accepted = mergeAccepted(state.accepted, r.accepted, ACCEPTED_STATE_CAP);
-  const timeMs = await blockTimeMs(to);
-  const objects = bakeObjects(book, state, { height: to, time: timeMs ? new Date(timeMs).toISOString() : null });
+  const timeMs = await blockTimeMs(r.height);
+  const objects = bakeObjects(book, state, { height: r.height, time: timeMs ? new Date(timeMs).toISOString() : null });
   const writes = [
     putJson(bucket, BOOK_KEY, objects[BOOK_KEY], "public, max-age=120"),
     putJson(bucket, OTHER_KEY, objects[OTHER_KEY], "public, max-age=120"),
@@ -460,7 +462,7 @@ async function foldOffers(env) {
   await Promise.all(writes);
   // State last: its height only advances once the matching book is out
   await putJson(bucket, STATE_KEY, state, "no-store");
-  console.log(`offers fold: ${from}..${to} (${r.windows} windows) +${r.added} -${r.removed} offers, ${r.accepted.length} accepted${to < tip ? `; ${tip - to} heights still behind` : ""}`);
+  console.log(`offers fold: ${from}..${r.height} (${r.windows} windows) +${r.added} -${r.removed} offers, ${r.accepted.length} accepted${r.height < tip ? `; ${tip - r.height} heights still behind` : ""}`);
 }
 
 export default {
