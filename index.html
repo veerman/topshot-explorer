@@ -2,7 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="preload" href="/fonts/emoji-subset.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Preload the emoji subset this browser will use: index.css picks the
+      // COLRv1 file by tech(), the COLRv0 one elsewhere (Safari), and a
+      // fixed preload of the COLRv1 file was 72 KB Safari never used
+      (function () {
+        var v1 = window.CSS && CSS.supports && CSS.supports("font-tech(color-COLRv1)");
+        var l = document.createElement("link");
+        l.rel = "preload"; l.as = "font"; l.type = "font/woff2"; l.crossOrigin = "anonymous";
+        l.href = v1 ? "/fonts/emoji-subset.woff2" : "/fonts/emoji-subset-colr0.woff2";
+        document.head.appendChild(l);
+      })();
+    </script>
     <link rel="preload" href="/fonts/outfit-var-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏀</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

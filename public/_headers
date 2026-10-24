@@ -9,9 +9,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 # Fonts are not content-hashed (the emoji subset gets regenerated), so a
-# day, not a year
+# day, not a year; past the day a returning visitor gets the cached copy at
+# once while it revalidates, instead of waiting on fonts before first paint
 /fonts/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 # Seed files are fetched with a ?v=<content hash> baked into the bundle
 # (vite.config.js seedVersion), so each version's URL is unique and the
 # response can be cached forever; a deploy that changes a seed changes
