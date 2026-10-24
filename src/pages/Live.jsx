@@ -538,9 +538,19 @@ export function Live() {
     if (publishTimerRef.current !== null) return;
     publishTimerRef.current = setTimeout(() => {
       publishTimerRef.current = null;
-      setMomentInfo(new Map(momentCacheRef.current));
+      // Capped like the stored copy, oldest first: a tab left open on Live
+      // grew the cache, and every publish copied all of it
+      const cache = momentCacheRef.current;
+      for (const id of cache.keys()) {
+        if (cache.size <= MOMENT_CACHE_MAX) break;
+        cache.delete(id);
+      }
+      setMomentInfo(new Map(cache));
     }, 50);
   }, []);
+  // Leaving the page drops the lookups still queued: their results only
+  // ever fed this page (at most three already running finish)
+  useEffect(() => () => { lookupQueueRef.current.waiting.length = 0; }, []);
   useEffect(() => () => {
     if (publishTimerRef.current !== null) clearTimeout(publishTimerRef.current);
   }, []);
@@ -757,12 +767,15 @@ export function Live() {
   const firstByTypeRef = useRef({});
   const liveFloorRef = useRef(Infinity);
 
+  /** Adds the blocks' new events to the store; true when any was new */
   const ingest = useCallback((blocks, type, older = false) => {
     const store = storeRef.current;
+    let added = false;
     for (const b of blocks || []) {
       for (const e of b.events || []) {
         const key = `${e.transaction_id}:${e.event_index}`;
         if (store.has(key)) continue;
+        added = true;
         const data = decodeEventPayload(e.payload);
         store.set(key, {
           key,
@@ -783,31 +796,40 @@ export function Live() {
       const live = [...store.values()].filter((r) => r.height >= liveFloorRef.current).sort((a, b) => a.height - b.height);
       for (const r of live.slice(0, Math.max(0, live.length - MAX_STORE))) store.delete(r.key);
     }
+    return added;
   }, []);
 
+  // One poll at a time: the interval, a tab coming back and a chip toggle
+  // could each start one and fetch the same ranges twice
+  const pollingRef = useRef(false);
   const doPoll = useCallback(async () => {
-    if (pausedRef.current || document.visibilityState === "hidden") return;
+    if (pausedRef.current || document.visibilityState === "hidden" || pollingRef.current) return;
     // Chip keys -> distinct event types: facet chips share one stream, so
     // Sold + Delisted enabled still costs ONE ListingCompleted request
     const types = [...new Set([...enabledRef.current].map((k) => (EVENT_INDEX[k] || {}).type).filter(Boolean))];
     if (types.length === 0) return;
+    pollingRef.current = true;
     try {
       const sealed = await getSealedHeight();
+      let added = false;
       await Promise.allSettled(
         types.map(async (t) => {
           lastByTypeRef.current[t] = await pollStream(t, lastByTypeRef.current[t] || 0, sealed, (blocks, from) => {
             if (!(t in firstByTypeRef.current)) firstByTypeRef.current[t] = from;
             liveFloorRef.current = Math.min(liveFloorRef.current, from);
-            ingest(blocks, t);
+            if (ingest(blocks, t)) added = true;
           });
         })
       );
       setTip(sealed);
       setError("");
       tickNow();
-      setEvents([...storeRef.current.values()]);
+      // A quiet poll changes no row, so it re-renders none
+      if (added) setEvents([...storeRef.current.values()]);
     } catch (e) {
       setError(e && e.message ? e.message : String(e));
+    } finally {
+      pollingRef.current = false;
     }
   }, [ingest]);
 
