@@ -256,7 +256,9 @@ so a caller that bypasses the DB must apply them itself. The IndexedDB
 learnings that cost real time: never reject on `onblocked` (multi-tab
 reads silently resolve empty), wrap every `onsuccess` body in its own
 try/catch (a throw there leaves the promise pending forever), and
-invalidate RAM caches after the write lands, not before.
+invalidate RAM caches after the write lands, not before. Plays carry
+their mint totals joined from editions and sets on read, so saving
+either store drops only that join, never the play records.
 
 ### 2.6 Minimum recipe for a new app
 

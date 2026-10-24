@@ -36,22 +36,27 @@ function cachedRead(load) {
   };
 }
 
+// The plays store as stored, before the join below
+const playRecordsCache = cachedRead(() => getAllRecords("plays"));
 // Each play carries its mint total and whether it sits in a Rookie
 // Ultimate set (the debut rule needs both), joined from the editions and
 // sets stores on read so a plays record never goes stale when mint
-// counts refresh; saving editions drops this cache too
-const playsCache = cachedRead(() => Promise.all([getAllRecords("plays"), getAllEditionsDB(), getAllSetsDB()])
-  .then(([records, editions, sets]) => attachMintTotals(records, editions, sets)));
+// counts refresh. Saving editions or sets drops only this join, never
+// the ~9,000 records under it; the join works on copies, so a page
+// holding the last result never sees its plays change underneath it.
+const playsCache = cachedRead(() => Promise.all([playRecordsCache.get(), getAllEditionsDB(), getAllSetsDB()])
+  .then(([records, editions, sets]) => attachMintTotals(records.map((r) => ({ ...r })), editions, sets)));
 // Home and Corrections both read this on load and again on sync
-// completion, and the map re-derived ~9,000 objects each time
-const playsRawCache = cachedRead(() => getAllPlaysDB().then((plays) => plays.map((play) => (play._raw ? { playID: play.playID, ...play._raw } : play))));
+// completion, and the map re-derived ~9,000 objects each time. The
+// original metadata has no join in it, so only a plays save drops it.
+const playsRawCache = cachedRead(() => playRecordsCache.get().then((plays) => plays.map((play) => (play._raw ? { playID: play.playID, ...play._raw } : play))));
 const setsCache = cachedRead(() => getAllRecords("sets"));
 const editionsCache = cachedRead(() => getAllRecords("editions"));
 const ipfsCache = cachedRead(() => getAllRecords("ipfs"));
 const teamsCache = cachedRead(() => readAllTeams());
 
 export function clearAllDBCaches() {
-  [playsCache, playsRawCache, setsCache, teamsCache, editionsCache, ipfsCache].forEach((c) => c.clear());
+  [playRecordsCache, playsCache, playsRawCache, setsCache, teamsCache, editionsCache, ipfsCache].forEach((c) => c.clear());
 }
 
 // 1. Establish and Open Database
@@ -278,6 +283,7 @@ export function savePlaysDB(playsArray) {
   return putRecordsBatch("plays", playsArray).then((ok) => {
     // Invalidate the RAM cache only after the write lands; invalidating before
     // let a concurrent read repopulate the cache with pre-write data.
+    playRecordsCache.clear();
     playsCache.clear();
     playsRawCache.clear();
     return ok;
@@ -315,7 +321,6 @@ export function saveEditionsDB(editionsArray) {
   return putRecordsBatch("editions", editionsArray).then((ok) => {
     editionsCache.clear();
     playsCache.clear(); // plays carry mint totals joined from editions
-    playsRawCache.clear();
     return ok;
   });
 }
