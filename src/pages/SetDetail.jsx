@@ -24,6 +24,8 @@ import { mapSetDetailsToRecords } from "../services/sync.coordinator";
 import { useSyncStatus, useReloadOnSyncComplete } from "../hooks/useSyncStatus";
 import { useLoad } from "../hooks/useLoad";
 import { LoadError } from "../components/LoadError";
+import { SyncProgress } from "../components/SyncProgress";
+import { useToggleSet } from "../hooks/useToggleSet";
 import { Loader } from "../components/Loader";
 import setsParallels from "../../data/sets_parallels.json";
 import teamsAdditions from "../../data/additions/teams.json";
@@ -35,7 +37,7 @@ import { getMediaInfo } from "../services/ipfs.media";
 import { generateSetArt } from "../services/ipfs.generate";
 import { setArtThumbUrl, fetchMediaManifest } from "../services/media.service";
 import { CubeTrigger } from "../components/MomentCube";
-import { buildCubeConfig, cubeFaceFor, cubeThumbFor, resolveCubeFace } from "../services/cube.service";
+import { buildCubeConfig, cubeFaceFor, cubeThumbFor, resolveCubeFace, gatewayUrl } from "../services/cube.service";
 import { SetArtPlaceholder } from "../components/SetArt";
 import { isSilhouette } from "../services/ipfs.silhouette";
 import { DynamicPhotoButton } from "../components/DynamicPhotoButton";
@@ -90,15 +92,9 @@ export function SetDetail() {
   // expands every play at once, and clicking a row expands just that one.
   const [collapseSubeditions, setCollapseSubeditions] = useState(true);
   const [runtimeSilhouettes, setRuntimeSilhouettes] = useState(() => new Set());
-  const [expandedPlays, setExpandedPlays] = useState(() => new Set());
+  // Plays whose subeditions are unfolded (togglePlay: the caret cell's click)
+  const [expandedPlays, togglePlay, setExpandedPlays] = useToggleSet();
   const navigate = useNavigate();
-  // Folds or unfolds one play's subeditions (the caret cell's click)
-  const togglePlay = (playKey) => setExpandedPlays((prev) => {
-    const next = new Set(prev);
-    if (next.has(playKey)) next.delete(playKey);
-    else next.add(playKey);
-    return next;
-  });
   // Lazy per-CID media metadata (dimensions, duration, size, dead CIDs)
   const ipfsMedia = useIpfsMedia();
   // Browsing as an account: Minted becomes owned/total, honouring the
@@ -270,7 +266,7 @@ export function SetDetail() {
   useEffect(() => {
     if (!needsGeneratedArt || !setArtHeroCid || setMeta?.series == null) return undefined;
     let cancelled = false;
-    generateSetArt(`https://ipfs.dapperlabs.com/ipfs/${setArtHeroCid}`, setMeta?.series)
+    generateSetArt(gatewayUrl(setArtHeroCid), setMeta?.series)
       .then((res) => { if (!cancelled) setHeaderArt({ cid: setArtHeroCid, url: res.url }); })
       .catch((err) => {
         console.warn("header set art generation failed:", err);
@@ -305,7 +301,7 @@ export function SetDetail() {
       // Sequential on purpose: cached verdicts resolve instantly, and a
       // stale deploy should trickle its image fetches, not burst them
       for (const cid of silhouetteCandidates) {
-        const verdict = await isSilhouette(cid, `https://ipfs.dapperlabs.com/ipfs/${cid}`);
+        const verdict = await isSilhouette(cid, gatewayUrl(cid));
         if (cancelled) return;
         if (verdict) setRuntimeSilhouettes((prev) => new Set(prev).add(cid));
       }
@@ -542,7 +538,6 @@ export function SetDetail() {
       // needed since the hero already IS the full photo, so no button.
       // The button owns its busy state (components/DynamicPhotoButton), so
       // a click no longer rebuilds this whole records table.
-      const gatewayUrl = (cid) => `https://ipfs.dapperlabs.com/ipfs/${cid}`;
       const heroGatewayUrl = cids.HERO ? gatewayUrl(cids.HERO) : null;
       const playerInfo = cids.PLAYER && ipfsMedia ? getMediaInfo(cids.PLAYER) : null;
       const heroIsPhoto = Boolean(cids.HERO && ipfsMedia && getMediaInfo(cids.HERO)?.fullBleed);
@@ -575,7 +570,7 @@ export function SetDetail() {
       const dynamicPhotoBtn = canRebuildPlayer ? (
         <DynamicPhotoButton
           heroUrl={heroGatewayUrl}
-          playerUrl={`https://ipfs.dapperlabs.com/ipfs/${cids.PLAYER}`}
+          playerUrl={gatewayUrl(cids.PLAYER)}
           playName={playName}
           onResult={setOverlayMedia}
         />
@@ -1094,20 +1089,7 @@ export function SetDetail() {
         )}
       </div>
 
-      {/* Sync coordinator progress bar, only while the page has no editions
-          yet: unmounting it under a populated table would jump the page,
-          and the navbar pill already shows sync status */}
-      {syncState.isSyncing && editions.length === 0 && (
-        <div className="glass-panel mt-20" style={{ background: "rgba(139, 92, 246, 0.05)", borderColor: "var(--primary)" }}>
-          <div className="d-flex justify-between" style={{ fontSize: "0.8rem", marginBottom: "4px" }}>
-            <span className="text-muted">Syncing from the Flow Blockchain: <strong>{syncState.stage}</strong></span>
-            <span>{syncState.progressPercent}%</span>
-          </div>
-          <div className="sync-bar-container">
-            <div className="sync-bar-fill" style={{ width: `${syncState.progressPercent}%` }}></div>
-          </div>
-        </div>
-      )}
+      {syncState.isSyncing && editions.length === 0 && <SyncProgress state={syncState} panel className="mt-20" />}
 
       {/* Main Datatable */}
       <div className="glass-panel table-panel mt-20">

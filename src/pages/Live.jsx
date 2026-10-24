@@ -11,7 +11,8 @@ import {
   momentRefOf, partiesRefOf, badgeFor, TRANSFER_TYPE, DEPOSIT_TYPE, WITHDRAW_TYPE
 } from "../services/flowEvents.service";
 import { getAllPlaysDB, getAllSetsDB } from "../services/db.service";
-import { getMomentByOwner, getMomentsByOwner } from "../services/fcl.service";
+import { getMomentsByOwner } from "../services/fcl.service";
+import { useToggleSet } from "../hooks/useToggleSet";
 import { formatAge } from "../utils/display.utils";
 import { EditionCells } from "../components/MomentIdentity";
 import { buildIdentityContext, EDITION_HEADINGS } from "../services/identity.service";
@@ -507,7 +508,9 @@ export function Live() {
       localStorage.setItem(COLLS_KEY, JSON.stringify(vals));
     } catch { /* private mode */ }
   };
-  const [expanded, setExpanded] = useState(() => new Set());
+  // Rows opened to their detail; toggleExpand keeps one identity, which
+  // EventRow's memo depends on
+  const [expanded, toggleExpand] = useToggleSet();
   // Render snapshot of the event store; the Map itself lives in a ref so
   // ingest can dedupe across polls without triggering renders per event
   const [events, setEvents] = useState([]);
@@ -601,7 +604,7 @@ export function Live() {
       let result = { status: "none" };
       for (const owner of [...new Set(candidates)]) {
         try {
-          const row = await getMomentByOwner(owner, momentID);
+          const [row] = await getMomentsByOwner(owner, [momentID]);
           if (row) {
             result = { status: "done", setID: row[1], playID: row[2], serial: row[3], subID: row[4], owner };
             break;
@@ -919,16 +922,6 @@ export function Live() {
     }
     applyEnabled(next, !anyOn);
   };
-
-  // Stable identity: EventRow's memo depends on this never changing
-  const toggleExpand = useCallback((key) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }, []);
 
   const { rows, collOptions } = useMemo(() => {
     const q = textFilter.trim().toLowerCase();

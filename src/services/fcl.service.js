@@ -450,38 +450,13 @@ export async function getCollectionData(address, momentIDs) {
   return (resp || []).map((row) => row.map(Number));
 }
 
-// 6d. Single-moment identity lookup for the Marketplace stream: which
-// play, set, serial and parallel a moment ID is, read from a known
-// owner's public collection. Nil-safe (no panic): returns null when the
-// owner does not expose the moment, so callers can try other candidates.
-export async function getMomentByOwner(address, momentID) {
-  const cleanAddr = stripHexPrefix(address);
-  const resp = await query({
-    cadence: `
-      import TopShot from 0x${TOPSHOT_ADDRESS}
-      access(all) fun main(id: UInt64): [UInt64]? {
-        if let ref = getAccount(0x${cleanAddr}).capabilities.borrow<&{TopShot.MomentCollectionPublic}>(/public/MomentCollection) {
-          if let nft = ref.borrowMoment(id: id) {
-            var sub = UInt64(0)
-            if let s = TopShot.getMomentsSubedition(nftID: id) {
-              sub = UInt64(s)
-            }
-            return [id, UInt64(nft.data.setID), UInt64(nft.data.playID), UInt64(nft.data.serialNumber), sub]
-          }
-        }
-        return nil
-      }
-    `,
-    args: (arg, t) => [arg(String(momentID), t.UInt64)]
-  });
-  return resp ? resp.map(Number) : null;
-}
-
-// 6d-batch. The same lookup for MANY moment ids in ONE script call. A
-// batch transaction can put 50 transfers on screen at once, all held by
-// the same account; resolving them one script per moment is pure waste.
-// Returns [id, setID, playID, serial, sub] rows for the ids the owner
-// exposes; ids the owner does not expose are simply absent.
+// 6d. Moment identity lookup for the Marketplace stream: which play, set,
+// serial and parallel each moment id is, read from a known owner's public
+// collection, MANY ids in ONE script call (a batch transaction can put 50
+// transfers on screen at once, all held by the same account). Nil-safe:
+// returns [id, setID, playID, serial, sub] rows for the ids the owner
+// exposes; ids the owner does not expose are simply absent, so callers
+// can try other candidates.
 export async function getMomentsByOwner(address, momentIDs) {
   const cleanAddr = stripHexPrefix(address);
   const resp = await query({

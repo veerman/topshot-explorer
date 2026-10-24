@@ -1,5 +1,6 @@
 import { CORE_MEDIA_FIELDS, getMediaTypeLabel, sortMediaTypes } from "../services/ipfs.analysis";
 import { describeMedia, mediaCellLines } from "../services/ipfs.media";
+import { gatewayUrl } from "../services/cube.service";
 
 /**
  * An edition's media files, one line each, the shape the set page table
@@ -35,7 +36,7 @@ export function MediaStack({ cids, ipfsMedia, onOpen, activeUrl, playerExtra, ex
         </span>
       );
     }
-    const url = `https://ipfs.dapperlabs.com/ipfs/${cid}`;
+    const url = gatewayUrl(cid);
     const isVideo = mediaType.toLowerCase().startsWith("video");
     // Pre-click context from the probe lookup: dimensions, duration, size,
     // audio, and when the gateway last confirmed the file; the hash tail

@@ -5,6 +5,7 @@ import { getAllPlaysDB, getAllSetsDB, getAllTeamsDB } from "../services/db.servi
 import { useSyncStatus, useReloadOnSyncComplete } from "../hooks/useSyncStatus";
 import { useLoad } from "../hooks/useLoad";
 import { LoadError } from "../components/LoadError";
+import { SyncProgress } from "../components/SyncProgress";
 
 import { buildTsdIndex, buildMintClock, momentContext, parentSeason, compareBadges, getSeriesInfo, mintEra, MINT_ERAS } from "../services/overrides.service";
 import { useUrlParam } from "../hooks/useUrlParam";
@@ -208,22 +209,7 @@ export function Plays() {
           Every play: the player, the game, the date, and its editions.
         </p>
 
-        {/* Only in the empty state; once the table is up, its removal would
-            jump the page, and the navbar pill already shows sync status */}
-        {syncState.isSyncing && plays.length === 0 && (
-          <div style={{ marginTop: "16px" }}>
-            <div className="d-flex justify-between" style={{ fontSize: "0.8rem", marginBottom: "4px" }}>
-              <span className="text-muted">{syncState.stage}</span>
-              <span>{syncState.progressPercent}%</span>
-            </div>
-            <div className="sync-bar-container">
-              <div
-                className="sync-bar-fill"
-                style={{ width: `${syncState.progressPercent}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
+        {syncState.isSyncing && plays.length === 0 && <SyncProgress state={syncState} />}
       </div>
 
       {/* Plays Datatable */}
@@ -234,11 +220,6 @@ export function Plays() {
           <div className="loader-container">
             <div className="spinner"></div>
             <p>Database is empty. Waiting for Sync Coordinator to fetch data...</p>
-            {syncState.isSyncing && (
-              <p className="text-muted" style={{ fontSize: "0.85rem", marginTop: "8px" }}>
-                Progress: {syncState.progressPercent}% - {syncState.stage}
-              </p>
-            )}
           </div>
         ) : (
           <>

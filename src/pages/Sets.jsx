@@ -9,6 +9,7 @@ import { useUrlParam } from "../hooks/useUrlParam";
 import { useSyncStatus } from "../hooks/useSyncStatus";
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
+import { SyncProgress } from "../components/SyncProgress";
 import { Loader } from "../components/Loader";
 import { getSubeditions as getSubeditionsService } from "../services/fcl.service";
 import { useAccountCollection } from "../hooks/useAccountCollection";
@@ -438,20 +439,7 @@ export function Sets() {
         </div>
       </div>
 
-      {/* In-page sync progress only in the empty state: unmounting it once
-          the table is up would jump the whole page, and the navbar pill
-          already shows sync status */}
-      {syncState.isSyncing && sets.length === 0 && (
-        <div className="glass-panel" style={{ background: "rgba(139, 92, 246, 0.05)", borderColor: "var(--primary)" }}>
-          <div className="d-flex justify-between" style={{ fontSize: "0.8rem", marginBottom: "4px" }}>
-            <span className="text-muted">Syncing from the Flow Blockchain: <strong>{syncState.stage}</strong></span>
-            <span>{syncState.progressPercent}%</span>
-          </div>
-          <div className="sync-bar-container">
-            <div className="sync-bar-fill" style={{ width: `${syncState.progressPercent}%` }}></div>
-          </div>
-        </div>
-      )}
+      {syncState.isSyncing && sets.length === 0 && <SyncProgress state={syncState} panel />}
 
       {sets.length === 0 ? (
         <div className="glass-panel text-center" style={{ padding: "40px" }}>

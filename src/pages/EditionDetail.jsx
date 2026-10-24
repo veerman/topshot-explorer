@@ -223,7 +223,7 @@ export function EditionDetail() {
       const foundKey = VIDEO_PRIORITY.find((type) => ipfsRecord.cids[type] && !isDead(ipfsRecord.cids[type]))
         // If no priority video, check any video type
         || Object.keys(ipfsRecord.cids).find((key) => key.toLowerCase().startsWith("video") && !isDead(ipfsRecord.cids[key]));
-      if (foundKey) vidToSet = `https://ipfs.dapperlabs.com/ipfs/${ipfsRecord.cids[foundKey]}`;
+      if (foundKey) vidToSet = gatewayUrl(ipfsRecord.cids[foundKey]);
     }
     // Settle like a fetch would, never mid-render
     Promise.resolve().then(() => setActiveVideo(vidToSet));

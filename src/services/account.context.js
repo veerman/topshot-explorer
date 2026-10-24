@@ -176,6 +176,14 @@ export const isEvmAddress = (input) => /^0x[0-9a-f]{40}$/.test(String(input || "
 
 /** The EVM addresses whose Top Shot holdings count as a Cadence account's:
  *  its Cadence-owned EVM accounts (COAs), as the chain reports them */
+/** A collection's moment ids: the Cadence ones, then those held on Flow
+ *  EVM that are not among them. A Set lookup; includes() over a
+ *  60,000-moment list was about 120 million comparisons. */
+export const mergeIds = (cadenceIDs, evmIDs) => {
+  const seen = new Set(cadenceIDs);
+  return [...cadenceIDs, ...evmIDs.filter((id) => !seen.has(id))];
+};
+
 export const evmAddressesOf = (graph) => ((graph && graph.evms) || (graph && graph.evm ? [graph.evm] : [])).map((a) => String(a).toLowerCase());
 
 function setLinked(address, patch) {
@@ -208,7 +216,7 @@ async function loadLinked(address, { force = false } = {}) {
     const evmList = await getEvmCollectionIDsAll(evmAddressesOf(graph)).catch(() => []);
     if (!alive()) return;
     const evmIDs = new Set(evmList);
-    const ids = [...cadenceIDs, ...evmList.filter((id) => !cadenceIDs.includes(id))];
+    const ids = mergeIds(cadenceIDs, evmList);
     const result = await syncCollectionTuples(address, ids, {
       evmIDs,
       cachedMoments: cached ? cached.moments : null,
@@ -333,7 +341,7 @@ async function fetchCollection(address, cachedMoments) {
     const evmList = await getEvmCollectionIDsAll(evm ? [address] : evmAddressesOf(graph)).catch((err) => { console.warn("EVM collection unavailable:", err); return []; });
     if (token !== fetchToken) return;
     const evmIDs = new Set(evmList);
-    const ids = [...cadenceIDs, ...evmList.filter((id) => !cadenceIDs.includes(id))];
+    const ids = mergeIds(cadenceIDs, evmList);
 
     const result = await syncCollectionTuples(address, ids, {
       evmIDs,

@@ -14,7 +14,7 @@ import { buildCubeConfig, cubeFaceFor, cubeThumbFor, resolveCubeFace } from "../
 import { useIpfsMedia } from "../hooks/useIpfsMedia";
 import { serialKinds, playSerialFacts, runSizeFor, SPECIAL_LABELS } from "../utils/serials.utils";
 import { MultiSelect } from "../components/MultiSelect";
-import { normalizeAddress, syncCollectionTuples, subscribeAccountReload, rememberAddress, evmAddressesOf, isEvmAddress } from "../services/account.context";
+import { normalizeAddress, syncCollectionTuples, subscribeAccountReload, rememberAddress, evmAddressesOf, isEvmAddress, mergeIds } from "../services/account.context";
 import { lockStateOf, clearLockCache, loadAccountLocks } from "../services/account.locks";
 
 const EMPTY_LOCKS = new Map();
@@ -39,6 +39,7 @@ import { playSummary, lockCell, getLeagueName, tierFacetRank as tierRank, player
 import { Badges } from "../components/Badges";
 import { Loader } from "../components/Loader";
 import { LoadError } from "../components/LoadError";
+import { useToggleSet } from "../hooks/useToggleSet";
 import { getEditionTier } from "../services/set.status";
 import { isMismintPlay } from "../services/overrides.service";
 import { replaceQuery } from "../utils/query";
@@ -55,7 +56,7 @@ import { replaceQuery } from "../utils/query";
 async function buildCollectionIndex(address, summary, onProgress, evmList = []) {
   const cadenceIDs = summary.momentIDs.map(Number);
   const evmIDs = new Set(evmList);
-  const ids = [...cadenceIDs, ...evmList.filter((id) => !cadenceIDs.includes(id))];
+  const ids = mergeIds(cadenceIDs, evmList);
   let cached = null;
   try { cached = await getAccountCollectionDB(normalizeAddress(address)); } catch { /* no cache */ }
   // Shared with the account context (services/account.context.js), which
@@ -190,12 +191,7 @@ export function Account() {
     );
   };
   // Edition keys whose full serial list is expanded in the grouped view
-  const [expandedSerials, setExpandedSerials] = useState(() => new Set());
-  const toggleSerials = (key) => setExpandedSerials((prev) => {
-    const next = new Set(prev);
-    if (next.has(key)) next.delete(key); else next.add(key);
-    return next;
-  });
+  const [expandedSerials, toggleSerials] = useToggleSet();
   const [localMeta, setLocalMeta] = useState(null); // { plays: Map, playsArr, sets: Map } for grouping and filters
 
   // Pagination state (declared before the filters: changing either
