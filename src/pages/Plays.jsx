@@ -267,14 +267,14 @@ export function Plays() {
               )}
               {anyFilter && (
                 <span className="text-muted" style={{ fontSize: "0.8rem" }}>
-                  {filteredRecords.length.toLocaleString()} of {tableRecords.length.toLocaleString()} plays match
+                  Filtered from {tableRecords.length.toLocaleString()} plays
                 </span>
               )}
             </LeagueFilter>
             {(seasonFilter || contextFilter || seriesFilter || eraFilter) && (
               <div className="plays-filter-indicator">
                 <span>
-                  Displaying <strong>{filteredRecords.length.toLocaleString()}</strong> plays for{" "}
+                  Displaying plays for{" "}
                   <strong>{[
                     selectedLeague !== "all" ? selectedLeague.toUpperCase() : "",
                     seriesFilter ? `${(getSeriesInfo(seriesFilter) || {}).name || `Series ${seriesFilter}`} sets` : "",
