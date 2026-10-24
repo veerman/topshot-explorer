@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { Pagination } from "./Pagination";
 import { replaceQuery } from "../utils/query";
 
@@ -96,7 +96,7 @@ function matchesColumnFilter(val, rawNeedle, colDef, rec, cellText) {
 // existing groups are skipped by reference, so a commit costs one chunk,
 // not the whole table so far; a keyed child diff over 9k rows per chunk
 // made the streaming quadratic.
-const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, mismints, mismintKey, keyColumn, onRowClick, sortColumn, sortOrder, filters }) {
+const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, mismintSet, mismintKey, keyColumn, onRowClick, sortColumn, sortOrder, filters }) {
   return (
     <tbody>
       {recs.map((rec, rIdx) => (
@@ -105,7 +105,7 @@ const TbodyChunk = React.memo(function TbodyChunk({ recs, columns, columnAlign, 
           rec={rec}
           columns={columns}
           columnAlign={columnAlign}
-          isMismint={mismints.includes(String(rec[mismintKey]))}
+          isMismint={mismintSet.has(String(rec[mismintKey]))}
           onRowClick={onRowClick}
           sortColumn={sortColumn}
           sortOrder={sortOrder}
@@ -149,6 +149,10 @@ const TableRow = React.memo(function TableRow({ rec, columns, columnAlign, isMis
   );
 });
 
+// The default for tables without mismints: one array for every render,
+// so the memoised row groups below see the same prop each time
+const NO_MISMINTS = [];
+
 export function DataTable({
   columns = [],
   records = [],
@@ -157,7 +161,7 @@ export function DataTable({
   defaultSortOrder = "asc",
   pageSizeOptions = [100, "All"],
   defaultPageSize = 100,
-  mismints = [], // Array of playIDs/ids that are misminted to highlight them
+  mismints = NO_MISMINTS, // Array of playIDs/ids that are misminted to highlight them
   mismintKey = "playID", // key in records to check against mismints
   hidePageSizeSelector = false,
   onRowClick = null,
@@ -455,6 +459,15 @@ export function DataTable({
 
   // A column whose visible values are all numeric right-aligns (digits line
   // up); everything else left-aligns. col.align overrides either way.
+  // Pages pass onRowClick as an inline arrow, a new function every
+  // render; the row groups get one stable handler that calls the latest,
+  // so a parent re-render does not redraw every row
+  const rowClickRef = useRef(onRowClick);
+  useLayoutEffect(() => { rowClickRef.current = onRowClick; });
+  const handleRowClick = useCallback((rec) => { if (rowClickRef.current) rowClickRef.current(rec); }, []);
+  const hasRowClick = Boolean(onRowClick);
+  const mismintSet = useMemo(() => new Set(mismints.map(String)), [mismints]);
+
   const columnAlign = useMemo(() => {
     const out = {};
     const sample = sortedRecords.slice(0, 40);
@@ -702,10 +715,10 @@ export function DataTable({
                 recs={recs}
                 columns={columns}
                 columnAlign={columnAlign}
-                mismints={mismints}
+                mismintSet={mismintSet}
                 mismintKey={mismintKey}
                 keyColumn={keyColumn}
-                onRowClick={onRowClick}
+                onRowClick={hasRowClick ? handleRowClick : null}
                 sortColumn={sortColumn}
                 sortOrder={sortOrder}
                 filters={columnFilters}
