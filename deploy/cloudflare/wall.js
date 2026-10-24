@@ -17,7 +17,7 @@
 // .run(); the dev server wraps node:sqlite to the same shape.
 //
 // Early Adopters ends when the fold stamps `closedAt` into the shipped
-// file (scripts/wall-fold.mjs --close): from the next deploy the sign
+// file (scripts/wall-fold.mjs --close): from the next deploy every wall
 // route answers 410 with WALL_CLOSED_MESSAGE, for new signers and changes
 // alike, so the list that ships is the whole wall. The wall itself stays.
 

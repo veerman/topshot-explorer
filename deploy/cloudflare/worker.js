@@ -16,7 +16,7 @@ import { getSealedHeight, MAX_EVENT_SPAN } from "../../src/services/flowEvents.s
 import { lookupUser } from "./lookup.js";
 import {
   makeChallenge, verifySignIn, makeSession, readSession, cookieValue, sessionCookie, clearedCookie,
-  sessionMayLookup, DENIED_FLAG, SESSION_COOKIE
+  sessionMayLookup, normAddress, DENIED_FLAG, SESSION_COOKIE
 } from "./auth.js";
 import { signWall, wallEntryFor, wallPending, WALL_CLOSED, WALL_CLOSED_MESSAGE } from "./wall.js";
 import { fetchAccountGraph, wallKindOf, WALL_NOT_ELIGIBLE } from "./graph.js";
@@ -62,16 +62,16 @@ const overLimit = async (limiter, key) => {
     return false;
   }
 };
-const tooMany = (what) =>
-  new Response(JSON.stringify({ error: `too many ${what}; try again in a minute` }), {
-    status: 429, headers: { "content-type": "application/json", "cache-control": "no-store", "retry-after": "60" }
-  });
+// Every JSON answer; uncached unless `extra` says otherwise
+const json = (status, body, extra = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
+const tooMany = (what) => json(429, { error: `too many ${what}; try again in a minute` }, { "retry-after": "60" });
 
 // The access node sends its content type twice, which reads back joined
 // ("application/json, application/json; charset=UTF-8"); keep the first
 const contentTypeOf = (res) => (res.headers.get("content-type") || "application/json").split(",")[0].trim();
 
-const proxyFlow = async (request, url, env, ctx) => {
+const proxyFlow = async (url, request, env, ctx) => {
   const upstreamPath = url.pathname.slice("/flow".length);
   const upstreamUrl = FLOW_UPSTREAM + upstreamPath + url.search;
   // Only the app's own reads pass (proxy-policy.js); nothing else is
@@ -153,7 +153,8 @@ const LOOKUP_MISS_TTL = 3600;
 // here too, so the table learns.
 const LOOKUP_HIT_TTL_ADDR = 86400;
 const LOOKUP_MISS_TTL_ADDR = 600; // short: a miss the census names should show within minutes of a push
-const normAddr = (a) => { const x = String(a || "").trim().toLowerCase().replace(/^0x/, ""); return /^[0-9a-f]{16}$/.test(x) ? x : null; };
+// The lookup table keys addresses as bare hex, without the 0x
+const normAddr = (a) => { const x = normAddress(a); return x && x.slice(2); };
 
 const learnUsername = async (env, body) => {
   const db = env && env.LOOKUP_DB;
@@ -188,7 +189,6 @@ const recordMiss = async (env, address) => {
 // addresses only. The deny list is a D1 table `denied(address)`: a denied
 // address signs in like anyone else and gets a flagged session that the
 // gated routes treat as anonymous (nothing tells them so).
-const FLOW_REST = "https://rest-mainnet.onflow.org";
 
 const isDenied = async (env, address) => {
   if (!env.LOOKUP_DB) return false;
@@ -221,13 +221,11 @@ const sessionOf = async (request, env) => {
 };
 
 const authRoutes = async (url, request, env) => {
-  const json = (status, body, extra = {}) =>
-    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
   if (!env.SESSION_SECRET) return json(503, { error: "sign-in is not set up on this host" });
   const secure = url.protocol === "https:";
   const path = url.pathname;
   if (path === "/auth/challenge" && request.method === "GET") {
-    const ch = await makeChallenge(env.SESSION_SECRET, url.searchParams.get("address"), url.host);
+    const ch = await makeChallenge(env.SESSION_SECRET, url.searchParams.get("address"));
     return ch ? json(200, ch) : json(400, { error: "not a Flow address" });
   }
   if (path === "/auth/verify" && request.method === "POST") {
@@ -236,7 +234,7 @@ const authRoutes = async (url, request, env) => {
     // Each attempt runs a script on the access node, so attempts are
     // limited per client; a real wallet needs one or two
     if (await overLimit(env.ABUSE_LIMIT, `verify:${clientKey(request)}`)) return tooMany("sign-in attempts");
-    const result = await verifySignIn(env.SESSION_SECRET, FLOW_REST, url.host, body);
+    const result = await verifySignIn(env.SESSION_SECRET, FLOW_UPSTREAM, body);
     if (!result.ok) return json(401, { error: result.error });
     const flags = (await isDenied(env, result.address)) ? DENIED_FLAG : "";
     const token = await makeSession(env.SESSION_SECRET, result.address, flags);
@@ -253,19 +251,12 @@ const authRoutes = async (url, request, env) => {
 };
 
 // ---- Early Adopters wall (see wall.js) ---------------------------------
-const sealedHeight = async () => {
-  try {
-    const res = await fetch(`${FLOW_REST}/v1/blocks?height=sealed`);
-    const j = await res.json();
-    return Number(j[0] && j[0].header && j[0].header.height) || null;
-  } catch {
-    return null;
-  }
-};
+const sealedHeight = () => getSealedHeight().catch(() => null);
 
 const wallRoutes = async (url, request, env, ctx) => {
-  const json = (status, body, extra = {}) =>
-    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
+  // Closed, the shipped file is the whole wall and the page asks for
+  // nothing here: every route answers so before a session or D1 read
+  if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE });
   if (!env.LOOKUP_DB) return json(404, { error: "no wall on this host" });
   const path = url.pathname;
   if (path === "/wall/pending" && request.method === "GET") {
@@ -281,11 +272,9 @@ const wallRoutes = async (url, request, env, ctx) => {
       full = await cached.json();
     } else {
       full = await wallPending(env.LOOKUP_DB, 0, 2000);
-      const stored = new Response(JSON.stringify(full), { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=10" } });
-      ctx.waitUntil(cache.put(cacheKey, stored));
+      ctx.waitUntil(cache.put(cacheKey, json(200, full, { "cache-control": "public, max-age=10" })));
     }
-    const body = { total: full.total, entries: (full.entries || []).filter((e) => e.seq > after) };
-    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json", "cache-control": "public, max-age=10" } });
+    return json(200, { total: full.total, entries: (full.entries || []).filter((e) => e.seq > after) }, { "cache-control": "public, max-age=10" });
   }
   const session = await sessionOf(request, env);
   if (!session) return json(401, { error: "sign in with your wallet first" });
@@ -294,7 +283,6 @@ const wallRoutes = async (url, request, env, ctx) => {
     return entry ? json(200, entry) : json(404, { error: "not signed yet" });
   }
   if (path === "/wall/sign" && request.method === "POST") {
-    if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE });
     // A signature reads the account graph from the chain and writes a
     // row; a few per minute per wallet is plenty
     if (await overLimit(env.ABUSE_LIMIT, `wall:${session.address}`)) return tooMany("signatures");
@@ -302,7 +290,7 @@ const wallRoutes = async (url, request, env, ctx) => {
     try { body = (await request.json()) || {}; } catch { body = {}; }
     // Who is signing, from the chain: a Dapper wallet, or a wallet
     // that is a parent of one; anything else is turned away in words
-    const graph = await fetchAccountGraph(FLOW_REST, session.address);
+    const graph = await fetchAccountGraph(FLOW_UPSTREAM, session.address);
     const kind = wallKindOf(graph);
     if (!kind) return json(403, { error: WALL_NOT_ELIGIBLE });
     const nameOf = async (addr) => {
@@ -321,8 +309,6 @@ const wallRoutes = async (url, request, env, ctx) => {
 };
 
 const lookupAddress = async (url, request, env, ctx) => {
-  const json = (status, body, extra = {}) =>
-    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
   const address = normAddr(url.pathname.slice("/lookup/address/".length));
   if (!address) return json(400, { error: "not a Flow address" });
   if (!env.LOOKUP_DB) return json(404, { error: "no lookup table on this host" });
@@ -370,17 +356,12 @@ const lookupAddress = async (url, request, env, ctx) => {
     };
   }
   const ttl = status === 200 ? LOOKUP_HIT_TTL_ADDR : LOOKUP_MISS_TTL_ADDR;
-  const stored = new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": `public, max-age=${ttl}` } });
-  ctx.waitUntil(cache.put(cacheKey, stored.clone()));
-  const res = new Response(stored.body, stored);
-  res.headers.set("x-lookup-cache", "MISS");
-  return res;
+  ctx.waitUntil(cache.put(cacheKey, json(status, body, { "cache-control": `public, max-age=${ttl}` })));
+  return json(status, body, { "cache-control": `public, max-age=${ttl}`, "x-lookup-cache": "MISS" });
 };
 
 const lookupUsername = async (url, request, env, ctx) => {
   const name = decodeURIComponent(url.pathname.slice("/lookup/user/".length)).trim().replace(/^@/, "");
-  const json = (status, body, extra = {}) =>
-    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", ...extra } });
 
   // Keyed by the name AS TYPED: the profile page is case sensitive
   // (Libruary resolves, libruary does not), so a lowercased key would let
@@ -402,11 +383,8 @@ const lookupUsername = async (url, request, env, ctx) => {
   if (status === 200) ctx.waitUntil(learnUsername(env, body));
   if (status === 200 || status === 404) {
     const ttl = status === 200 ? LOOKUP_HIT_TTL : LOOKUP_MISS_TTL;
-    const stored = new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": `public, max-age=${ttl}` } });
-    ctx.waitUntil(cache.put(cacheKey, stored.clone()));
-    const res = new Response(stored.body, stored);
-    res.headers.set("x-lookup-cache", "MISS");
-    return res;
+    ctx.waitUntil(cache.put(cacheKey, json(status, body, { "cache-control": `public, max-age=${ttl}` })));
+    return json(status, body, { "cache-control": `public, max-age=${ttl}`, "x-lookup-cache": "MISS" });
   }
   return json(status, body, { "x-lookup-cache": "MISS" });
 };
@@ -465,55 +443,30 @@ async function foldOffers(env) {
   console.log(`offers fold: ${from}..${r.height} (${r.windows} windows) +${r.added} -${r.removed} offers, ${r.accepted.length} accepted${r.height < tip ? `; ${tip - r.height} heights still behind` : ""}`);
 }
 
+// The routed prefixes (run_worker_first in wrangler.jsonc). A route
+// that throws answers 502 in its own words; anything else falls through
+// to the asset layer.
+const ROUTES = [
+  { prefix: "/flow/", name: "flow proxy", run: proxyFlow, failed: () => new Response("flow proxy error", { status: 502 }) },
+  { prefix: "/auth/", name: "auth", run: authRoutes, failed: (err) => json(502, { error: `sign-in failed: ${String((err && err.message) || err).slice(0, 300)}` }) },
+  { prefix: "/wall/", name: "wall", run: wallRoutes, failed: () => json(502, { error: "the wall did not answer" }) },
+  { prefix: "/lookup/user/", method: "GET", name: "username lookup", run: lookupUsername, failed: () => json(502, { error: "lookup failed" }) },
+  { prefix: "/lookup/address/", method: "GET", name: "address lookup", run: lookupAddress, failed: () => json(502, { error: "lookup failed" }) }
+];
+
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(foldOffers(env).catch((err) => console.error("offers fold failed:", err)));
   },
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/flow/")) {
-      try {
-        return await proxyFlow(request, url, env, ctx);
-      } catch (err) {
-        console.error("flow proxy error:", err);
-        return new Response("flow proxy error", { status: 502 });
-      }
+    const route = ROUTES.find((r) => url.pathname.startsWith(r.prefix) && (!r.method || r.method === request.method));
+    if (!route) return env.ASSETS.fetch(request);
+    try {
+      return await route.run(url, request, env, ctx);
+    } catch (err) {
+      console.error(`${route.name} error:`, err);
+      return route.failed(err);
     }
-    if (url.pathname.startsWith("/auth/")) {
-      try {
-        return await authRoutes(url, request, env);
-      } catch (err) {
-        console.error("auth error:", err);
-        const why = String((err && err.message) || err).slice(0, 300);
-        return new Response(JSON.stringify({ error: `sign-in failed: ${why}` }), { status: 502, headers: { "content-type": "application/json" } });
-      }
-    }
-    if (url.pathname.startsWith("/wall/")) {
-      try {
-        return await wallRoutes(url, request, env, ctx);
-      } catch (err) {
-        console.error("wall error:", err);
-        return new Response(JSON.stringify({ error: "the wall did not answer" }), { status: 502, headers: { "content-type": "application/json" } });
-      }
-    }
-    if (url.pathname.startsWith("/lookup/user/") && request.method === "GET") {
-      try {
-        return await lookupUsername(url, request, env, ctx);
-      } catch (err) {
-        console.error("username lookup error:", err);
-        return new Response(JSON.stringify({ error: "lookup failed" }), { status: 502, headers: { "content-type": "application/json" } });
-      }
-    }
-    if (url.pathname.startsWith("/lookup/address/") && request.method === "GET") {
-      try {
-        return await lookupAddress(url, request, env, ctx);
-      } catch (err) {
-        console.error("address lookup error:", err);
-        return new Response(JSON.stringify({ error: "lookup failed" }), { status: 502, headers: { "content-type": "application/json" } });
-      }
-    }
-    // Only /flow/*, /lookup/*, /auth/* and /wall/* are routed here via run_worker_first;
-    // anything else that arrives falls through to the asset layer
-    return env.ASSETS.fetch(request);
   }
 };

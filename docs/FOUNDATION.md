@@ -876,8 +876,8 @@ signing order and never change; a row removed from the file on purpose
 is listed under `dropped` so a fold does not bring it back. It confers
 nothing. Every fold also writes `EARLY-ADOPTERS.md`, the thank-you page in
 the repository. `--close` ends Early Adopters by stamping `closedAt` into
-the file: the sign route then answers 410 ("Early Adopters has
-concluded."), the page keeps showing the shipped list without the sign
+the file: every wall route then answers 410 ("Early Adopters has
+concluded.") without reading the session or the database, the page keeps showing the shipped list without the sign
 controls, and `npm run wall:reset` refuses to run. Early Adopters
 concluded on 2026-10-23 with 28 signatures.
 

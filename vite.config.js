@@ -68,16 +68,16 @@ const serveWall = () => ({
         res.setHeader('cache-control', 'no-store')
         res.end(JSON.stringify(body))
       }
+      if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE })
       const d = await open()
       if (path === '/pending' && req.method === 'GET') return json(200, await wallPending(d, Number(params.get('after')) || 0))
       const session = await devSession(req)
-      if (!session) return json(401, { error: 'sign in with a Flow wallet first' })
+      if (!session) return json(401, { error: 'sign in with your wallet first' })
       if (path === '/me' && req.method === 'GET') {
         const entry = await wallEntryFor(d, session.address)
         return entry ? json(200, entry) : json(404, { error: 'not signed yet' })
       }
       if (path === '/sign' && req.method === 'POST') {
-        if (WALL_CLOSED) return json(410, { error: WALL_CLOSED_MESSAGE })
         const body = (await readJsonBody(req)) || {}
         const graph = await fetchAccountGraph('https://rest-mainnet.onflow.org', session.address)
         const kind = wallKindOf(graph)
@@ -109,12 +109,12 @@ const serveAuth = () => ({
         res.end(JSON.stringify(body))
       }
       if (path === '/challenge' && req.method === 'GET') {
-        const ch = await makeChallenge(DEV_SESSION_SECRET, params.get('address'), req.headers.host || 'localhost')
+        const ch = await makeChallenge(DEV_SESSION_SECRET, params.get('address'))
         return ch ? json(200, ch) : json(400, { error: 'not a Flow address' })
       }
       if (path === '/verify' && req.method === 'POST') {
         const body = await readJsonBody(req)
-        const result = await verifySignIn(DEV_SESSION_SECRET, 'https://rest-mainnet.onflow.org', req.headers.host || 'localhost', body)
+        const result = await verifySignIn(DEV_SESSION_SECRET, 'https://rest-mainnet.onflow.org', body)
         if (!result.ok) return json(401, { error: result.error })
         const token = await makeSession(DEV_SESSION_SECRET, result.address, '')
         return json(200, { address: result.address }, { 'set-cookie': sessionCookie(token, false) })
@@ -206,8 +206,9 @@ const serveAddressLookup = () => ({
       res.setHeader('content-type', 'application/json')
       res.setHeader('cache-control', 'no-store')
       // Same gate as the Worker: names are for signed-in readers
-      if (!sessionMayLookup(await devSession(req))) { res.statusCode = 401; res.end(JSON.stringify({ error: 'sign in with a Flow wallet to see usernames' })); return }
-      const d = /^[0-9a-f]{16}$/.test(raw) ? await open() : null
+      if (!/^[0-9a-f]{16}$/.test(raw)) { res.statusCode = 400; res.end(JSON.stringify({ error: 'not a Flow address' })); return }
+      if (!sessionMayLookup(await devSession(req))) { res.statusCode = 401; res.end(JSON.stringify({ error: 'sign in with your wallet to see usernames' })); return }
+      const d = await open()
       if (!d) { res.statusCode = 404; res.end(JSON.stringify({ address: `0x${raw}` })); return }
       const row = d.prepare('SELECT g.dapper, g.parents, g.children, g.checked_at, n.username FROM accounts a LEFT JOIN graph g ON g.address = a.address LEFT JOIN names n ON n.address = a.address WHERE a.address = ?').get(raw)
       if (!row) { res.statusCode = 404; res.end(JSON.stringify({ address: `0x${raw}` })); return }

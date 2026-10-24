@@ -52,10 +52,9 @@ export async function nonceFor(secret, address, issuedAt) {
 
 /**
  * The exact text a wallet signs; the wallet shows it, so it is four
- * short labelled lines. The site line
- * names the real domain whatever host is serving it; the host is not
- * part of the message, the nonce (which the host derives) is what ties
- * a signature to one issue for one address.
+ * short labelled lines. The site line names the real domain whatever
+ * host is serving it: the nonce (which the host derives) is what ties a
+ * signature to one issue for one address.
  */
 export function signInMessage({ address, issuedAt, nonce }) {
   return [
@@ -68,12 +67,12 @@ export function signInMessage({ address, issuedAt, nonce }) {
 
 export const toHex = (s) => Array.from(enc.encode(s), (b) => b.toString(16).padStart(2, "0")).join("");
 
-export async function makeChallenge(secret, rawAddress, host, now = new Date()) {
+export async function makeChallenge(secret, rawAddress, now = new Date()) {
   const address = normAddress(rawAddress);
   if (!address) return null;
   const issuedAt = now.toISOString();
   const nonce = await nonceFor(secret, address, issuedAt);
-  const message = signInMessage({ address, issuedAt, nonce, host });
+  const message = signInMessage({ address, issuedAt, nonce });
   return { address, issuedAt, nonce, message, messageHex: toHex(message) };
 }
 
@@ -117,7 +116,7 @@ export async function verifyUserSignatures(restBase, address, messageHex, signat
 }
 
 /** The full verify step: nonce recomputed, issue time fresh, chain agrees */
-export async function verifySignIn(secret, restBase, host, body, fetchImpl = fetch, now = Date.now()) {
+export async function verifySignIn(secret, restBase, body, fetchImpl = fetch, now = Date.now()) {
   const address = normAddress(body && body.address);
   const issuedAt = String((body && body.issuedAt) || "");
   const nonce = String((body && body.nonce) || "");
@@ -126,7 +125,7 @@ export async function verifySignIn(secret, restBase, host, body, fetchImpl = fet
   if (!Number.isFinite(issued) || now - issued > CHALLENGE_TTL_MS || issued - now > 60 * 1000) return { ok: false, error: "the sign-in request expired; try again" };
   const expected = await nonceFor(secret, address, issuedAt);
   if (!timingSafeEqual(expected, nonce)) return { ok: false, error: "the sign-in request did not match; try again" };
-  const messageHex = toHex(signInMessage({ address, issuedAt, nonce, host }));
+  const messageHex = toHex(signInMessage({ address, issuedAt, nonce }));
   const valid = await verifyUserSignatures(restBase, address, messageHex, body.signatures, fetchImpl);
   if (!valid) return { ok: false, error: "the wallet's signature did not verify on chain" };
   return { ok: true, address };
