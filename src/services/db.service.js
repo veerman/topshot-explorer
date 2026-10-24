@@ -3,21 +3,55 @@ import { applyEditionOverrides, attachMintTotals } from "./overrides.service";
 const DB_NAME = "TopShotExplorerDB";
 const DB_VERSION = 6; // 6: account_collections store (browsed-address moment cache)
 
-// In-Memory RAM Caches
-let playsCache = null;
-let playsRawCache = null;
-let setsCache = null;
-let teamsCache = null;
-let editionsCache = null;
-let ipfsCache = null;
+// In-memory RAM caches, one per store. Callers asking at the same time
+// share the read in flight: Home asked for plays and raw plays together,
+// which read the plays store twice and editions and sets three times. A
+// write clears its cache once it lands and bumps a generation, so a read
+// begun before the write never refills the cache with the rows it replaced.
+function cachedRead(load) {
+  let value = null;
+  let pending = null;
+  let generation = 0;
+  return {
+    get() {
+      if (value) return Promise.resolve(value);
+      if (pending) return pending;
+      const g = generation;
+      const p = load().then((v) => {
+        if (g === generation) value = v;
+        if (pending === p) pending = null;
+        return v;
+      }, (err) => {
+        if (pending === p) pending = null;
+        throw err;
+      });
+      pending = p;
+      return p;
+    },
+    clear() {
+      value = null;
+      pending = null;
+      generation += 1;
+    }
+  };
+}
+
+// Each play carries its mint total and whether it sits in a Rookie
+// Ultimate set (the debut rule needs both), joined from the editions and
+// sets stores on read so a plays record never goes stale when mint
+// counts refresh; saving editions drops this cache too
+const playsCache = cachedRead(() => Promise.all([getAllRecords("plays"), getAllEditionsDB(), getAllSetsDB()])
+  .then(([records, editions, sets]) => attachMintTotals(records, editions, sets)));
+// Home and Corrections both read this on load and again on sync
+// completion, and the map re-derived ~9,000 objects each time
+const playsRawCache = cachedRead(() => getAllPlaysDB().then((plays) => plays.map((play) => (play._raw ? { playID: play.playID, ...play._raw } : play))));
+const setsCache = cachedRead(() => getAllRecords("sets"));
+const editionsCache = cachedRead(() => getAllRecords("editions"));
+const ipfsCache = cachedRead(() => getAllRecords("ipfs"));
+const teamsCache = cachedRead(() => readAllTeams());
 
 export function clearAllDBCaches() {
-  playsCache = null;
-  playsRawCache = null;
-  setsCache = null;
-  teamsCache = null;
-  editionsCache = null;
-  ipfsCache = null;
+  [playsCache, playsRawCache, setsCache, teamsCache, editionsCache, ipfsCache].forEach((c) => c.clear());
 }
 
 // 1. Establish and Open Database
@@ -244,62 +278,26 @@ export function savePlaysDB(playsArray) {
   return putRecordsBatch("plays", playsArray).then((ok) => {
     // Invalidate the RAM cache only after the write lands; invalidating before
     // let a concurrent read repopulate the cache with pre-write data.
-    playsCache = null;
-    playsRawCache = null;
+    playsCache.clear();
+    playsRawCache.clear();
     return ok;
   });
 }
 
-export function getAllPlaysDB() {
-  if (playsCache) {
-    return Promise.resolve(playsCache);
-  }
-  // Each play carries its mint total and whether it sits in a Rookie
-  // Ultimate set (the debut rule needs both), joined from the editions and
-  // sets stores on read so a plays record never goes stale when mint
-  // counts refresh; saving editions drops this cache too
-  return Promise.all([getAllRecords("plays"), getAllEditionsDB(), getAllSetsDB()]).then(([records, editions, sets]) => {
-    playsCache = attachMintTotals(records, editions, sets);
-    return playsCache;
-  });
-}
+export const getAllPlaysDB = () => playsCache.get();
 
-export function getAllPlaysRawDB() {
-  // Cached like the other accessors: Home and Corrections both call this on
-  // load and again on sync completion, and the map re-derived ~9,000
-  // objects each time
-  if (playsRawCache) {
-    return Promise.resolve(playsRawCache);
-  }
-  return getAllPlaysDB().then((plays) => {
-    playsRawCache = plays.map((play) => {
-      if (play._raw) {
-        return { playID: play.playID, ...play._raw };
-      }
-      return play;
-    });
-    return playsRawCache;
-  });
-}
+export const getAllPlaysRawDB = () => playsRawCache.get();
 
 // 7. Accessors for sets
 export function saveSetsDB(setsArray) {
   return putRecordsBatch("sets", setsArray).then((ok) => {
-    setsCache = null;
-    playsCache = null; // plays carry the Rookie Ultimate mark joined from sets
+    setsCache.clear();
+    playsCache.clear(); // plays carry the Rookie Ultimate mark joined from sets
     return ok;
   });
 }
 
-export function getAllSetsDB() {
-  if (setsCache) {
-    return Promise.resolve(setsCache);
-  }
-  return getAllRecords("sets").then((records) => {
-    setsCache = records;
-    return records;
-  });
-}
+export const getAllSetsDB = () => setsCache.get();
 
 export function getAllSetsRawDB() {
   return getAllSetsDB().then((sets) => {
@@ -315,22 +313,14 @@ export function getAllSetsRawDB() {
 // 8. Accessors for editions
 export function saveEditionsDB(editionsArray) {
   return putRecordsBatch("editions", editionsArray).then((ok) => {
-    editionsCache = null;
-    playsCache = null; // plays carry mint totals joined from editions
-    playsRawCache = null;
+    editionsCache.clear();
+    playsCache.clear(); // plays carry mint totals joined from editions
+    playsRawCache.clear();
     return ok;
   });
 }
 
-export function getAllEditionsDB() {
-  if (editionsCache) {
-    return Promise.resolve(editionsCache);
-  }
-  return getAllRecords("editions").then((records) => {
-    editionsCache = records;
-    return records;
-  });
-}
+export const getAllEditionsDB = () => editionsCache.get();
 
 export function getSetEditionsDB(setID) {
   return getRecordsByKeyPrefix("editions", `${Number(setID)}_`);
@@ -339,20 +329,12 @@ export function getSetEditionsDB(setID) {
 // 9. Accessors for IPFS CIDs
 export function saveIPFSCIDsDB(ipfsArray) {
   return putRecordsBatch("ipfs", ipfsArray).then((ok) => {
-    ipfsCache = null;
+    ipfsCache.clear();
     return ok;
   });
 }
 
-export function getAllIPFSDB() {
-  if (ipfsCache) {
-    return Promise.resolve(ipfsCache);
-  }
-  return getAllRecords("ipfs").then((records) => {
-    ipfsCache = records;
-    return records;
-  });
-}
+export const getAllIPFSDB = () => ipfsCache.get();
 
 export function getSetIPFSDB(setID) {
   return getRecordsByKeyPrefix("ipfs", `${Number(setID)}_`);
@@ -426,7 +408,7 @@ export function saveTeamsDB(teamsArray) {
         });
 
         tx.oncomplete = () => {
-          teamsCache = null;
+          teamsCache.clear();
           resolve(true);
         };
         tx.onerror = () => resolve(false);
@@ -440,10 +422,9 @@ export function saveTeamsDB(teamsArray) {
   });
 }
 
-export function getAllTeamsDB() {
-  if (teamsCache) {
-    return Promise.resolve(teamsCache);
-  }
+export const getAllTeamsDB = () => teamsCache.get();
+
+function readAllTeams() {
   return getDB().then((db) => {
     return new Promise((resolve) => {
       try {
@@ -464,7 +445,6 @@ export function getAllTeamsDB() {
               });
               cursor.continue();
             } else {
-              teamsCache = results;
               resolve(results);
             }
           } catch (err) {
