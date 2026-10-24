@@ -1618,15 +1618,19 @@ span.ipfs-line {
   margin-top: 0;
 }
 
-/* Owned moments of a set with parallels: one row per parallel */
+/* Owned moments of a set with parallels: one row per parallel. It fits
+   its container (AGENTS.md: no sideways scroll): headings and parallel
+   names wrap, the numbers keep one line, and narrow screens tighten the
+   gaps. */
 .owned-table-wrap {
-  overflow-x: auto;
   max-width: 100%;
   margin-top: 12px;
 }
 .owned-table {
   border-collapse: collapse;
   font-size: 0.9rem;
+}
+.owned-table tbody td {
   white-space: nowrap;
 }
 .owned-table th,
@@ -1658,6 +1662,23 @@ span.ipfs-line {
 .owned-table tbody tr + tr td,
 .owned-table tbody tr + tr th {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+/* Last, so it wins over the rules above at the same specificity */
+@media (max-width: 640px) {
+  .owned-set-banner {
+    padding: 10px;
+  }
+  .owned-table {
+    font-size: clamp(0.62rem, 2.9vw, 0.82rem);
+  }
+  .owned-table th,
+  .owned-table td {
+    padding-right: 6px;
+  }
+  .owned-table thead th {
+    font-size: 0.56rem;
+    letter-spacing: 0;
+  }
 }
 .play-id-link {
   text-decoration: none;
