@@ -34,6 +34,7 @@ let state = {
   graph: null, // getAccountGraph result: dapper flag, parents, children, COAs (null for an EVM address)
   included: [], // linked addresses checked into the context (persisted)
   linked: {}, // per included address: { status, moments, fetchedAt, error }
+  linkedMoments: null, // every linked account's moments in one array (see update)
 
   status: "idle", // idle | loading | ready | error
   moments: null, // [[momentID, setID, playID, serial, subeditionID], ...]
@@ -48,8 +49,21 @@ function notify() {
   listeners.forEach((l) => l({ ...state }));
 }
 
+// The moments arrays linkedMoments was last merged from. A linked
+// account's status change (loading, ready) replaces linked with the same
+// arrays, so the merged array is kept and pages skip rebuilding their
+// owned index.
+let linkedParts = [];
+function mergeLinked(linked) {
+  const parts = Object.values(linked).map((l) => l.moments).filter(Array.isArray);
+  if (parts.length === linkedParts.length && parts.every((p, i) => p === linkedParts[i])) return state.linkedMoments;
+  linkedParts = parts;
+  return parts.length > 0 ? parts.flat() : null;
+}
+
 function update(patch) {
-  state = { ...state, ...patch };
+  const linkedMoments = patch.linked ? mergeLinked(patch.linked) : state.linkedMoments;
+  state = { ...state, ...patch, linkedMoments };
   notify();
 }
 

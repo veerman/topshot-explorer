@@ -21,10 +21,7 @@ export function useAccountCollection() {
 
   // Linked accounts checked into the context (account menu) contribute
   // their moments; the merged list is what every page sees as "owned"
-  const linkedMoments = useMemo(() => {
-    const parts = Object.values(ctx.linked || {}).map((l) => l.moments).filter(Array.isArray);
-    return parts.length > 0 ? parts.flat() : null;
-  }, [ctx.linked]);
+  const linkedMoments = ctx.linkedMoments;
   const moments = useMemo(
     () => (Array.isArray(ctx.moments) && linkedMoments ? ctx.moments.concat(linkedMoments) : ctx.moments),
     [ctx.moments, linkedMoments]
@@ -60,10 +57,13 @@ export function useAccountCollection() {
 
   // The wrapper must keep a stable identity between renders: pages put
   // the whole return value in useMemo dep arrays, and a fresh literal
-  // every render would defeat all of them
+  // every render would defeat all of them. It holds only what pages read:
+  // with the load status, progress and account graph in it (the navbar
+  // reads those from its own subscription), every progress tick and the
+  // graph's arrival rebuilt every account table and matrix.
   const owned = useMemo(
-    () => ({ address: ctx.address, addresses: [ctx.address, ...(ctx.included || [])], status: ctx.status, progress: ctx.progress, error: ctx.error, graph: ctx.graph, index }),
-    [ctx.address, ctx.included, ctx.status, ctx.progress, ctx.error, ctx.graph, index]
+    () => ({ address: ctx.address, addresses: [ctx.address, ...(ctx.included || [])], index }),
+    [ctx.address, ctx.included, index]
   );
   if (!ctx.address) return null;
   return owned;
