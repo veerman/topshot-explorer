@@ -117,8 +117,12 @@ npm run atlas:burns        moments destroyed per edition into data/burns.json, t
                            remaining-supply source; rerun after each harvest
 npm run atlas:autographs   which parallels are signed, into data/autographs.json;
                            the Autograph badge follows it per parallel
+npm run atlas:sets         what a new set needs: its tier vs Atlas, and a name for
+                           its series (suggested from its plays' season); --apply
+                           writes only what is missing, differences are reported
 npm run atlas:refresh      the routine: one harvest, then burns and autographs
-                           applied and the three checks reported (apply a check only when it
+                           applied, new sets' tiers and series names filled, and
+                           the three checks reported (apply a check only when it
                            shows a new set, parallel or badge); then deploy
 ```
 
