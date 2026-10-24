@@ -42,9 +42,9 @@ coding agents.
 - **Smart sync**: a full first sync takes under a minute; afterwards only new
   plays and sets are fetched incrementally, and every sync pass re-reads the
   mint count and retired flag of every edition (open editions keep minting,
-  so counts are never allowed to go stale). Leftover placeholder rows from
-  the prototype era (fabricated mint counts or IPFS CIDs) are detected and
-  rebuilt from chain automatically. All heavy pages read from IndexedDB,
+  so counts are never allowed to go stale). Leftover placeholder mint
+  counts from the prototype era are corrected from chain the same way.
+  All heavy pages read from IndexedDB,
   not the chain.
 
 ## Data correction layer

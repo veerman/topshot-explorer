@@ -226,15 +226,20 @@ override a chain fix has made unnecessary.
 7. On every pass re-read one batch of 200 existing plays, a batch further
    along each time (`playRefreshCursor` in the sync stats; about 47 visits
    cover the catalogue, then it starts over), and recompile only a play
-   whose raw metadata changed on chain. Edits are rare, so this is one
+   whose raw metadata changed on chain (or that is missing from the
+   store, a write that never landed). Edits are rare, so this is one
    small request per visit, never a re-download; with the proxy's day-long
    cache on the play script, an edit reaches a regular visitor within days.
 
 Self-heals run in the "nothing new" branch: empty teams store, empty
-editions store, prototype-era fake CIDs (any CID shorter than 46
-characters; real ones are 46 for `Qm...` or 59 for `bafy...`) and missing
-edition placeholders. The one-shot IPFS backfill gated by a localStorage
-flag is gone: step 5 covers its sets, 27 and 52 included.
+editions store and missing edition placeholders. The heal for
+prototype-era fake CIDs is gone (it wiped both detail stores and
+refetched through `getSetDetails`, which cannot return sets 27 and 52),
+as is the one-shot IPFS backfill gated by a localStorage flag: step 5
+covers its sets, 27 and 52 included. A store write that does not land
+(storage full) throws, so the pass fails and its stats stay unsaved; the
+next visit tries again. Force Full Re-Sync wipes every store and runs a
+first visit, seed included.
 
 ### 2.5 The IndexedDB shape
 

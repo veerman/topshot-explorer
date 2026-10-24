@@ -15,7 +15,6 @@ import {
   saveEditionsDB,
   saveIPFSCIDsDB,
   clearAllStoresDB,
-  clearStoresDB,
   clearAllDBCaches,
   getAllSetsDB,
   getAllEditionsDB,
@@ -390,9 +389,11 @@ async function refreshPlaysSlice(cursor, maxPlayID) {
   ]);
   const storedRaw = new Map(stored.map((p) => [Number(p.playID), p._raw]));
   const changed = new Map();
+  // A play missing from the store (a write that never landed) is stored
+  // now, like an edited one
   fetched.forEach((p) => {
     const id = Number(p.playID);
-    if (p.metadata && storedRaw.has(id) && !sameRaw(storedRaw.get(id), p.metadata)) changed.set(id, p.metadata);
+    if (p.metadata && (!storedRaw.has(id) || !sameRaw(storedRaw.get(id), p.metadata))) changed.set(id, p.metadata);
   });
   if (changed.size > 0) {
     // Prime the name aliases and the player bio index with the new values
@@ -401,7 +402,7 @@ async function refreshPlaysSlice(cursor, maxPlayID) {
     buildNameAliases(rawPlays);
     await savePlaysDB([...changed].map(([id, md]) => compilePlayMetadata(id, { ...md })).filter(Boolean));
     await rebuildTeams();
-    log(`Play refresh: ${changed.size} of plays ${start}-${end} changed on chain; recompiled.`);
+    log(`Play refresh: ${changed.size} of plays ${start}-${end} changed on chain or were missing; recompiled.`);
   }
   return end >= maxPlayID ? 1 : end + 1;
 }
@@ -698,13 +699,12 @@ export async function runSmartSync() {
         stage: "Incremental updates detected. Syncing..."
       });
     } else {
-      // Four independent store reads, all cold on a fresh page load; one
-      // round of parallel IndexedDB transactions instead of four in series
-      const [teams, existingSets, existingEditions, existingIpfs] = await Promise.all([
+      // Three independent store reads, all cold on a fresh page load; one
+      // round of parallel IndexedDB transactions instead of three in series
+      const [teams, existingSets, existingEditions] = await Promise.all([
         getAllTeamsDB(),
         getAllSetsDB(),
-        getAllEditionsDB(),
-        getAllIPFSDB()
+        getAllEditionsDB()
       ]);
 
       // Ensure teams database store is populated even if already up to date
@@ -716,24 +716,16 @@ export async function runSmartSync() {
       // can leave plays/sets populated while the editions/ipfs stores are
       // empty; the reconstructed sync stats then report up-to-date forever.
       // Backfill the editions and IPFS details when that state is detected.
-      // Self-heal 2 (2026-09-01): prototype-seeded ipfs rows carry
-      // placeholder CIDs like "bafy24170HERO"; real CIDs are 46+ chars
-      // (CIDv0 Qm... = 46, CIDv1 bafy... = 59). Rebuild both detail stores
-      // when any are found, mirroring the fabricated-momentCount fix.
-      const hasFakeCids = existingIpfs.some((rec) =>
-        Object.values(rec.cids || {}).some((cid) => cid && String(cid).length < 46));
-      if (existingSets.length > 0 && (existingEditions.length === 0 || hasFakeCids)) {
-        log(hasFakeCids
-          ? "Fabricated placeholder IPFS CIDs detected. Rebuilding editions & IPFS details from chain..."
-          : "Editions store is empty despite synced sets. Backfilling editions & IPFS details...");
+      // (A second heal, for placeholder CIDs from a 2026 prototype, wiped
+      // both stores and refetched through getSetDetails, which cannot
+      // return the biggest sets; it was removed so it can never gut them.)
+      if (existingSets.length > 0 && existingEditions.length === 0) {
+        log("Editions store is empty despite synced sets. Backfilling editions & IPFS details...");
         updateStatus({ stage: "Phase 4: Syncing IPFS CIDs & edition details...", progressPercent: 5 });
         const { detailedEditions, detailedIPFS } = await fetchAllSetDetails(5, 95);
         if (detailedEditions.length > 0) {
-          // Wipe first so stale fabricated rows cannot survive the upsert
-          if (hasFakeCids) await clearStoresDB(["editions", "ipfs"]);
           await saveEditionsDB(detailedEditions);
           await saveIPFSCIDsDB(detailedIPFS);
-
         }
       }
 
@@ -907,22 +899,17 @@ export async function runSmartSync() {
   }
 }
 
-// Force re-sync trigger
+// Force re-sync trigger: wipe every store, then run a first visit,
+// which loads the prebuilt seed when the deployment ships one and walks
+// the chain only when it does not
 export async function forceFullSync() {
-  updateStatus({
-    isSyncing: true,
-    stage: "Wiping database stores...",
-    progressPercent: 0
-  });
-
-  try {
-    await clearAllStoresDB();
-    const liveStats = await getTopshotStats();
-    await performPhasedFullSync(liveStats);
-  } catch (err) {
-    console.error("Force full re-sync failed:", err);
-    updateStatus({ isSyncing: false, stage: "Wipe error occurred" });
+  if (currentStatus.isSyncing) return;
+  updateStatus({ stage: "Wiping database stores...", progressPercent: 0 });
+  if (!(await clearAllStoresDB())) {
+    updateStatus({ stage: "Wipe error occurred" });
+    return;
   }
+  await runSmartSync();
 }
 
 // Sequenced Data Loading Pipeline

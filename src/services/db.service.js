@@ -278,9 +278,18 @@ export function putRecordsBatch(storeName, values) {
   });
 }
 
+// The store saves below throw when the write does not land (storage
+// full, a closed connection), so a sync that loses rows fails like any
+// other error and leaves its stats unsaved: the next visit tries again
+// instead of believing the rows are there.
+const mustLand = (storeName) => (ok) => {
+  if (!ok) throw new Error(`could not write to the ${storeName} store`);
+  return ok;
+};
+
 // 6. Accessors for plays
 export function savePlaysDB(playsArray) {
-  return putRecordsBatch("plays", playsArray).then((ok) => {
+  return putRecordsBatch("plays", playsArray).then(mustLand("plays")).then((ok) => {
     // Invalidate the RAM cache only after the write lands; invalidating before
     // let a concurrent read repopulate the cache with pre-write data.
     playRecordsCache.clear();
@@ -296,7 +305,7 @@ export const getAllPlaysRawDB = () => playsRawCache.get();
 
 // 7. Accessors for sets
 export function saveSetsDB(setsArray) {
-  return putRecordsBatch("sets", setsArray).then((ok) => {
+  return putRecordsBatch("sets", setsArray).then(mustLand("sets")).then((ok) => {
     setsCache.clear();
     playsCache.clear(); // plays carry the Rookie Ultimate mark joined from sets
     return ok;
@@ -318,7 +327,7 @@ export function getAllSetsRawDB() {
 
 // 8. Accessors for editions
 export function saveEditionsDB(editionsArray) {
-  return putRecordsBatch("editions", editionsArray).then((ok) => {
+  return putRecordsBatch("editions", editionsArray).then(mustLand("editions")).then((ok) => {
     editionsCache.clear();
     playsCache.clear(); // plays carry mint totals joined from editions
     return ok;
@@ -333,7 +342,7 @@ export function getSetEditionsDB(setID) {
 
 // 9. Accessors for IPFS CIDs
 export function saveIPFSCIDsDB(ipfsArray) {
-  return putRecordsBatch("ipfs", ipfsArray).then((ok) => {
+  return putRecordsBatch("ipfs", ipfsArray).then(mustLand("ipfs")).then((ok) => {
     ipfsCache.clear();
     return ok;
   });
@@ -400,6 +409,10 @@ export function saveAccountCollectionDB(record) {
 }
 
 // 12. Accessors for teams
+// The array is the whole collection (rebuildTeams derives it from every
+// play), so the store is cleared in the same transaction: a team key that
+// no play carries any more does not linger, and a failed write leaves the
+// old collection whole.
 export function saveTeamsDB(teamsArray) {
   return getDB().then((db) => {
     return new Promise((resolve) => {
@@ -407,6 +420,7 @@ export function saveTeamsDB(teamsArray) {
         const tx = db.transaction("teams", "readwrite");
         const store = tx.objectStore("teams");
 
+        store.clear();
         teamsArray.forEach((team) => {
           const { key, ...rest } = team;
           store.put(rest, key);
@@ -424,7 +438,7 @@ export function saveTeamsDB(teamsArray) {
         resolve(false);
       }
     });
-  });
+  }).then(mustLand("teams"));
 }
 
 export const getAllTeamsDB = () => teamsCache.get();
