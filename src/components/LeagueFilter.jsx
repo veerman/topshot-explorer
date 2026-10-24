@@ -24,7 +24,7 @@ export function LeagueFilter({ options, selected, onSelect, children }) {
               cursor: "pointer",
               fontWeight: "600",
               fontSize: "0.85rem",
-              transition: "all 0.2s",
+              transition: "background-color 0.2s",
               whiteSpace: "nowrap"
             }}
           >

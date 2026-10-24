@@ -873,7 +873,7 @@ export function Navbar() {
           width: 0;
           height: 2px;
           background: var(--primary);
-          transition: var(--transition-smooth);
+          transition: width 0.3s var(--ease-smooth);
         }
         .nav-item:hover::after, .nav-item.active::after {
           width: 100%;

@@ -72,7 +72,15 @@
   --font-mono: 'Outfit', var(--font-emoji), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   
   --glass-blur: blur(16px);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* The visual properties only, never `all` (AGENTS.md): animating `all`
+     animates size and position too, so hovers lag and boxes slide while
+     the page loads. A rule that grows something names it itself
+     (.nav-item::after, width). */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: color 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth),
+    border-color 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth), opacity 0.3s var(--ease-smooth),
+    transform 0.3s var(--ease-smooth), filter 0.3s var(--ease-smooth), text-shadow 0.3s var(--ease-smooth),
+    outline-color 0.3s var(--ease-smooth), fill 0.3s var(--ease-smooth), stroke 0.3s var(--ease-smooth);
   --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 
                     0 1px 3px rgba(255, 255, 255, 0.05) inset;
 }
