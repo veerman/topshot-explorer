@@ -95,10 +95,15 @@ types are in `src/services/flowEvents.service.js`.
 ### 2.2 Access node and the caching proxy
 
 One build-time knob, `VITE_FLOW_ACCESS_NODE`, defaulting to
-`https://rest-mainnet.onflow.org`. Both transports read it: FCL for
-scripts (`fcl.service.js`) and plain `fetch` for events
-(`flowEvents.service.js`). The `typeof import.meta.env` guard exists so
-the same modules run under Node in the maintenance scripts.
+`https://rest-mainnet.onflow.org`. Both transports read it, both plain
+`fetch`: scripts through `flow.query.js` (FCL's own request, retries and
+decoder, without FCL; every request body is byte for byte what
+`fcl.query` sent, so cache keys did not move), events through
+`flowEvents.service.js`. FCL itself loads only for a wallet
+(`wallet.service.js`: on the first wallet action, or at once when FCL
+remembers a connected wallet), which keeps about 60 KB compressed off
+every other visit. The `typeof import.meta.env` guard exists so the same
+modules run under Node in the maintenance scripts.
 
 A personal instance can talk to the public node directly. A public
 instance should not: v1 was reworked precisely because every visitor
@@ -159,7 +164,8 @@ Semantics worth keeping:
 - `salePrice` null means not listed.
 - The contract never decrements `numberMintedPerPlay` on burn, so burned
   sets (the four Platinum Ice sets) carry an off-chain `burned` flag.
-- **FCL decodes every integer as a string.** Coerce with `Number()`
+- **FCL's decoder (and `flow.query.js`, which keeps it) returns every
+  integer as a string.** Coerce with `Number()`
   before comparing; a strict `includes()` on numeric ids matches nothing.
   `UFix64` is kept as a string on purpose so no precision is invented.
 - Address arguments want bare hex without `0x`.

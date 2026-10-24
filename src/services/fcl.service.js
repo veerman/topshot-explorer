@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import { query, setAccessNode } from "./flow.query";
 
 // Configuration for Flow mainnet
 export const TOPSHOT_ADDRESS = "0b2a3299cc857e29";
@@ -16,9 +16,9 @@ export function initFCL() {
   const accessNode =
     (typeof import.meta.env !== "undefined" && import.meta.env.VITE_FLOW_ACCESS_NODE) ||
     "https://rest-mainnet.onflow.org";
-  fcl.config({
-    "accessNode.api": accessNode
-  });
+  // Script reads go through flow.query (FCL's own request and decoder,
+  // without FCL); the wallet takes the same node when it loads FCL
+  setAccessNode(accessNode);
 }
 
 // Mint count per subedition (parallel). Not readable from the chain (the
@@ -92,7 +92,7 @@ export const subeditionLabel = (sub) =>
 
 // 1. Get TopShot contract metadata (Total Supply, nextPlayID, nextSetID, currentSeries)
 export async function getTopshotStats() {
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) struct Stats {
@@ -117,7 +117,7 @@ export async function getTopshotStats() {
 
 // 2. Get all subeditions from smart contract
 export async function getSubeditions() {
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) struct Sub {
@@ -153,7 +153,7 @@ export async function getSubeditions() {
 
 // 3. Get all sets (names, series, locked status, and playIDs in them)
 export async function getSetsOverview() {
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) struct SetPlays {
@@ -189,7 +189,7 @@ export async function getSetsOverview() {
 // 4. Fetch metadata for a batch of specific Play IDs
 export async function fetchPlayBatch(playIDs) {
   if (!playIDs || playIDs.length === 0) return [];
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) struct PlayInfo {
@@ -215,7 +215,7 @@ export async function fetchPlayBatch(playIDs) {
 
 // 5. Get detailed info of a single set (Creation order, Play IDs, retired status, play mint sizes, and play metadata)
 export async function getSetDetails(setID) {
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       import TopShotIPFSResolver from 0x${IPFS_RESOLVER_ADDRESS}
@@ -303,7 +303,7 @@ export async function getSetDetails(setID) {
 // on every pass with this instead of refetching full set details.
 // Returns { setID: { playID: { minted, retired } } }.
 export async function getMintCounts(setIDs) {
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(ids: [UInt32]): {UInt32: {UInt32: [UInt32]}} {
@@ -339,7 +339,7 @@ export async function getMintCounts(setIDs) {
 // computation limit on the biggest sets (27 and 52, Platinum Ice), so the
 // sync self-heal and the seed generator read CIDs through this instead.
 export async function getSetCIDs(setID, playIDs) {
-  return fcl.query({
+  return query({
     cadence: `
       import TopShotIPFSResolver from 0x${IPFS_RESOLVER_ADDRESS}
       access(all) fun main(setID: UInt32, playIDs: [UInt32]): {UInt32: {String: String}} {
@@ -360,7 +360,7 @@ export async function getSetCIDs(setID, playIDs) {
 export async function getAccountDetails(address) {
   // Normalize address (remove 0x prefix if exists, fcl needs it with 0x inside cadence though)
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       import Market from 0x${MARKET_ADDRESS}
@@ -404,7 +404,7 @@ export async function getAccountDetails(address) {
 // 6b. Get every moment ID in an address's collection (IDs only, one call)
 export async function getCollectionIDs(address) {
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(): [UInt64] {
@@ -426,7 +426,7 @@ export async function getCollectionIDs(address) {
 export async function getCollectionData(address, momentIDs) {
   if (!momentIDs || momentIDs.length === 0) return [];
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(ids: [UInt64]): [[UInt64]] {
@@ -456,7 +456,7 @@ export async function getCollectionData(address, momentIDs) {
 // owner does not expose the moment, so callers can try other candidates.
 export async function getMomentByOwner(address, momentID) {
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(id: UInt64): [UInt64]? {
@@ -484,7 +484,7 @@ export async function getMomentByOwner(address, momentID) {
 // exposes; ids the owner does not expose are simply absent.
 export async function getMomentsByOwner(address, momentIDs) {
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(ids: [UInt64]): [[UInt64]] {
@@ -517,7 +517,7 @@ export async function getMomentsByOwner(address, momentIDs) {
 // "currently on EVM" and the ERC721's totalSupply is "ever bridged".
 export async function getBridgeStats() {
   const current = Number(
-    await fcl.query({
+    await query({
       cadence: `
         import TopShot from 0x${TOPSHOT_ADDRESS}
         import FlowEVMBridgeUtils from 0x1e4aa0b87d10b141
@@ -578,7 +578,7 @@ export async function getBridgeStats() {
 // getAuthAccount reads storage, so this is script-only (fine: it is one).
 export async function getAccountGraph(address) {
   const cleanAddr = stripHexPrefix(address);
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import HybridCustody from 0xd8a7e05a7ac670c0
       import EVM from 0xe467b9dd11fa00df
@@ -676,7 +676,7 @@ export async function getEvmCollectionIDs(evmHex, { pageSize = 1000 } = {}) {
   const out = [];
   let from = 0;
   for (;;) {
-    const page = await fcl.query({
+    const page = await query({
       cadence: `
         import EVM from 0xe467b9dd11fa00df
         import FlowEVMBridgeUtils from 0x1e4aa0b87d10b141
@@ -715,7 +715,7 @@ export async function getEvmCollectionIDs(evmHex, { pageSize = 1000 } = {}) {
 // cache can merge both.
 export async function getEscrowMomentData(momentIDs) {
   if (!momentIDs || momentIDs.length === 0) return [];
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       import FlowEVMBridgeUtils from 0x1e4aa0b87d10b141
@@ -757,7 +757,7 @@ export async function getAccountMoments(address, momentIDs) {
   // is left out and only the escrow is searched
   const cleanAddr = stripHexPrefix(address);
   const holderHex = /^[0-9a-f]{16}$/i.test(cleanAddr) ? `0x${cleanAddr}` : null;
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       import Market from 0x${MARKET_ADDRESS}
@@ -872,7 +872,7 @@ export async function getSaleData(address, momentIDs, useV3) {
   if (!momentIDs || momentIDs.length === 0) return [];
   const cleanAddr = stripHexPrefix(address);
   const collectionPath = useV3 ? "topshotSalev3Collection" : "topshotSaleCollection";
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShot from 0x${TOPSHOT_ADDRESS}
       import Market from 0x${MARKET_ADDRESS}
@@ -907,7 +907,7 @@ export async function getSaleData(address, momentIDs, useV3) {
 // over time, so callers should not cache this across sessions.
 export async function getLockData(momentIDs) {
   if (!momentIDs || momentIDs.length === 0) return [];
-  const resp = await fcl.query({
+  const resp = await query({
     cadence: `
       import TopShotLocking from 0x${TOPSHOT_ADDRESS}
       access(all) fun main(ids: [UInt64]): [[UFix64]] {
@@ -957,7 +957,7 @@ export async function getOffersMadeBy(address) {
   const cleanAddr = stripHexPrefix(address);
   let resp;
   try {
-    resp = await fcl.query({
+    resp = await query({
       cadence: `
         import OffersV2 from 0xb8ea91944fd51c43
         import DapperOffersV2 from 0xb8ea91944fd51c43
@@ -974,7 +974,7 @@ export async function getOffersMadeBy(address) {
     });
   } catch {
     // Two-phase fallback for oversized books
-    const ids = await fcl.query({
+    const ids = await query({
       cadence: `
         import DapperOffersV2 from 0xb8ea91944fd51c43
         access(all) fun main(): [UInt64] {
@@ -987,7 +987,7 @@ export async function getOffersMadeBy(address) {
     });
     resp = [];
     for (let i = 0; i < ids.length; i += 5000) {
-      resp.push(...await fcl.query({
+      resp.push(...await query({
         cadence: `
           import OffersV2 from 0xb8ea91944fd51c43
           import DapperOffersV2 from 0xb8ea91944fd51c43

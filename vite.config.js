@@ -253,19 +253,20 @@ export default defineConfig({
   // for the ~1.6MB of data files in the bundle
   json: { stringify: true },
   // The main bundle in three files that change at different rates, so a
-  // deploy re-downloads only what changed: the libraries (Preact, the
-  // router, FCL; every package in the build sits in the main chunk, none
-  // only in a lazy page), the data the main chunk imports, and the app
-  // code. The data list is explicit: a data file only lazy pages use
-  // (commentary, logos, the Dapper ids, the Early Adopters list) must not
-  // move into the first download, so a new file stays where the bundler
-  // puts it until it is added here.
+  // deploy re-downloads only what changed: the libraries every page needs
+  // (Preact and the router), the data the main chunk imports, and the app
+  // code. Both lists are explicit, because a group captures a module even
+  // when only a lazy chunk uses it: FCL loads only for a wallet
+  // (wallet.service), and a data file only lazy pages use (commentary,
+  // logos, the Dapper ids, the Early Adopters list) must not move into the
+  // first download, so a new file stays where the bundler puts it until it
+  // is added here.
   build: {
     rolldownOptions: {
       output: {
         codeSplitting: {
           groups: [
-            { name: 'vendor', test: /[\\/]node_modules[\\/]/, priority: 2 },
+            { name: 'vendor', test: /[\\/]node_modules[\\/](preact|react-router|react-router-dom)[\\/]/, priority: 2 },
             {
               name: 'data',
               test: /[\\/]data[\\/]((additions|overrides|awards)[\\/][^\\/]+|burns|autographs|census_stats|collection_sizes|ipfs_dead|ipfs_media_summary|leagues|plays_exclude|sets_parallels)\.json$/,

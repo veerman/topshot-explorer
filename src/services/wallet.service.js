@@ -1,7 +1,7 @@
-import * as fcl from "@onflow/fcl";
 import { useState, useEffect } from "react";
 import { resetLookups, setLookupGate } from "./usernames.service";
 import { getAccountContext, setAccountAddress, clearAccountAddress } from "./account.context";
+import { getAccessNode } from "./flow.query";
 
 /**
  * Wallet sign-in. A wallet (Flow Wallet, Dapper Wallet, any FCL
@@ -19,12 +19,10 @@ const DAPPER_WALLET_ID = "0xead892083b3e2c6c";
 // Shot collectors keep anything. Discovery shows both on desktop only;
 // mobile already lists just Flow Wallet and Dapper Wallet.
 const HIDDEN_WALLET_IDS = ["0x55ad22f01ef568a1", "0x95b85a9ef4daabb1"];
-let configured = false;
-function configureWallet() {
-  if (configured) return;
-  configured = true;
+function configureWallet(fcl) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   fcl.config({
+    "accessNode.api": getAccessNode(),
     "flow.network": "mainnet",
     "discovery.wallet": "https://fcl-discovery.onflow.org/authn",
     "discovery.authn.endpoint": "https://fcl-discovery.onflow.org/api/authn",
@@ -35,6 +33,34 @@ function configureWallet() {
     "app.detail.url": origin
   });
 }
+
+// FCL (about 60 KB compressed; script reads go through flow.query) loads
+// only for a wallet: on the first wallet action, or at once when FCL
+// remembers a connected wallet from an earlier visit (its CURRENT_USER in
+// localStorage). Once loaded it stays in fclModule, so signing the message
+// can call it with no await in front, inside the click that asked.
+let fclModule = null;
+let fclPromise = null;
+function loadFcl() {
+  if (!fclPromise) {
+    fclPromise = import("@onflow/fcl").then((fcl) => {
+      configureWallet(fcl);
+      fclModule = fcl;
+      watchWallet(fcl);
+      return fcl;
+    });
+    fclPromise.catch(() => { fclPromise = null; });
+  }
+  return fclPromise;
+}
+const rememberedWallet = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("CURRENT_USER") || "null");
+    return Boolean(user && user.loggedIn && user.addr);
+  } catch {
+    return false;
+  }
+};
 
 // ---- session store ---------------------------------------------------------
 let session = { status: "unknown", address: null, error: null, busy: false, wallet: null, challenge: null };
@@ -59,8 +85,7 @@ function walletFacts(user) {
  * signed inside one click. Connecting and disconnecting run through here
  * too (connectWallet / signOut).
  */
-function watchWallet() {
-  configureWallet();
+function watchWallet(fcl) {
   fcl.currentUser.subscribe((user) => {
     if (user && user.loggedIn && user.addr) {
       const w = walletFacts(user);
@@ -81,7 +106,7 @@ export const isProved = (s = session) => s.status === "signed" && Boolean(s.wall
 /** Ask the host once who the cookie says we are, and FCL which wallet is connected */
 export function ensureSession() {
   if (asked) return asked;
-  try { watchWallet(); } catch { /* no window */ }
+  if (rememberedWallet()) loadFcl().catch((err) => console.warn("wallet library unavailable:", err));
   // A host without the sign-in route answers with the app shell, not JSON
   let hostSignsIn = false;
   asked = fetch("/auth/me", { headers: { accept: "application/json" } })
@@ -135,9 +160,9 @@ const fetchChallenge = async (address) => {
  * the click that asked for it, so connect and sign are separate clicks.
  */
 export async function connectWallet() {
-  configureWallet();
   set({ busy: true, error: null, challenge: null });
   try {
+    const fcl = await loadFcl();
     await fcl.unauthenticate();
     const user = await fcl.authenticate();
     if (!user || !user.addr) throw new Error("no wallet connected");
@@ -185,6 +210,8 @@ export async function signIn({ quiet = false } = {}) {
       set({ challenge: ch, busy: false, error: "The sign-in request had expired; a new one is ready, click Sign again." });
       return session;
     }
+    // A connected wallet means FCL is loaded (it connected or remembered it)
+    const fcl = fclModule || await loadFcl();
     const signatures = await fcl.currentUser.signUserMessage(ch.messageHex);
     const vRes = await fetch("/auth/verify", {
       method: "POST",
@@ -223,7 +250,10 @@ export async function signOut() {
   const wallet = session.wallet;
   set({ busy: true });
   try { await fetch("/auth/signout", { method: "POST" }); } catch { /* cookie may already be gone */ }
-  try { await fcl.unauthenticate(); } catch { /* not connected */ }
+  try {
+    const fcl = fclModule || (rememberedWallet() ? await loadFcl() : null);
+    if (fcl) await fcl.unauthenticate();
+  } catch { /* not connected */ }
   set({ status: "anonymous", address: null, busy: false, error: null, wallet: null, challenge: null });
   resetLookups();
   setLookupGate(false);
