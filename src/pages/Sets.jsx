@@ -21,7 +21,7 @@ import { supplyOf, otherSupplyOf, remainingOf, isRemainingSupply } from "../serv
 import { Supply } from "../components/Supply";
 import { computeIpfsCoverageForSets, formatCoveragePct, buildCoverageTooltip, isMismintPlay } from "../services/ipfs.analysis";
 import { getSetStatus, getSetTier, getEditionTier, isMismintSet, MIXED_TIER } from "../services/set.status";
-import { parallelGroup } from "../services/parallel.groups";
+import { parallelGroup, PARALLEL_ORDER } from "../services/parallel.groups";
 import { TIER_ORDER, TIER_COLORS } from "../utils/display.utils";
 
 import { DataTable } from "../components/DataTable";
@@ -90,7 +90,10 @@ export function Sets() {
   const navigate = useNavigate();
   const seriesFilter = searchParams.get("series");
   const tierFilter = searchParams.get("tier");
-  const parallelFilter = searchParams.get("parallel");
+  // A size group the app no longer has (a link saved before the buckets
+  // changed) filters nothing, so the link opens every set
+  const parallelParam = searchParams.get("parallel");
+  const parallelFilter = PARALLEL_ORDER.includes(parallelParam) ? parallelParam : null;
   const DEEP_LINK_KEYS = ["series", "tier", "parallel"];
 
   // Find total mints and subedition breakdowns offline
