@@ -433,10 +433,13 @@ function TierMatrix({ league, rows, ipfs, columns = TIER_ORDER, colors = TIER_CO
   // 108K), the totals row included.
   const unitFor = (max) => (max >= 2000000 ? "M" : max >= 10000 ? "K" : "");
   const oneDecimal = (x) => x.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  // A non-zero count too small for its column's unit reads "<0.1M", never
+  // "0.0M": a new series' first mints sit in the same column as 13.9M
   const fmtIn = (v, u) => {
-    if (u === "M") return `${oneDecimal(v / 1000000)}M`;
-    if (u === "K") return `${oneDecimal(v / 1000)}K`;
-    return fmt(Math.round(v));
+    const div = u === "M" ? 1000000 : u === "K" ? 1000 : 0;
+    if (!div) return fmt(Math.round(v));
+    if (v > 0 && v / div < 0.05) return `<0.1${u}`;
+    return `${oneDecimal(v / div)}${u}`;
   };
   const colUnit = {};
   tiers.forEach((t) => { colUnit[t] = unitFor(colMax[t]); });
