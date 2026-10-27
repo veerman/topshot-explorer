@@ -11,7 +11,7 @@
 //   POST /auth/verify { address, issuedAt, nonce, signatures }  -> the host
 //        checks the nonce, then asks FCLCrypto.verifyUserSignatures on
 //        chain, then sets the session cookie
-//   GET  /auth/me  -> who the cookie says, or 401
+//   GET  /auth/me  -> who the cookie says ({ address }, null when nobody)
 // Sessions are HMAC-signed JSON, 30 days, and carry only the address plus
 // a flags field; a denied address gets a session like any other, flagged.
 

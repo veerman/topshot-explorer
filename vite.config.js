@@ -122,7 +122,7 @@ const serveAuth = () => ({
       if (path === '/signout' && req.method === 'POST') return json(200, { ok: true }, { 'set-cookie': clearedCookie(false) })
       if (path === '/me' && req.method === 'GET') {
         const session = await devSession(req)
-        return session ? json(200, { address: session.address }) : json(401, { error: 'not signed in' })
+        return json(200, { address: session ? session.address : null })
       }
       json(404, { error: 'no such route' })
     })

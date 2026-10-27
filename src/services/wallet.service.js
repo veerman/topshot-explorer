@@ -112,8 +112,9 @@ export function ensureSession() {
   asked = fetch("/auth/me", { headers: { accept: "application/json" } })
     .then(async (res) => {
       hostSignsIn = (res.headers.get("content-type") || "").includes("application/json");
-      if (res.status === 200) {
-        const body = await res.json();
+      // { address: null } (or a 401 from an older host) is a signed-out reader
+      const body = res.status === 200 ? await res.json().catch(() => null) : null;
+      if (body && body.address) {
         set({ status: "signed", address: body.address });
       } else if (res.status === 503) {
         set({ status: "unavailable" });

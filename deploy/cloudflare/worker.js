@@ -245,7 +245,9 @@ const authRoutes = async (url, request, env) => {
   }
   if (path === "/auth/me" && request.method === "GET") {
     const session = await sessionOf(request, env);
-    return session ? json(200, { address: session.address }) : json(401, { error: "not signed in" });
+    // Nobody signed in is an answer, not an error: a 401 here put a console
+    // error on every page load for every signed-out visitor
+    return json(200, { address: session ? session.address : null });
   }
   return json(404, { error: "no such route" });
 };
