@@ -943,10 +943,6 @@ export function Navbar() {
           background: rgba(139, 92, 246, 0.12);
           color: #fff;
         }
-        .dropdown-view-all {
-          font-weight: 600;
-          color: var(--primary-hover);
-        }
         .dropdown-divider {
           height: 1px;
           background: rgba(255, 255, 255, 0.08);

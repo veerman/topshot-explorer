@@ -221,7 +221,7 @@ const correlate = (a, b) => {
 // and would garble the correlation
 const thumb = (image) => image.clone().flatten({ background: "#000" }).greyscale().resize(64, 64, { fit: "fill" }).raw().toBuffer();
 
-let done = 0, skipped = 0, failed = 0, suspects = 0, teamVaries = 0;
+let done = 0, skipped = 0, failed = 0, teamVaries = 0;
 const failures = [];
 const start = Date.now();
 
@@ -252,7 +252,7 @@ for (const p of plan) {
     done++;
     if (done % 10 === 0) {
       const mins = ((Date.now() - start) / 60000).toFixed(1);
-      console.log(`${done} extracted (${skipped} skipped, ${failed} failed, ${suspects} suspect), ${mins} min`);
+      console.log(`${done} extracted (${skipped} skipped, ${failed} failed), ${mins} min`);
     }
   } catch (err) {
     failed++;
@@ -273,6 +273,6 @@ manifest.failures = failures;
 manifest.noCubeHero = noCubeHero;
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 1));
 
-console.log(`\nfinished: ${done} extracted, ${skipped} already present, ${failed} failed, ${suspects} flagged suspect, ${teamVaries} single-art sets flagged team-varying`);
+console.log(`\nfinished: ${done} extracted, ${skipped} already present, ${failed} failed, ${teamVaries} single-art sets flagged team-varying`);
 if (noCubeHero.length) console.log(`unusable (all heroes are raw photos): ${noCubeHero.map((s) => `${s.setID} ${s.setName}`).join("; ")}`);
 console.log(`output: ${OUT_DIR} (manifest: index.json)`);

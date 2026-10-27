@@ -2,7 +2,7 @@ import { useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllEditionsDB } from "../services/db.service";
 import { DataTable } from "../components/DataTable";
-import { getTeamDetailsById, getTeamNameWithEmoji, getTeamEmoji, isMismintPlay, teamKeyForPlay } from "../services/overrides.service";
+import { resolveVenue, getTeamNameWithEmoji, getTeamEmoji, isMismintPlay, teamKeyForPlay } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply, SupplyWord } from "../components/Supply";
 import { isWnbaTeam, renderEmojiName, playerPath, ownedMintsColumn, ownedCountColumn, buildPlayToSets } from "../utils/display.utils";
@@ -52,7 +52,7 @@ export function TeamDetail() {
 
   // Fetch additions details
   const teamDetails = useMemo(() => {
-    return getTeamDetailsById(teamID);
+    return resolveVenue(teamID);
   }, [teamID]);
 
   // Filter plays and build aggregations
@@ -222,7 +222,7 @@ export function TeamDetail() {
     // own plays merged the same way under "Team Play"
     const pushGroup = (name, nameCell, playIDs, totalMints, totalOther) => {
       const playIDsLinks = (
-        <div className="set-links-cell id-grid id-grid-right" style={{ "--id-w": "7.2em" }}>
+        <div className="id-grid id-grid-right" style={{ "--id-w": "7.2em" }}>
           {playIDs.map(editionChip)}
         </div>
       );
@@ -333,7 +333,7 @@ export function TeamDetail() {
               {/* Structured emoji + name so the h1 gradient text-fill
                   cannot bleach the emoji white; the gradient itself leans
                   into the team's primary colour */}
-              <h1 className="team-title mt-8" style={teamHeadingStyle((getTeamDetailsById(teamID) || {}).color)}>
+              <h1 className="team-title mt-8" style={teamHeadingStyle((resolveVenue(teamID) || {}).color)}>
                 {renderEmojiName(getTeamEmoji(teamContext.primaryName), teamContext.primaryName)}
               </h1>
               {teamContext.alternateNames.length > 0 && (

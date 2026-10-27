@@ -220,7 +220,6 @@ export function AccountOffers() {
   const totalPages = Math.ceil((sortedMatched?.length || 0) / pageSize) || 1;
   const pageRows = sortedMatched ? sortedMatched.slice((currentPage - 1) * pageSize, currentPage * pageSize) : [];
 
-  const subLabel = subeditionLabel;
   const msFacet = (label, key, options) => ((options.length > 1 || filters[key].length > 0)
     ? <MultiSelect label={label} values={filters[key]} options={options} onChange={(vals) => setFilter(key, vals)} />
     : null);
@@ -267,7 +266,7 @@ export function AccountOffers() {
               {msFacet("League", "league", [...facetData.opts.league].sort().map((l) => [l, l]))}
               {msFacet("Series", "series", [...facetData.opts.series].sort((a, b) => a - b).map((s) => [String(s), `Series ${s}`]))}
               {msFacet("Set", "set", [...facetData.opts.set.entries()].sort((a, b) => a[1].localeCompare(b[1])).map(([id, name]) => [String(id), name]))}
-              {msFacet("Subedition", "sub", [...facetData.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subLabel(s)]))}
+              {msFacet("Subedition", "sub", [...facetData.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subeditionLabel(s)]))}
               {msFacet("Tier", "tier", [...facetData.opts.tier].sort((a, b) => tierRank(a) - tierRank(b)).map((t) => [t, t]))}
               {msFacet("Play type", "type", [...facetData.opts.type].sort().map((t) => [t, t]))}
               {msFacet("Year", "year", [...facetData.opts.year].sort().reverse().map((y) => [y, y]))}
@@ -329,7 +328,7 @@ export function AccountOffers() {
                           </td>
                           <td><Link to={`/sets/${f.setID}`}>{f.setName}</Link></td>
                           <td><Link to={`/plays/${f.playID}`}>{playSummary(f.play, f.playID)}</Link></td>
-                          <td>{f.otype === "subedition" ? subLabel(f.subID) : <span className="text-muted" title="An edition-level offer accepts any subedition of the play">Any</span>}</td>
+                          <td>{f.otype === "subedition" ? subeditionLabel(f.subID) : <span className="text-muted" title="An edition-level offer accepts any subedition of the play">Any</span>}</td>
                           <td>
                             {f.player ? (
                               <Link to={playerPath(f.player)} style={{ fontWeight: "600" }}>{f.player}</Link>

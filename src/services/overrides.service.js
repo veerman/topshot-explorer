@@ -947,13 +947,6 @@ export function resolveVenue(teamId, gameDateISO) {
 }
 
 /**
- * Gets team additions details by NBA ID, resolving to active current venue.
- */
-export function getTeamDetailsById(nbaID) {
-  return resolveVenue(nbaID);
-}
-
-/**
  * Compiles raw play metadata, preserves the original under _raw,
  * and applies normalizations, overrides, and additions at compile-time.
  */

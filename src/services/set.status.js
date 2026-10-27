@@ -23,11 +23,11 @@ export function getSetStatus(setID) {
 }
 
 export function isBurnedSet(setID) {
-  return getSetStatus(setID).burned !== null;
+  return Boolean((setsAdditions[String(setID)] || {}).burned);
 }
 
 export function isMismintSet(setID) {
-  return getSetStatus(setID).mismint;
+  return (setsAdditions[String(setID)] || {}).mismint === true;
 }
 
 // Tier of ONE edition: its own addition first, else the set-level tier

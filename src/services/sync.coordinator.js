@@ -181,10 +181,9 @@ async function fetchAllSetDetails(progressStart, progressEnd) {
   return { detailedEditions, detailedIPFS, failedSets, totalSets: sets.length };
 }
 
-// Stages that mean a sync pass just finished and pages should reload from DB.
-// The IPFS stage may carry a partial-failure suffix, so match by prefix.
+// The stage that means a sync pass just finished and pages should reload from DB
 export function isSyncCompleteStage(stage) {
-  return stage === "Up to date!" || (typeof stage === "string" && stage.startsWith("IPFS cache refreshed!"));
+  return stage === "Up to date!";
 }
 
 // Canonical-name aliases and the player bio fill need every play, which a
@@ -201,12 +200,8 @@ async function applyNameAliasPass() {
     return (name && aliases.has(name)) || hasBlankBioField(raw);
   });
   if (affected.length === 0) return;
-  const recompiled = affected.map((p) => {
-    const rawCopy = { ...(p._raw || p) };
-    delete rawCopy._raw;
-    delete rawCopy.playID;
-    return compilePlayMetadata(p.playID, rawCopy);
-  }).filter(Boolean);
+  // compilePlayMetadata copies the raw record and drops _raw and playID itself
+  const recompiled = affected.map((p) => compilePlayMetadata(p.playID, p._raw || p)).filter(Boolean);
   await savePlaysDB(recompiled);
   log(`Name aliases: ${aliases.size} canonical spellings; recompiled ${recompiled.length} plays.`);
 }
@@ -222,12 +217,7 @@ export async function recompileDatabase(newHash) {
     const [rawPlays, rawSetsRead] = await Promise.all([getAllPlaysRawDB(), getAllSetsRawDB()]);
     buildNameAliases(rawPlays);
     if (rawPlays.length > 0) {
-      const compiledPlays = rawPlays.map((p) => {
-        const rawCopy = p._raw || { ...p };
-        delete rawCopy._raw;
-        delete rawCopy.playID;
-        return compilePlayMetadata(p.playID, rawCopy);
-      }).filter(Boolean);
+      const compiledPlays = rawPlays.map((p) => compilePlayMetadata(p.playID, p._raw || p)).filter(Boolean);
       await savePlaysDB(compiledPlays);
       await rebuildTeams();
     }
@@ -235,12 +225,7 @@ export async function recompileDatabase(newHash) {
     // 2. Recompile Sets from raw backups
     const rawSets = rawSetsRead;
     if (rawSets.length > 0) {
-      const compiledSets = rawSets.map((s) => {
-        const rawCopy = s._raw || { ...s };
-        delete rawCopy._raw;
-        delete rawCopy.id;
-        return compileSetMetadata({ id: s.id, ...rawCopy });
-      }).filter(Boolean);
+      const compiledSets = rawSets.map((s) => compileSetMetadata({ ...(s._raw || s), id: s.id })).filter(Boolean);
       await saveSetsDB(compiledSets);
     }
 

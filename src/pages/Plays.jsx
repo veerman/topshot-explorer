@@ -316,23 +316,6 @@ export function Plays() {
         .plays-filter-indicator .clear-filter-inline:hover {
           background: rgba(139, 92, 246, 0.15);
         }
-        .sync-banner {
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
-        }
-        .team-at-moment {
-          font-weight: 700;
-        }
-        .winner-highlight {
-          border: 1px solid rgba(16, 185, 129, 0.25);
-          background: rgba(16, 185, 129, 0.08);
-          padding: 2px 8px;
-          border-radius: 4px;
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          color: #34d399;
-          font-weight: 600;
-        }
       `}</style>
     </div>
   );

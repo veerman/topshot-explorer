@@ -523,7 +523,7 @@ export function DataTable({
     // Inline dropdown selector to merge and remove repetitive words
     const sizeSelector = (
       <select
-        className="form-control inline-select"
+        className="form-control"
         style={{
           display: "inline-block",
           padding: "2px 8px",

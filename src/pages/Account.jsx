@@ -795,7 +795,6 @@ export function Account() {
   // except Listed and Owned; option lists cascade off the other filters.
   const selStyle = { padding: "3px 8px", fontSize: "0.82rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px", cursor: "pointer", maxWidth: "180px" };
   const optStyle = { background: "#1a1a1a" };
-  const subLabel = subeditionLabel;
   const msFacet = (label, key, options) => ((options.length > 1 || filters[key].length > 0)
     ? <MultiSelect label={label} values={filters[key]} options={options} onChange={(vals) => setFilter(key, vals)} />
     : null);
@@ -808,7 +807,7 @@ export function Account() {
         const pf = playFacts?.get(Number(id));
         return [id, `Play ${id}${pf && (pf.player || pf.team) ? `: ${pf.player || pf.team}` : ""}`];
       }))}
-      {msFacet("Subedition", "sub", [...facetData.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subLabel(s)]))}
+      {msFacet("Subedition", "sub", [...facetData.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subeditionLabel(s)]))}
       {msFacet("Tier", "tier", [...facetData.opts.tier].sort((a, b) => tierRank(a) - tierRank(b)).map((t) => [t, t]))}
       {msFacet("Type", "type", [...facetData.opts.type].sort().map((t) => [t, t]))}
       {msFacet("Year", "year", [...facetData.opts.year].sort().reverse().map((y) => [y, y]))}

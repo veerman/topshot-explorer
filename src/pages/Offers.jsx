@@ -563,7 +563,6 @@ export function Offers() {
     ? (sortedAccepted ? sortedAccepted.slice((currentPage - 1) * pageSize, currentPage * pageSize) : [])
     : (sortedMatched ? sortedMatched.slice((currentPage - 1) * pageSize, currentPage * pageSize) : []);
 
-  const subLabel = subeditionLabel;
   const msFacet = (label, key, options) => ((options.length > 1 || filters[key].length > 0)
     ? <MultiSelect label={label} values={filters[key]} options={options} onChange={(vals) => setFilter(key, vals)} />
     : null);
@@ -742,7 +741,7 @@ export function Offers() {
                   {msFacet("League", "league", [...fd.opts.league].sort().map((l) => [l, l]))}
                   {msFacet("Series", "series", [...fd.opts.series].sort((a, b) => a - b).map((s) => [String(s), `Series ${s}`]))}
                   {msFacet("Set", "set", [...fd.opts.set].sort((a, b) => a.localeCompare(b)).map((name) => [name, name]))}
-                  {msFacet("Subedition", "sub", [...fd.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subLabel(s)]))}
+                  {msFacet("Subedition", "sub", [...fd.opts.sub].sort((a, b) => a - b).map((s) => [String(s), subeditionLabel(s)]))}
                   {msFacet("Tier", "tier", [...fd.opts.tier].sort((a, b) => tierRank(a) - tierRank(b)).map((t) => [t, t]))}
                   {msFacet("Play type", "type", [...fd.opts.type].sort().map((t) => [t, t]))}
                   {msFacet("Year", "year", [...fd.opts.year].sort().reverse().map((y) => [y, y]))}
@@ -810,7 +809,7 @@ export function Offers() {
                         const subCell = (e) => (
                           e.sub == null
                             ? <span className="text-muted" title="An edition-level offer accepts any subedition of the play">Any</span>
-                            : <Link to={`/editions/${f.setID}_${f.playID}_${e.sub}`}>{subLabel(e.sub)}</Link>);
+                            : <Link to={`/editions/${f.setID}_${f.playID}_${e.sub}`}>{subeditionLabel(e.sub)}</Link>);
                         const top = f.entries[0];
                         // Flat keyed rows, never a keyed Fragment with
                         // conditional rows inside (Preact misorders those)

@@ -28,7 +28,7 @@ export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct 
   if (pct) {
     return (
       <span
-        className={`font-mono owned-fraction${complete ? " owned-complete" : ""}`}
+        className={`font-mono${complete ? " owned-complete" : ""}`}
         title={title ? `${title} (${fracText})` : fracText}
         style={{ color, fontWeight: 600, cursor: "help" }}
       >
@@ -41,7 +41,7 @@ export function OwnedFraction({ owned, total, greenWhenFull = false, title, pct 
   return (
     <Tag
       {...(to ? { to } : {})}
-      className={`font-mono owned-fraction${complete ? " owned-complete" : ""}${to ? " owned-fraction-link" : ""}`}
+      className={`font-mono${complete ? " owned-complete" : ""}`}
       title={to ? `${title ? `${title} (${pctText}). ` : ""}Click to see what is missing` : (title ? `${title} (${pctText})` : pctText)}
       style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25, verticalAlign: "middle", cursor: to ? "pointer" : "help", textDecoration: "none" }}
     >

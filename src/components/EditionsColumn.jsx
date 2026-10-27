@@ -56,7 +56,7 @@ export function editionsColumn({ mismintBadge = false } = {}) {
         : null;
       if (matchingSets.length === 0) {
         return (
-          <div className="set-links-cell">
+          <div>
             <Link to={`/plays/${rec.playID}`} className="set-link" title={`Play ${rec.playID} is not in any set yet, so it has no edition; opens the play`}>
               ?_{rec.playID}
             </Link>
@@ -65,7 +65,7 @@ export function editionsColumn({ mismintBadge = false } = {}) {
         );
       }
       return (
-        <div className="set-links-cell" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {ordered.map((s) => {
             const editionID = `${s.id}_${rec.playID}`;
             // A reward badge belongs to ONE edition, not the play: its

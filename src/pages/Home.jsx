@@ -1150,8 +1150,6 @@ export function Home() {
     otherWNBA: seriesTiersByLeague.WNBA.reduce((s, r) => s + (r.other ? r.other.total : r.total), 0)
   }), [seriesTiersByLeague]);
 
-  // High-level stats over the per-CID media lookup (lazy 5MB import via
-  // the hook; cards render "..." until it arrives)
   // IPFS media coverage per league and series, with the same semantics as
   // the Sets page (core four media files per edition, dead-at-gateway CIDs
   // count as missing, mismints excluded), attributed per edition so the
@@ -1538,26 +1536,22 @@ export function Home() {
       <h3 className="home-section-title">IPFS media</h3>
       <div className="stats-metric-grid">
         <MetricCard
-          value={ipfsMediaStats ? fmt(ipfsMediaStats.total) : "..."}
+          value={fmt(ipfsMediaStats.total)}
           label="Media Files on IPFS"
-          desc={ipfsMediaStats
-            ? `${fmt(ipfsMediaStats.videos)} MP4 · ${fmt(ipfsMediaStats.jpg)} JPG · ${fmt(ipfsMediaStats.png)} PNG · ${ipfsMediaStats.mpo} MPO`
-            : undefined}
+          desc={`${fmt(ipfsMediaStats.videos)} MP4 · ${fmt(ipfsMediaStats.jpg)} JPG · ${fmt(ipfsMediaStats.png)} PNG · ${ipfsMediaStats.mpo} MPO`}
         />
         <MetricCard
-          value={ipfsMediaStats ? `${(ipfsMediaStats.seconds / 86400).toFixed(1)} days` : "..."}
+          value={`${(ipfsMediaStats.seconds / 86400).toFixed(1)} days`}
           label="Total Video Runtime"
-          desc={ipfsMediaStats
-            ? `${Math.round(ipfsMediaStats.seconds / 3600).toLocaleString()} hours across ${fmt(ipfsMediaStats.videos)} clips`
-            : undefined}
+          desc={`${Math.round(ipfsMediaStats.seconds / 3600).toLocaleString()} hours across ${fmt(ipfsMediaStats.videos)} clips`}
         />
         <MetricCard
-          value={ipfsMediaStats ? `${(ipfsMediaStats.bytes / 1e12).toFixed(2)} TB` : "..."}
+          value={`${(ipfsMediaStats.bytes / 1e12).toFixed(2)} TB`}
           label="Total Media Size"
           desc="sizes partly estimated from bitrate"
         />
         <MetricCard
-          value={ipfsMediaStats ? fmt(ipfsMediaStats.dead) : "..."}
+          value={fmt(ipfsMediaStats.dead)}
           label="Missing files"
           desc="registered on chain, nothing at the gateway"
           accent="var(--status-mismint)"

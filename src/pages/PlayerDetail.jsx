@@ -3,7 +3,7 @@ import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllPlaysDB, getAllSetsDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.service";
 import { harmonizePlayerProfiles } from "../services/relationship.service";
 import { DataTable } from "../components/DataTable";
-import { getTeamNameWithEmoji, getTeamEmoji, getTeamDetailsById, isMismintPlay, teamKeyForPlay, draftStatus } from "../services/overrides.service";
+import { getTeamNameWithEmoji, getTeamEmoji, resolveVenue, isMismintPlay, teamKeyForPlay, draftStatus } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply, SupplyWord } from "../components/Supply";
 import { buildTeamNameMap, isWnbaTeam, renderTeamLink, renderEmojiName, formatHeight, playerNameFromParam, calendarDateCell, buildPlayToSets } from "../utils/display.utils";
@@ -44,7 +44,7 @@ export function PlayerDetail() {
   const teamNbaIdParam = queryParams.get("teamnbaid");
 
   const filteredTeamDetails = useMemo(() => {
-    return teamNbaIdParam ? getTeamDetailsById(teamNbaIdParam) : null;
+    return teamNbaIdParam ? resolveVenue(teamNbaIdParam) : null;
   }, [teamNbaIdParam]);
 
   const { data, loading, loadError, retry } = useDbData(loadPlayerData, "Could not read this player's data from the local database.");
@@ -508,24 +508,6 @@ export function PlayerDetail() {
           color: var(--primary-hover);
           font-weight: 600;
         }
-        .jersey-badge {
-          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-          color: #fff;
-          font-family: var(--font-mono);
-          font-size: 0.8rem;
-          font-weight: 700;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 8px var(--primary-glow);
-          transition: var(--transition-smooth);
-        }
-        .jersey-badge:hover {
-          transform: scale(1.1);
-        }
         .player-stats-row {
           display: flex;
           align-items: center;
@@ -556,11 +538,6 @@ export function PlayerDetail() {
         .flex-1 {
           flex: 1;
           min-width: 320px;
-        }
-        .text-conflict {
-          color: #f59e0b !important;
-          font-weight: 600;
-          font-style: italic;
         }
         .team-breakouts-row {
           display: grid;

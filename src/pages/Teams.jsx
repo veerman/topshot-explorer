@@ -4,7 +4,7 @@ import { getAllPlaysDB, getAllEditionsDB, getAllTeamsDB } from "../services/db.s
 import { useDbData } from "../hooks/useDbData";
 import { LoadError } from "../components/LoadError";
 import { Loader } from "../components/Loader";
-import { getTeamDetailsById, isMismintPlay, teamKeyForPlay, isNameKeyedTeam } from "../services/overrides.service";
+import { resolveVenue, isMismintPlay, teamKeyForPlay, isNameKeyedTeam } from "../services/overrides.service";
 import { supplyOf, otherSupplyOf } from "../services/supply.service";
 import { Supply } from "../components/Supply";
 import { getLeagueName, renderEmojiName, ownedMintsColumn, ownedCountColumn, ALL_LEAGUE_OPTIONS } from "../utils/display.utils";
@@ -158,7 +158,7 @@ export function Teams() {
         </Link>
       );
 
-      const details = getTeamDetailsById(team.id);
+      const details = resolveVenue(team.id);
 
       const nameCell = (
         <Link to={`/teams/${team.id}`} style={{ fontWeight: "600", color: "#fff", textDecoration: "none" }} className="player-detail-link font-hover-glow">

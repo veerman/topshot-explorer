@@ -698,20 +698,6 @@ table.premium-table tr.mismint-row:hover td {
   box-shadow: 0 0 10px var(--primary-glow);
 }
 
-/* Winner highlight adjacent cells merge */
-.td-winner-highlight-team {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border-top: 2px solid #10b981 !important;
-  border-bottom: 2px solid #10b981 !important;
-  border-left: 2px solid #10b981 !important;
-}
-.td-winner-highlight-score {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border-top: 2px solid #10b981 !important;
-  border-bottom: 2px solid #10b981 !important;
-  border-right: 2px solid #10b981 !important;
-}
-
 /* ============================================================
    Shared page components. One definition each; these were
    previously copy-pasted (with drift) across page style blocks.
