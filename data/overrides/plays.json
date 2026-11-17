@@ -1896,15 +1896,6 @@
     "Birthplace": "Pau, FRA",
     "Height": 69
   },
-  "9321": {
-    "DraftYear": 2026,
-    "DraftRound": 1,
-    "DraftSelection": 2,
-    "DraftTeam": "Utah Jazz",
-    "Birthdate": "2007-01-17",
-    "Birthplace": "Canton, OH, USA",
-    "Height": 78
-  },
   "9322": {
     "DraftYear": 2026,
     "DraftRound": 1,
@@ -1912,6 +1903,315 @@
     "DraftTeam": "Memphis Grizzlies",
     "Birthdate": "2007-07-18",
     "Birthplace": "Salt Lake City, UT, USA",
+    "Height": 80
+  },
+  "9323": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 5,
+    "DraftTeam": "LA Clippers",
+    "Birthdate": "2007-02-03",
+    "Birthplace": "Shawnee, KS, USA",
+    "Height": 78
+  },
+  "9324": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 1,
+    "DraftTeam": "Washington Wizards",
+    "Birthdate": "2007-01-29",
+    "Birthplace": "Boston, MA, USA",
+    "Height": 81
+  },
+  "9336": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 36,
+    "DraftTeam": "LA Clippers",
+    "Birthdate": "2004-02-07",
+    "Birthplace": "Palma de Mallorca, ESP",
+    "Height": 83
+  },
+  "9339": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 30,
+    "DraftTeam": "Dallas Mavericks",
+    "Birthdate": "2007-01-20",
+    "Birthplace": "Gilbert, AZ, USA",
+    "Height": 80
+  },
+  "9342": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 9,
+    "DraftTeam": "Dallas Mavericks",
+    "Birthdate": "2006-01-25",
+    "Birthplace": "Riverdale, IL, USA",
+    "Height": 82
+  },
+  "9343": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 6,
+    "DraftTeam": "Brooklyn Nets",
+    "Birthdate": "2006-04-03",
+    "Birthplace": "Orlando, FL, USA",
+    "Height": 76
+  },
+  "9353": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 7,
+    "DraftTeam": "Sacramento Kings",
+    "Birthdate": "2006-11-16",
+    "Birthplace": "Detroit, MI, USA",
+    "Height": 74
+  },
+  "9355": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 4,
+    "DraftTeam": "Chicago Bulls",
+    "Birthdate": "2006-07-18",
+    "Birthplace": "Atlanta, GA, USA",
+    "Height": 82
+  },
+  "9356": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 15,
+    "DraftTeam": "Chicago Bulls",
+    "Birthdate": "2005-07-15",
+    "Birthplace": "Columbus, OH, USA",
+    "Height": 78
+  },
+  "9357": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 27,
+    "DraftTeam": "Boston Celtics",
+    "Birthdate": "2007-02-01",
+    "Birthplace": "New Orleans, LA, USA",
+    "Height": 83
+  },
+  "9366": {
+    "DraftYear": 2025,
+    "Birthdate": "2002-06-20",
+    "Birthplace": "Alabaster, AL, USA",
+    "Height": 79
+  },
+  "9380": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 21,
+    "DraftTeam": "Detroit Pistons",
+    "Birthdate": "2007-04-12",
+    "Birthplace": "Hermosillo, MEX",
+    "Height": 80
+  },
+  "9381": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 31,
+    "DraftTeam": "New York Knicks",
+    "Birthdate": "2003-09-14",
+    "Birthplace": "Fairburn, GA, USA",
+    "Height": 72
+  },
+  "9382": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 49,
+    "DraftTeam": "Denver Nuggets",
+    "Birthdate": "2002-09-07",
+    "Birthplace": "Downers Grove, IL, USA",
+    "Height": 79
+  },
+  "9383": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 55,
+    "DraftTeam": "New York Knicks",
+    "Birthdate": "2004-04-20",
+    "Birthplace": "Glenview, IL, USA",
+    "Height": 79
+  },
+  "9384": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 34,
+    "DraftTeam": "Sacramento Kings",
+    "Birthdate": "2006-08-06",
+    "Birthplace": "Pittsburgh, PA, USA",
+    "Height": 75
+  },
+  "9385": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 23,
+    "DraftTeam": "Atlanta Hawks",
+    "Birthdate": "2004-04-20",
+    "Birthplace": "Dallas, TX, USA",
+    "Height": 80
+  },
+  "9386": {
+    "DraftYear": 2026,
+    "Birthdate": "2002-08-03",
+    "Birthplace": "Aurora, CO, USA",
+    "Height": 82
+  },
+  "9387": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 13,
+    "DraftTeam": "Miami Heat",
+    "Birthdate": "2006-12-10",
+    "Birthplace": "Woodbridge, VA, USA",
+    "Height": 82
+  },
+  "9388": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 22,
+    "DraftTeam": "Philadelphia 76ers",
+    "Birthdate": "2005-11-24",
+    "Birthplace": "Mobile, AL, USA",
+    "Height": 75
+  },
+  "9389": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 16,
+    "DraftTeam": "Memphis Grizzlies",
+    "Birthdate": "2003-10-03",
+    "Birthplace": "Liberty, MO, USA",
+    "Height": 75
+  },
+  "9390": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 38,
+    "DraftTeam": "Chicago Bulls",
+    "Birthdate": "2003-07-25",
+    "Birthplace": "Russellville, AR, USA",
+    "Height": 71
+  },
+  "9391": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 10,
+    "DraftTeam": "Milwaukee Bucks",
+    "Birthdate": "2005-09-18",
+    "Birthplace": "San Bernardino, CA, USA",
+    "Height": 76
+  },
+  "9392": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 8,
+    "DraftTeam": "Atlanta Hawks",
+    "Birthdate": "2007-01-03",
+    "Birthplace": "Newport News, VA, USA",
+    "Height": 75
+  },
+  "9394": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 50,
+    "DraftTeam": "Toronto Raptors",
+    "Birthdate": "2003-09-14",
+    "Birthplace": "Rochester, NY, USA",
+    "Height": 75
+  },
+  "9395": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 35,
+    "DraftTeam": "San Antonio Spurs",
+    "Birthdate": "2003-01-07",
+    "Birthplace": "Springfield, MO, USA",
+    "Height": 82
+  },
+  "9396": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 45,
+    "DraftTeam": "Sacramento Kings",
+    "Birthdate": "2004-03-07",
+    "Birthplace": "Tel Aviv, ISR",
+    "Height": 75
+  },
+  "9397": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 37,
+    "DraftTeam": "Oklahoma City Thunder",
+    "Birthdate": "2004-06-15",
+    "Birthplace": "Indianapolis, IN, USA",
+    "Height": 74
+  },
+  "9398": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 25,
+    "DraftTeam": "Los Angeles Lakers",
+    "Birthdate": "2005-12-04",
+    "Birthplace": "Valladolid, ESP",
+    "Height": 78
+  },
+  "9399": {
+    "DraftYear": 2025,
+    "DraftRound": 2,
+    "DraftSelection": 47,
+    "DraftTeam": "Milwaukee Bucks",
+    "Birthdate": "2005-07-12",
+    "Birthplace": "Užice, SRB",
+    "Height": 82
+  },
+  "9400": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 18,
+    "DraftTeam": "Charlotte Hornets",
+    "Birthdate": "2006-04-02",
+    "Birthplace": "Atlanta, GA, USA",
+    "Height": 73
+  },
+  "9401": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 26,
+    "DraftTeam": "Denver Nuggets",
+    "Birthdate": "2003-08-05",
+    "Birthplace": "St. Louis, MO, USA",
+    "Height": 82
+  },
+  "9417": {
+    "DraftYear": 2026,
+    "DraftRound": 2,
+    "DraftSelection": 48,
+    "DraftTeam": "Dallas Mavericks",
+    "Birthdate": "2003-05-01",
+    "Birthplace": "London, GBR",
+    "Height": 79
+  },
+  "9421": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 14,
+    "DraftTeam": "Charlotte Hornets",
+    "Birthdate": "2006-05-01",
+    "Birthplace": "Würzburg, DEU",
+    "Height": 82
+  },
+  "9435": {
+    "DraftYear": 2026,
+    "DraftRound": 1,
+    "DraftSelection": 19,
+    "DraftTeam": "Toronto Raptors",
+    "Birthdate": "2006-07-28",
+    "Birthplace": "Ponchatoula, LA, USA",
     "Height": 80
   }
 }

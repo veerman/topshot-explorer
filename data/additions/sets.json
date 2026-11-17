@@ -816,7 +816,22 @@
   "281": {
     "tier": "Common"
   },
+  "282": {
+    "tier": "Common"
+  },
+  "283": {
+    "tier": "Rare"
+  },
   "284": {
     "tier": "Rare"
+  },
+  "285": {
+    "tier": "Ultimate"
+  },
+  "286": {
+    "tier": "Fandom"
+  },
+  "287": {
+    "tier": "Fandom"
   }
 }

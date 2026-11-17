@@ -1474,7 +1474,8 @@
       "2024"
     ],
     "cups": [
-      "2023"
+      "2023",
+      "2026"
     ],
     "arenas": [
       {
@@ -2099,6 +2100,15 @@
         "lat": 45.531508,
         "lng": -122.666934,
         "area_codes": "503"
+      },
+      {
+        "start_date": "2026-05-09",
+        "arena": "Moda Center",
+        "city": "Portland",
+        "state": "Oregon",
+        "lat": 45.531508,
+        "lng": -122.666934,
+        "area_codes": "503"
       }
     ]
   },
@@ -2288,9 +2298,12 @@
     "name": "Golden State Valkyries",
     "emoji": "🛡️",
     "color": "#AD96DC",
+    "championships": [
+      "2026"
+    ],
     "arenas": [
       {
-        "start_date": "2026-05-10",
+        "start_date": "2025-05-06",
         "arena": "Chase Center",
         "city": "San Francisco",
         "state": "California",
@@ -2306,7 +2319,7 @@
     "color": "#5C061E",
     "arenas": [
       {
-        "start_date": "2026-05-14",
+        "start_date": "2026-05-08",
         "name": "Coca-Cola Coliseum",
         "arena": "Coca-Cola Coliseum",
         "city": "Toronto",
